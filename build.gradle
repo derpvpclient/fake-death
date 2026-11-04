@@ -1,15 +1,24 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+	id 'fabric-loom' version "${loom_version}"
+}
+
+repositories {
+	maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+		content { includeGroup "maven.modrinth" }
+	}
 }
 
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// Only for the settings button in Mod Menu, the mod runs without it.
-	compileOnly files("libs/modmenu-21.0.0.jar")
+	modCompileOnly "maven.modrinth:modmenu:17.0.1"
 }
 
 processResources {
@@ -22,10 +31,21 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+	it.options.release = 21
 }
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+// Only for testing: a client game test creates a world and lets the demo play every scene. Not part of the jar.
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = "fakedeath-gametest"
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
 }

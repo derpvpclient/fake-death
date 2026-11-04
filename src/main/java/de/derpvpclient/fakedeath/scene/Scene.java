@@ -241,7 +241,7 @@ public abstract class Scene {
 
 	/** A chat line that looks like a normal player message. */
 	protected static void say(Minecraft minecraft, Component speaker, Component text) {
-		minecraft.gui.getChat().addServerSystemMessage(Component.literal("<").append(speaker).append("> ").append(text));
+		minecraft.gui.getChat().addMessage(Component.literal("<").append(speaker).append("> ").append(text));
 	}
 
 	protected static void sound(ClientLevel level, Vec3 pos, SoundEvent sound, SoundSource source, float volume, float pitch) {

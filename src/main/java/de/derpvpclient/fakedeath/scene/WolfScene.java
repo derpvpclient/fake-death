@@ -92,7 +92,7 @@ public class WolfScene extends Scene {
 				pos = starts.get(i).lerp(ring(level, player, angles.get(i), CLOSE), t);
 				pos = new Vec3(pos.x, floor(level, pos.x, pos.z, player.getY()), pos.z);
 				if (tick % 4 == i % 4 && t > 0.0F && t < 1.0F) {
-					sound(level, pos, SoundEvents.WOLF_STEP.value(), SoundSource.HOSTILE, 1.0F, 1.2F);
+					sound(level, pos, SoundEvents.WOLF_STEP, SoundSource.HOSTILE, 1.0F, 1.2F);
 				}
 			} else {
 				// Circling close, then the leaps.

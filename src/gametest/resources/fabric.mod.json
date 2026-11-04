@@ -1,0 +1,12 @@
+{
+	"schemaVersion": 1,
+	"id": "fakedeath-gametest",
+	"version": "1.0.0",
+	"name": "Fake Death game test",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": [
+			"de.derpvpclient.fakedeath.gametest.DemoGameTest"
+		]
+	}
+}

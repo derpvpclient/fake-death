@@ -208,7 +208,7 @@ public class GiantItemScene extends Scene {
 			sound(level, feet, SoundEvents.ITEM_BREAK.value(), SoundSource.PLAYERS, 2.0F, 0.6F);
 		}
 
-		particles(level, new ItemParticleOption(ParticleTypes.ITEM, stack.getItem()), player.getEyePosition(), 40, 1.5, 0.35);
+		particles(level, new ItemParticleOption(ParticleTypes.ITEM, stack), player.getEyePosition(), 40, 1.5, 0.35);
 		particles(level, new BlockParticleOption(ParticleTypes.BLOCK, level.getBlockState(player.blockPosition().below())), feet.add(0.0, 0.2, 0.0), 40, 1.8, 0.3);
 		particles(level, ParticleTypes.POOF, feet, 25, 2.0, 0.1);
 

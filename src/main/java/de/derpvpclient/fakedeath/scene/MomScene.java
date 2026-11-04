@@ -191,7 +191,7 @@ public class MomScene extends Scene {
 		if (t >= 1.0F) {
 			boolean last = throwIndex >= ammo.size();
 			sound(level, player.position(), impactSound(flyingStack), SoundSource.PLAYERS, 1.5F, 0.9F);
-			particles(level, new ItemParticleOption(ParticleTypes.ITEM, flyingStack.getItem()), player.getEyePosition(), 10, 0.3, 0.15);
+			particles(level, new ItemParticleOption(ParticleTypes.ITEM, flyingStack), player.getEyePosition(), 10, 0.3, 0.15);
 			hit(level, player, SoundEvents.PLAYER_HURT, weight(flyingStack), last);
 			despawn(level, flying);
 			flying = null;

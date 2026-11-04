@@ -104,7 +104,7 @@ public class TestScreen extends Screen {
 		minecraft.setScreen(null);
 		FakeDeath.schedule(0, id);
 		Component scene = id != null ? Component.translatable("fakedeath.scene." + id) : Component.translatable("fakedeath.test.fitting");
-		minecraft.gui.getChat().addClientSystemMessage(Component.literal("[Fake Death] ").withStyle(ChatFormatting.DARK_RED)
+		minecraft.gui.getChat().addMessage(Component.literal("[Fake Death] ").withStyle(ChatFormatting.DARK_RED)
 			.append(Component.translatable("fakedeath.command.test", scene).withStyle(ChatFormatting.GRAY)));
 	}
 
