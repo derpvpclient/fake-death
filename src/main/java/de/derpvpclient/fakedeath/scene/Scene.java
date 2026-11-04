@@ -36,6 +36,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 /**
  * A short cutscene that plays before the fake death screen opens. Everything a scene spawns or
@@ -190,8 +192,61 @@ public abstract class Scene {
 		return false;
 	}
 
+	/** Swaps any block for another one on this client only, put back when the scene ends. */
+	protected void replaceBlock(ClientLevel level, BlockPos pos, BlockState replacement) {
+		changeBlock(level, pos, replacement);
+	}
+
+	/**
+	 * Opens a shaft of the given depth right under the player. The block under the feet becomes an invisible barrier,
+	 * so the player really keeps standing and the server sees nothing; only the camera falls into the hole.
+	 */
+	protected void openShaft(ClientLevel level, LocalPlayer player, int depth) {
+		BlockPos below = player.blockPosition().below();
+		replaceBlock(level, below, Blocks.BARRIER.defaultBlockState());
+
+		for (int i = 1; i <= depth; i++) {
+			hideBlock(level, below.below(i));
+		}
+	}
+
+	/** An item as a client-only display entity, centered on its position. */
+	protected Display.ItemDisplay itemDisplay(ClientLevel level, net.minecraft.world.item.ItemStack stack, Vec3 pos) {
+		Display.ItemDisplay display = spawn(level, EntityType.ITEM_DISPLAY, pos);
+		((de.derpvpclient.fakedeath.mixin.ItemDisplayAccessor) display).fakedeath$setItemStack(stack);
+		((de.derpvpclient.fakedeath.mixin.ItemDisplayAccessor) display).fakedeath$setItemTransform(net.minecraft.world.item.ItemDisplayContext.FIXED);
+		((DisplayAccessor) display).fakedeath$setWidth(4.0F);
+		((DisplayAccessor) display).fakedeath$setHeight(4.0F);
+		((DisplayAccessor) display).fakedeath$setInterpolationDuration(1);
+		return display;
+	}
+
+	/** Puts a display at a spot with a size and a rotation, a block display stays centered on the spot. */
+	protected static void place(Display display, Vec3 pos, Vector3f size, Quaternionf rotation) {
+		display.setPos(pos.x, pos.y, pos.z);
+		Vector3f offset = display instanceof Display.BlockDisplay ? new Vector3f(size).mul(-0.5F).rotate(rotation) : new Vector3f();
+		transform(display, new Transformation(offset, rotation, size, new Quaternionf()));
+	}
+
+	protected static void place(Display display, Vec3 pos, float size) {
+		place(display, pos, new Vector3f(size), new Quaternionf());
+	}
+
+	/** Shakes the camera a little, like an earthquake or heavy steps. 0 stops it. */
+	protected void cameraShake(float strength) {
+		moveCamera(strength <= 0.0F ? Vec3.ZERO
+			: new Vec3((random.nextFloat() - 0.5F) * strength, (random.nextFloat() - 0.5F) * strength, (random.nextFloat() - 0.5F) * strength));
+	}
+
+	/** A point that circles around a center, for flying swarms and spinning cameras. */
+	protected static Vec3 orbit(Vec3 center, double radius, double angle, double height) {
+		return center.add(Math.cos(angle) * radius, height, Math.sin(angle) * radius);
+	}
+
 	private void changeBlock(ClientLevel level, BlockPos pos, BlockState replacement) {
-		changedBlocks.putIfAbsent(pos.immutable(), new BlockChange(level.getBlockState(pos), replacement));
+		// A block changed twice (magma, then lava) still goes back to what was there first.
+		BlockChange before = changedBlocks.get(pos);
+		changedBlocks.put(pos.immutable(), new BlockChange(before != null ? before.original() : level.getBlockState(pos), replacement));
 		level.setBlock(pos, replacement, BLOCK_FLAGS);
 	}
 

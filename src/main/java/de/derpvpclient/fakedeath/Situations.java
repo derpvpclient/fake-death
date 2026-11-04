@@ -35,6 +35,40 @@ import de.derpvpclient.fakedeath.scene.StalactiteScene;
 import de.derpvpclient.fakedeath.scene.TaxAuditScene;
 import de.derpvpclient.fakedeath.scene.TreeScene;
 import de.derpvpclient.fakedeath.scene.WolfScene;
+import de.derpvpclient.fakedeath.scene.BarberScene;
+import de.derpvpclient.fakedeath.scene.BeeNestScene;
+import de.derpvpclient.fakedeath.scene.BuildingOfficeScene;
+import de.derpvpclient.fakedeath.scene.CamelScene;
+import de.derpvpclient.fakedeath.scene.CaretakerScene;
+import de.derpvpclient.fakedeath.scene.ChandelierScene;
+import de.derpvpclient.fakedeath.scene.ChefScene;
+import de.derpvpclient.fakedeath.scene.ChestScene;
+import de.derpvpclient.fakedeath.scene.ChickenScene;
+import de.derpvpclient.fakedeath.scene.ChimneySweepScene;
+import de.derpvpclient.fakedeath.scene.DentistScene;
+import de.derpvpclient.fakedeath.scene.DoctorScene;
+import de.derpvpclient.fakedeath.scene.DolphinScene;
+import de.derpvpclient.fakedeath.scene.EarthquakeScene;
+import de.derpvpclient.fakedeath.scene.ElectricianScene;
+import de.derpvpclient.fakedeath.scene.EndermanScene;
+import de.derpvpclient.fakedeath.scene.FoxScene;
+import de.derpvpclient.fakedeath.scene.FurnaceScene;
+import de.derpvpclient.fakedeath.scene.InfluencerScene;
+import de.derpvpclient.fakedeath.scene.LicenseFeeScene;
+import de.derpvpclient.fakedeath.scene.MagicianScene;
+import de.derpvpclient.fakedeath.scene.MoonScene;
+import de.derpvpclient.fakedeath.scene.MoversScene;
+import de.derpvpclient.fakedeath.scene.PistonScene;
+import de.derpvpclient.fakedeath.scene.PlumberScene;
+import de.derpvpclient.fakedeath.scene.PoliceScene;
+import de.derpvpclient.fakedeath.scene.SunburnScene;
+import de.derpvpclient.fakedeath.scene.ThornScene;
+import de.derpvpclient.fakedeath.scene.TornadoScene;
+import de.derpvpclient.fakedeath.scene.TrainerScene;
+import de.derpvpclient.fakedeath.scene.VolcanoScene;
+import net.minecraft.world.entity.animal.camel.Camel;
+import net.minecraft.world.entity.animal.Chicken;
+import net.minecraft.world.entity.animal.Fox;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -64,7 +98,10 @@ public final class Situations {
 		"baum", "hoehle", "blitz", "lava", "kaktus", "beeren", "schnee", "hunger", "feuer",
 		"spieler", "riese", "skelett", "creeper", "finanzamt", "herobrine", "slenderman",
 		"tropfstein", "bienen", "phantom", "amboss", "unsichtbar", "geister",
-		"doppelgaenger", "ertrunkener", "woelfe", "froesche", "riesenfrosch", "silberfische", "ziege", "magier", "ueberfall", "meteorit", "ghast", "fledermaeuse", "riesenitem", "paketbote", "mama", "papagei", "glitch", "disco");
+		"doppelgaenger", "ertrunkener", "woelfe", "froesche", "riesenfrosch", "silberfische", "ziege", "magier", "ueberfall", "meteorit", "ghast", "fledermaeuse", "riesenitem", "paketbote", "mama", "papagei", "glitch", "disco",
+		"tornado", "mond", "sonnenbrand", "truhe", "ofen", "delfin", "kronleuchter", "kolben", "kamel", "fuchs", "enderman", "huehner",
+		"dornen", "erdbeben", "vulkan", "bienennest", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer",
+		"klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch");
 
 	/** English scene names, both work in every language. Names that are the same in both are left out. */
 	private static final Map<String, String> ENGLISH = Map.ofEntries(
@@ -74,7 +111,13 @@ public final class Situations {
 		Map.entry("stalactite", "tropfstein"), Map.entry("bees", "bienen"), Map.entry("anvil", "amboss"), Map.entry("invisible", "unsichtbar"), Map.entry("ghosts", "geister"),
 		Map.entry("doppelganger", "doppelgaenger"), Map.entry("drowned", "ertrunkener"), Map.entry("wolves", "woelfe"), Map.entry("frogs", "froesche"), Map.entry("giantfrog", "riesenfrosch"),
 		Map.entry("silverfish", "silberfische"), Map.entry("goat", "ziege"), Map.entry("evoker", "magier"), Map.entry("raid", "ueberfall"), Map.entry("meteor", "meteorit"),
-		Map.entry("bats", "fledermaeuse"), Map.entry("giantitem", "riesenitem"), Map.entry("delivery", "paketbote"), Map.entry("mom", "mama"), Map.entry("parrot", "papagei"));
+		Map.entry("bats", "fledermaeuse"), Map.entry("giantitem", "riesenitem"), Map.entry("delivery", "paketbote"), Map.entry("mom", "mama"), Map.entry("parrot", "papagei"),
+		Map.entry("moon", "mond"), Map.entry("sunburn", "sonnenbrand"), Map.entry("chest", "truhe"), Map.entry("furnace", "ofen"), Map.entry("dolphin", "delfin"),
+		Map.entry("chandelier", "kronleuchter"), Map.entry("pistons", "kolben"), Map.entry("camel", "kamel"), Map.entry("fox", "fuchs"), Map.entry("chickens", "huehner"),
+		Map.entry("thorns", "dornen"), Map.entry("earthquake", "erdbeben"), Map.entry("volcano", "vulkan"), Map.entry("beenest", "bienennest"),
+		Map.entry("licensefee", "rundfunk"), Map.entry("dentist", "zahnarzt"), Map.entry("buildingoffice", "bauamt"), Map.entry("movers", "umzug"),
+		Map.entry("electrician", "elektriker"), Map.entry("magician", "zauberer"), Map.entry("plumber", "klempner"), Map.entry("caretaker", "hausmeister"),
+		Map.entry("doctor", "arzt"), Map.entry("police", "polizist"), Map.entry("chimneysweep", "schornsteinfeger"), Map.entry("barber", "friseur"), Map.entry("chef", "koch"));
 
 	public static final List<String> ENGLISH_NAMES = NAMES.stream()
 		.map(name -> ENGLISH.entrySet().stream().filter(entry -> entry.getValue().equals(name)).map(Map.Entry::getKey).findFirst().orElse(name))
@@ -82,7 +125,7 @@ public final class Situations {
 
 	/** The ids stay plain for config files, what players type and see is spelled right. */
 	private static final Map<String, String> UMLAUTS = Map.of(
-		"hoehle", "höhle", "doppelgaenger", "doppelgänger", "fledermaeuse", "fledermäuse", "froesche", "frösche", "ueberfall", "überfall");
+		"hoehle", "höhle", "doppelgaenger", "doppelgänger", "fledermaeuse", "fledermäuse", "froesche", "frösche", "ueberfall", "überfall", "huehner", "hühner");
 
 	/** Scenes with fast flashing lights, they only play with that setting switched on. */
 	public static final java.util.Set<String> FLASHING = java.util.Set.of("glitch", "disco");
@@ -334,11 +377,110 @@ public final class Situations {
 			options.add("disco", music ? 6 : 1, DiscoScene::new);
 		}
 
+		addNewer(options, level, player, feet, head, sky, dark);
+
 		options.add("creeper", 3, CreeperScene::new);
 		options.add("unsichtbar", 1, () -> new CreeperScene(true));
 		options.add("finanzamt", 2, TaxAuditScene::new);
 
 		return options.roll();
+	}
+
+	/** The scenes added in 1.0.37: weather, places, animals and the characters with their jobs. */
+	private static void addNewer(Choices options, ClientLevel level, LocalPlayer player, BlockPos feet, BlockPos head, boolean sky, boolean dark) {
+		var biome = level.getBiome(feet);
+		boolean hot = biome.is(Biomes.DESERT) || biome.is(BiomeTags.IS_BADLANDS) || biome.is(BiomeTags.IS_SAVANNA);
+
+		if (sky) {
+			options.add("tornado", level.isRaining() ? 3 : 1, TornadoScene::new);
+			options.add("erdbeben", 1, EarthquakeScene::new);
+		}
+		if (sky && level.isNight() && !level.isRaining()) {
+			options.add("mond", 1, MoonScene::new);
+		}
+		if (sky && !level.isNight() && !level.isRaining() && hot) {
+			options.add("sonnenbrand", 4, SunburnScene::new);
+		}
+		if (options.wants("truhe")) {
+			BlockPos chest = find(level, feet, 4, 2, state -> state.is(Blocks.CHEST) || state.is(Blocks.TRAPPED_CHEST));
+			if (chest != null) {
+				options.add("truhe", 4, () -> new ChestScene(chest));
+			}
+		}
+		if (options.wants("ofen")) {
+			BlockPos furnace = find(level, feet, 4, 2, Situations::isFurnace);
+			if (furnace != null) {
+				options.add("ofen", 4, () -> new FurnaceScene(furnace));
+			}
+		}
+		if (options.wants("delfin")) {
+			BlockPos sea = find(level, feet, 8, 3, state -> state.getFluidState().is(FluidTags.WATER));
+			if (sea != null) {
+				options.add("delfin", biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_BEACH) ? 4 : 1, () -> new DolphinScene(sea));
+			}
+		}
+		if (!sky && !hasRoomAbove(level, head, 8)) {
+			options.add("kronleuchter", 3, ChandelierScene::new);
+		}
+		options.add("kolben", 1, PistonScene::new);
+		if (biome.is(Biomes.DESERT) || !level.getEntitiesOfClass(Camel.class, player.getBoundingBox().inflate(16.0)).isEmpty()) {
+			options.add("kamel", 4, CamelScene::new);
+		}
+		if (biome.is(BiomeTags.IS_TAIGA) || biome.is(Biomes.GROVE) || !level.getEntitiesOfClass(Fox.class, player.getBoundingBox().inflate(16.0)).isEmpty()) {
+			options.add("fuchs", 4, () -> new FoxScene(player));
+		}
+		if (level.dimension() == Level.END) {
+			options.add("enderman", 6, EndermanScene::new);
+		} else if (dark) {
+			options.add("enderman", 2, EndermanScene::new);
+		}
+		if (!level.getEntitiesOfClass(Chicken.class, player.getBoundingBox().inflate(16.0)).isEmpty()) {
+			options.add("huehner", 5, ChickenScene::new);
+		}
+		if (biome.is(BiomeTags.IS_TAIGA) || find(level, feet, 6, 2, state -> state.is(Blocks.SWEET_BERRY_BUSH)) != null) {
+			options.add("dornen", 3, ThornScene::new);
+		}
+		if (biome.is(Biomes.BASALT_DELTAS)) {
+			options.add("vulkan", 6, VolcanoScene::new);
+		} else if (level.dimension() == Level.NETHER) {
+			options.add("vulkan", 2, VolcanoScene::new);
+		}
+		if (sky && (biome.is(Biomes.FLOWER_FOREST) || biome.is(Biomes.MEADOW) || find(level, feet, 8, 6, state -> state.is(Blocks.BEE_NEST)) != null)) {
+			options.add("bienennest", 4, BeeNestScene::new);
+		}
+
+		// The characters, each one rare. The chimney sweep needs a sky for his roof.
+		if (sky) {
+			for (String npc : List.of("influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer", "klempner",
+				"hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch")) {
+				options.add(npc, 1, () -> npcScene(npc));
+			}
+		}
+	}
+
+	private static Scene npcScene(String id) {
+		return switch (id) {
+			case "influencer" -> new InfluencerScene();
+			case "rundfunk" -> new LicenseFeeScene();
+			case "zahnarzt" -> new DentistScene();
+			case "bauamt" -> new BuildingOfficeScene();
+			case "umzug" -> new MoversScene();
+			case "elektriker" -> new ElectricianScene();
+			case "zauberer" -> new MagicianScene();
+			case "klempner" -> new PlumberScene();
+			case "hausmeister" -> new CaretakerScene();
+			case "arzt" -> new DoctorScene();
+			case "polizist" -> new PoliceScene();
+			case "schornsteinfeger" -> new ChimneySweepScene();
+			case "trainer" -> new TrainerScene();
+			case "friseur" -> new BarberScene();
+			case "koch" -> new ChefScene();
+			default -> null;
+		};
+	}
+
+	private static boolean isFurnace(BlockState state) {
+		return state.is(Blocks.FURNACE) || state.is(Blocks.BLAST_FURNACE) || state.is(Blocks.SMOKER);
 	}
 
 	/** The scenes that fit right now, each with a weight. Scenes switched off in the settings never get in. */
@@ -438,7 +580,23 @@ public final class Situations {
 			case "papagei" -> new ParrotScene();
 			case "glitch" -> new GlitchScene();
 			case "disco" -> new DiscoScene();
-			default -> null;
+			case "tornado" -> new TornadoScene();
+			case "mond" -> new MoonScene();
+			case "sonnenbrand" -> new SunburnScene();
+			case "truhe" -> new ChestScene(find(level, feet, 6, 3, state -> state.is(Blocks.CHEST) || state.is(Blocks.TRAPPED_CHEST)));
+			case "ofen" -> new FurnaceScene(find(level, feet, 6, 3, Situations::isFurnace));
+			case "delfin" -> new DolphinScene(find(level, feet, 10, 3, state -> state.getFluidState().is(FluidTags.WATER)));
+			case "kronleuchter" -> new ChandelierScene();
+			case "kolben" -> new PistonScene();
+			case "kamel" -> new CamelScene();
+			case "fuchs" -> new FoxScene(player);
+			case "enderman" -> new EndermanScene();
+			case "huehner" -> new ChickenScene();
+			case "dornen" -> new ThornScene();
+			case "erdbeben" -> new EarthquakeScene();
+			case "vulkan" -> new VolcanoScene();
+			case "bienennest" -> new BeeNestScene();
+			default -> npcScene(id);
 		};
 	}
 
