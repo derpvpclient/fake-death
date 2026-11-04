@@ -91,7 +91,7 @@ public class HerobrineScene extends Scene {
 		for (long i = 0; i < 1000; i++) {
 			UUID uuid = new UUID(0x4865726F62726E65L, i);
 
-			if (DefaultPlayerSkin.get(uuid).body().id().getPath().contains("steve")) {
+			if (DefaultPlayerSkin.get(uuid).texture().getPath().contains("steve")) {
 				return uuid;
 			}
 		}

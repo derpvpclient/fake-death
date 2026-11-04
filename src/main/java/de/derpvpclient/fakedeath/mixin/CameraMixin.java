@@ -5,7 +5,7 @@ import de.derpvpclient.fakedeath.CameraDirector;
 import net.minecraft.client.Camera;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,13 +22,13 @@ public abstract class CameraMixin {
 	protected abstract void setPosition(Vec3 position);
 
 	@Inject(method = "setup", at = @At("HEAD"))
-	private void fakedeath$rememberPartialTick(Level level, Entity entity, boolean detached, boolean mirrored, float partialTicks, CallbackInfo ci) {
+	private void fakedeath$rememberPartialTick(BlockGetter level, Entity entity, boolean detached, boolean mirrored, float partialTicks, CallbackInfo ci) {
 		CameraDirector.setPartialTick(partialTicks);
 	}
 
 	// Some scenes pull the camera away from the eyes, like the giant frog's tongue. Only the camera moves.
 	@Inject(method = "setup", at = @At("TAIL"))
-	private void fakedeath$sceneOffset(Level level, Entity entity, boolean detached, boolean mirrored, float partialTicks, CallbackInfo ci) {
+	private void fakedeath$sceneOffset(BlockGetter level, Entity entity, boolean detached, boolean mirrored, float partialTicks, CallbackInfo ci) {
 		Vec3 offset = CameraDirector.positionOffset();
 
 		if (offset.lengthSqr() > 1.0E-6) {

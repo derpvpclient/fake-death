@@ -13,7 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.player.PlayerSkin;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -92,7 +92,7 @@ public class DoppelgangerScene extends Scene {
 
 	/** A copy of the player: their skin, their armor and what they hold. With its own id, so it never gets mixed up with them. */
 	private static RemotePlayer mirror(ClientLevel level, LocalPlayer player) {
-		GameProfile profile = new GameProfile(UUID.randomUUID(), player.getGameProfile().name());
+		GameProfile profile = new GameProfile(UUID.randomUUID(), player.getGameProfile().getName());
 		RemotePlayer copy = new RemotePlayer(level, profile) {
 			{
 				// The second skin layer (hat, jacket, sleeves) and the main hand, exactly as the player has them set.
