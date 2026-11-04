@@ -1,0 +1,29 @@
+{
+	"required": true,
+	"package": "de.derpvpclient.fakedeath.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"BlockDisplayAccessor",
+		"CameraMixin",
+		"DeathScreenMixin",
+		"DisplayAccessor",
+		"EntityAccessor",
+		"FallingBlockEntityAccessor",
+		"FirstPersonHandsAndItemsMixin",
+		"FrogAccessor",
+		"HudMixin",
+		"ItemDisplayAccessor",
+		"KeyboardInputMixin",
+		"LivingEntityRendererMixin",
+		"LocalPlayerMixin",
+		"MultiPlayerGameModeMixin",
+		"OptionsScreenMixin",
+		"SpellcasterIllagerAccessor"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

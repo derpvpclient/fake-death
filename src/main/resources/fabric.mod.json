@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "fakedeath",
+	"version": "${version}",
+	"name": "Fake Death",
+	"description": "A convincing fake death with a scene that fits the moment. Only you see it, nothing is sent to the server.",
+	"authors": [
+		"derpvpclient"
+	],
+	"license": "MIT",
+	"icon": "assets/fakedeath/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"de.derpvpclient.fakedeath.FakeDeathClient"
+		],
+		"modmenu": [
+			"de.derpvpclient.fakedeath.FakeDeathModMenu"
+		]
+	},
+	"mixins": [
+		{
+			"config": "fakedeath.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"modmenu": "*"
+	}
+}

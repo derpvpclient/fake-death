@@ -1,0 +1,100 @@
+package de.derpvpclient.fakedeath;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
+import net.fabricmc.loader.api.FabricLoader;
+
+public final class FakeDeathConfig {
+	// Version 2 turned the random event on by default.
+	private static final int VERSION = 2;
+
+	public static boolean randomEvent = true;
+	public static int randomMinMinutes = 10;
+	public static int randomMaxMinutes = 30;
+	public static boolean reveal = true;
+	/** Scenes with fast flashing lights, off by default for people sensitive to them. */
+	public static boolean flashing = false;
+	/** Scene ids the random event and a plain /fakedeath leave out. Testing a scene by name still works. */
+	public static final Set<String> disabledScenes = new TreeSet<>();
+
+	private FakeDeathConfig() {
+	}
+
+	public static boolean isEnabled(String scene) {
+		return !disabledScenes.contains(scene);
+	}
+
+	public static void setEnabled(String scene, boolean enabled) {
+		if (enabled) {
+			disabledScenes.remove(scene);
+		} else {
+			disabledScenes.add(scene);
+		}
+	}
+
+	public static void load() {
+		Path file = file();
+		Properties properties = new Properties();
+
+		if (Files.exists(file)) {
+			try (Reader reader = Files.newBufferedReader(file)) {
+				properties.load(reader);
+			} catch (IOException | IllegalArgumentException e) {
+				FakeDeathClient.LOGGER.warn("Could not read {}, using defaults", file, e);
+			}
+		}
+
+		// Files from before version 2 only have randomEvent=false because that was the default, not a choice.
+		boolean oldFile = parseInt(properties, "version", 1) < VERSION;
+		randomEvent = oldFile || Boolean.parseBoolean(properties.getProperty("randomEvent", String.valueOf(randomEvent)));
+		randomMinMinutes = Math.max(1, parseInt(properties, "randomMinMinutes", randomMinMinutes));
+		randomMaxMinutes = Math.max(randomMinMinutes, parseInt(properties, "randomMaxMinutes", randomMaxMinutes));
+		reveal = Boolean.parseBoolean(properties.getProperty("reveal", String.valueOf(reveal)));
+		flashing = Boolean.parseBoolean(properties.getProperty("flashing", String.valueOf(flashing)));
+
+		disabledScenes.clear();
+		for (String scene : properties.getProperty("disabledScenes", "").split(",")) {
+			if (Situations.NAMES.contains(scene.trim())) {
+				disabledScenes.add(scene.trim());
+			}
+		}
+
+		save();
+	}
+
+	public static void save() {
+		Path file = file();
+		Properties properties = new Properties();
+		properties.setProperty("version", String.valueOf(VERSION));
+		properties.setProperty("randomEvent", String.valueOf(randomEvent));
+		properties.setProperty("randomMinMinutes", String.valueOf(randomMinMinutes));
+		properties.setProperty("randomMaxMinutes", String.valueOf(randomMaxMinutes));
+		properties.setProperty("reveal", String.valueOf(reveal));
+		properties.setProperty("flashing", String.valueOf(flashing));
+		properties.setProperty("disabledScenes", String.join(",", disabledScenes));
+
+		try (Writer writer = Files.newBufferedWriter(file)) {
+			properties.store(writer, "Fake Death. randomEvent = Fake-Tod zufällig zwischen randomMinMinutes und randomMaxMinutes. reveal = nach dem Klick „Reingelegt!“ anzeigen. flashing = Szenen mit schnell blinkenden Lichtern erlauben. disabledScenes = abgeschaltete Szenen, mit Komma getrennt");
+		} catch (IOException e) {
+			FakeDeathClient.LOGGER.warn("Could not write {}", file, e);
+		}
+	}
+
+	private static Path file() {
+		return FabricLoader.getInstance().getConfigDir().resolve("fakedeath.properties");
+	}
+
+	private static int parseInt(Properties properties, String key, int fallback) {
+		try {
+			return Integer.parseInt(properties.getProperty(key, String.valueOf(fallback)).trim());
+		} catch (NumberFormatException e) {
+			return fallback;
+		}
+	}
+}

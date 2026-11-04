@@ -1,0 +1,35 @@
+# gradle
+.gradle/
+build/
+out/
+classes/
+*.log
+
+# ide
+.idea/
+*.iml
+*.ipr
+*.iws
+.settings/
+.vscode/
+bin/
+.classpath
+.project
+*.DS_Store
+
+# fabric
+run/
+
+# third-party jars, download them from Modrinth (see libs/README.md)
+libs/*.jar
+
+# notes and release texts, not part of the source
+modrinth/
+ARBEITSPLAN.md
+ergebnisse/
+
+# java
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
