@@ -118,7 +118,7 @@ public class HazardScene extends Scene {
 
 			if (tick == FOOD_GONE) {
 				// Weak with hunger: the view narrows and sways a little.
-				addEffect(player, MobEffects.NAUSEA, LENGTH);
+				addEffect(player, MobEffects.CONFUSION, LENGTH);
 			}
 		}
 

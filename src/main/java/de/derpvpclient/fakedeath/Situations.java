@@ -161,7 +161,7 @@ public final class Situations {
 		BlockPos feet = player.blockPosition();
 		BlockPos head = feet.above();
 		boolean sky = level.canSeeSky(head);
-		boolean dark = sky ? level.isDarkOutside() : level.getMaxLocalRawBrightness(head) <= 7;
+		boolean dark = sky ? level.isNight() : level.getMaxLocalRawBrightness(head) <= 7;
 		Choices options = new Choices();
 
 		if (level.isThundering() && sky) {
@@ -218,7 +218,7 @@ public final class Situations {
 				options.add("slenderman", 3, SlendermanScene::new);
 			}
 
-			if (sky && level.isDarkOutside()) {
+			if (sky && level.isNight()) {
 				options.add("phantom", 3, PhantomScene::new);
 			}
 		}
@@ -296,7 +296,7 @@ public final class Situations {
 			options.add("ueberfall", 4, RaidScene::new);
 		}
 
-		if (sky && level.isDarkOutside() && !level.isRaining()) {
+		if (sky && level.isNight() && !level.isRaining()) {
 			options.add("meteorit", 2, MeteorScene::new);
 		}
 

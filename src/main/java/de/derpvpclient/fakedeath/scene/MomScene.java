@@ -29,6 +29,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
@@ -212,7 +213,7 @@ public class MomScene extends Scene {
 			}
 			return state.requiresCorrectToolForDrops() ? 0.3F : 0.18F;
 		}
-		if (stack.has(DataComponents.WEAPON) || stack.has(DataComponents.TOOL)) {
+		if (stack.is(ItemTags.SWORDS) || stack.has(DataComponents.TOOL)) {
 			return 0.3F;
 		}
 		if (stack.is(Items.LEATHER_BOOTS)) {
@@ -234,7 +235,7 @@ public class MomScene extends Scene {
 		if (stack.is(Items.LEATHER_BOOTS)) {
 			return SoundEvents.ARMOR_EQUIP_LEATHER.value();
 		}
-		if (stack.has(DataComponents.WEAPON) || stack.has(DataComponents.TOOL)) {
+		if (stack.is(ItemTags.SWORDS) || stack.has(DataComponents.TOOL)) {
 			return SoundEvents.PLAYER_ATTACK_STRONG;
 		}
 		if (stack.has(DataComponents.EQUIPPABLE)) {

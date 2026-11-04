@@ -17,8 +17,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.animal.frog.Frog;
-import net.minecraft.world.entity.animal.frog.FrogVariant;
-import net.minecraft.world.entity.animal.frog.FrogVariants;
+import net.minecraft.world.entity.animal.FrogVariant;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -26,7 +25,7 @@ import net.minecraft.world.phys.Vec3;
  * surround the player and snap at them with their tongues until there is nothing left.
  */
 public class FrogScene extends Scene {
-	private static final List<ResourceKey<FrogVariant>> COLORS = List.of(FrogVariants.TEMPERATE, FrogVariants.WARM, FrogVariants.COLD);
+	private static final List<ResourceKey<FrogVariant>> COLORS = List.of(FrogVariant.TEMPERATE, FrogVariant.WARM, FrogVariant.COLD);
 	private static final int COUNT = 10;
 	private static final int RAIN_START = 35;
 	private static final int RAIN_EVERY = 5;

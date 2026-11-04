@@ -48,7 +48,7 @@ public class SlendermanScene extends Scene {
 			sound(level, player.position(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.HOSTILE, 0.6F + step * 0.2F, 0.7F + step * 0.05F);
 
 			if (step == 2) {
-				addEffect(player, MobEffects.NAUSEA, 200);
+				addEffect(player, MobEffects.CONFUSION, 200);
 			}
 		}
 

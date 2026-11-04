@@ -123,7 +123,7 @@ public abstract class Scene {
 			throw new IllegalStateException("Could not create " + type);
 		}
 		entity.setId(nextEntityId--);
-		entity.snapTo(pos);
+		entity.moveTo(pos);
 		entity.setSilent(true);
 		level.addEntity(entity);
 		actors.add(entity);
@@ -132,7 +132,7 @@ public abstract class Scene {
 
 	protected <T extends Entity> T spawn(ClientLevel level, T entity, Vec3 pos) {
 		entity.setId(nextEntityId--);
-		entity.snapTo(pos);
+		entity.moveTo(pos);
 		entity.setSilent(true);
 		level.addEntity(entity);
 		actors.add(entity);

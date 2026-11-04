@@ -19,8 +19,7 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.frog.Frog;
-import net.minecraft.world.entity.animal.frog.FrogVariant;
-import net.minecraft.world.entity.animal.frog.FrogVariants;
+import net.minecraft.world.entity.animal.FrogVariant;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -29,7 +28,7 @@ import net.minecraft.world.phys.Vec3;
  * Inside it is dark and wet until the stomach is done.
  */
 public class GiantFrogScene extends Scene {
-	private static final List<ResourceKey<FrogVariant>> COLORS = List.of(FrogVariants.TEMPERATE, FrogVariants.WARM, FrogVariants.COLD);
+	private static final List<ResourceKey<FrogVariant>> COLORS = List.of(FrogVariant.TEMPERATE, FrogVariant.WARM, FrogVariant.COLD);
 	private static final double SIZE = 6.0;
 	private static final int APPEAR = 45;
 	private static final double START_DISTANCE = 24.0;

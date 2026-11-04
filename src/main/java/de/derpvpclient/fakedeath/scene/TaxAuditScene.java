@@ -96,7 +96,7 @@ public class TaxAuditScene extends Scene {
 
 		if (tick == 0) {
 			villager = spawn(level, EntityType.VILLAGER, groundSpot(level, player, 3.5, 0.0));
-			villager.setVillagerData(villager.getVillagerData().withProfession(level.registryAccess(), VillagerProfession.LIBRARIAN));
+			villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.LIBRARIAN));
 			villager.setCustomName(NAME);
 			villager.setCustomNameVisible(true);
 			particles(level, ParticleTypes.POOF, villager.position().add(0, 1, 0), 20, 0.5, 0.1);

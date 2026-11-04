@@ -4,7 +4,6 @@ import de.derpvpclient.fakedeath.FakeDeath;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.world.entity.player.Input;
-import net.minecraft.world.phys.Vec2;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,7 +19,8 @@ public abstract class KeyboardInputMixin extends ClientInput {
 	private void fakedeath$freeze(CallbackInfo ci) {
 		if (FakeDeath.freezesMovement()) {
 			keyPresses = Input.EMPTY;
-			moveVector = Vec2.ZERO;
+			leftImpulse = 0.0F;
+			forwardImpulse = 0.0F;
 		}
 	}
 }
