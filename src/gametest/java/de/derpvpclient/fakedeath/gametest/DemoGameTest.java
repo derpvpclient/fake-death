@@ -13,6 +13,8 @@ import net.fabricmc.loader.api.FabricLoader;
 public class DemoGameTest implements FabricClientGameTest {
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		// Tests run silently.
+		context.runOnClient(client -> client.options.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.MASTER).set(0.0));
 		Path marker = FabricLoader.getInstance().getConfigDir().resolve("fakedeath-demo.txt");
 
 		try {
