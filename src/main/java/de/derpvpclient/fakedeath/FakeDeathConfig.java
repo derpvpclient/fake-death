@@ -17,7 +17,6 @@ public final class FakeDeathConfig {
 	public static boolean randomEvent = true;
 	public static int randomMinMinutes = 10;
 	public static int randomMaxMinutes = 30;
-	public static boolean reveal = true;
 	/** Scenes with fast flashing lights. On by default, people sensitive to them can switch them off. */
 	public static boolean flashing = true;
 	/** Scene ids the random event and a plain /fakedeath leave out. Testing a scene by name still works. */
@@ -56,7 +55,6 @@ public final class FakeDeathConfig {
 		randomEvent = version < 2 || Boolean.parseBoolean(properties.getProperty("randomEvent", String.valueOf(randomEvent)));
 		randomMinMinutes = Math.max(1, parseInt(properties, "randomMinMinutes", randomMinMinutes));
 		randomMaxMinutes = Math.max(randomMinMinutes, parseInt(properties, "randomMaxMinutes", randomMaxMinutes));
-		reveal = Boolean.parseBoolean(properties.getProperty("reveal", String.valueOf(reveal)));
 		flashing = version < 3 || Boolean.parseBoolean(properties.getProperty("flashing", String.valueOf(flashing)));
 
 		disabledScenes.clear();
@@ -76,12 +74,11 @@ public final class FakeDeathConfig {
 		properties.setProperty("randomEvent", String.valueOf(randomEvent));
 		properties.setProperty("randomMinMinutes", String.valueOf(randomMinMinutes));
 		properties.setProperty("randomMaxMinutes", String.valueOf(randomMaxMinutes));
-		properties.setProperty("reveal", String.valueOf(reveal));
 		properties.setProperty("flashing", String.valueOf(flashing));
 		properties.setProperty("disabledScenes", String.join(",", disabledScenes));
 
 		try (Writer writer = Files.newBufferedWriter(file)) {
-			properties.store(writer, "Fake Death. randomEvent = Fake-Tod zufällig zwischen randomMinMinutes und randomMaxMinutes. reveal = nach dem Klick „Reingelegt!“ anzeigen. flashing = Szenen mit schnell blinkenden Lichtern erlauben. disabledScenes = abgeschaltete Szenen, mit Komma getrennt");
+			properties.store(writer, "Fake Death. randomEvent = Fake-Tod zufällig zwischen randomMinMinutes und randomMaxMinutes. flashing = Szenen mit schnell blinkenden Lichtern erlauben. disabledScenes = abgeschaltete Szenen, mit Komma getrennt");
 		} catch (IOException e) {
 			FakeDeathClient.LOGGER.warn("Could not write {}", file, e);
 		}
