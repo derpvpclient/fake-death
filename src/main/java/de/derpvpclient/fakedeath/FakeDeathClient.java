@@ -26,7 +26,6 @@ public class FakeDeathClient implements ClientModInitializer {
 	// Every sub command works in German and English, whatever language the game is set to.
 	private static final List<String> CANCEL = List.of("abbrechen", "cancel");
 	private static final List<String> RANDOM = List.of("zufall", "random");
-	private static final List<String> REVEAL = List.of("auflösen", "reveal");
 	private static final List<String> ON = List.of("an", "on");
 	private static final List<String> OFF = List.of("aus", "off");
 
@@ -120,13 +119,6 @@ public class FakeDeathClient implements ClientModInitializer {
 			root.then(random);
 		}
 
-		for (String word : REVEAL) {
-			LiteralArgumentBuilder<FabricClientCommandSource> reveal = literal(word);
-			ON.forEach(on -> reveal.then(literal(on).executes(context -> setReveal(context, true))));
-			OFF.forEach(off -> reveal.then(literal(off).executes(context -> setReveal(context, false))));
-			root.then(reveal);
-		}
-
 		return root;
 	}
 
@@ -147,13 +139,6 @@ public class FakeDeathClient implements ClientModInitializer {
 		} else {
 			feedback(context, "fakedeath.command.random.off");
 		}
-		return 1;
-	}
-
-	private static int setReveal(CommandContext<FabricClientCommandSource> context, boolean enabled) {
-		FakeDeathConfig.reveal = enabled;
-		FakeDeathConfig.save();
-		feedback(context, enabled ? "fakedeath.command.reveal.on" : "fakedeath.command.reveal.off");
 		return 1;
 	}
 
