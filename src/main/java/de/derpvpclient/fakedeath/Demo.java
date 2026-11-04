@@ -29,6 +29,7 @@ final class Demo {
 	private static final int GIVE_UP = 60 * 20;
 
 	private static Boolean wanted;
+	private static List<String> names = Situations.NAMES;
 	private static boolean running;
 	private static int index;
 	private static int wait = START_DELAY;
@@ -48,6 +49,7 @@ final class Demo {
 	static void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player) {
 		if (wanted == null) {
 			wanted = Files.exists(marker());
+			names = chosenScenes();
 		}
 		if (!wanted) {
 			return;
@@ -55,7 +57,7 @@ final class Demo {
 		running = true;
 
 		Scene scene = FakeDeath.currentScene();
-		String name = index < Situations.NAMES.size() ? Situations.NAMES.get(index) : null;
+		String name = index < names.size() ? names.get(index) : null;
 
 		if (current != null) {
 			if (scene != current) {
@@ -120,7 +122,7 @@ final class Demo {
 			return;
 		}
 
-		FakeDeathClient.LOGGER.info("[Fake Death demo] {} ({}/{})", name, index + 1, Situations.NAMES.size());
+		FakeDeathClient.LOGGER.info("[Fake Death demo] {} ({}/{})", name, index + 1, names.size());
 		current = next;
 		photo = false;
 		deathPhoto = false;
@@ -145,6 +147,17 @@ final class Demo {
 		}
 
 		FakeDeath.rollRandomTimer();
+	}
+
+	/** The scenes listed in the start file, comma separated, or all of them. */
+	private static List<String> chosenScenes() {
+		try {
+			List<String> chosen = java.util.Arrays.stream(Files.readString(marker()).split(","))
+				.map(String::trim).filter(Situations.NAMES::contains).toList();
+			return chosen.isEmpty() ? Situations.NAMES : chosen;
+		} catch (IOException e) {
+			return Situations.NAMES;
+		}
 	}
 
 	private static Path marker() {

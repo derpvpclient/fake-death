@@ -30,7 +30,7 @@ public class DemoStarter implements ClientModInitializer {
 				ticks = 0;
 				started = true;
 				try {
-					Files.writeString(marker, "demo");
+					Files.writeString(marker, System.getProperty("fakedeath.demoScenes", "demo"));
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
