@@ -77,7 +77,7 @@
 	"fakedeath.test.locked": "Blinkt schnell. Schalte erst „Blinkende Effekte“ in den Einstellungen ein.",
 	"fakedeath.test.switched_off": "Für das Zufalls-Event ausgeschaltet, testen geht trotzdem.
 %s",
-	"fakedeath.options.flashing.tooltip": "Erlaubt Szenen mit schnell blinkenden Lichtern und Farben (Glitch, Disco). Nicht einschalten, wenn du empfindlich auf blinkende Lichter reagierst.",
+	"fakedeath.options.flashing.tooltip": "Szenen mit schnell blinkenden Lichtern und Farben (Glitch, Disco). Standardmäßig an. Schalte das aus, wenn du empfindlich auf blinkende Lichter reagierst.",
 	"fakedeath.command.flashing_off": "Diese Szene hat schnell blinkende Lichter. Schalte erst „Blinkende Effekte“ in den Einstellungen ein.",
 	"fakedeath.glitch.chunk": "Fehler: Chunk %s, %s konnte nicht geladen werden. Welt wird beschädigt …",
 	"fakedeath.glitch.null": "java.lang.NullPointerException: Spieler \"%s\" ist null",

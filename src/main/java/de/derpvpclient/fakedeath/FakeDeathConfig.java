@@ -11,15 +11,15 @@ import java.util.TreeSet;
 import net.fabricmc.loader.api.FabricLoader;
 
 public final class FakeDeathConfig {
-	// Version 2 turned the random event on by default.
-	private static final int VERSION = 2;
+	// Version 2 turned the random event on by default, version 3 the flashing effects.
+	private static final int VERSION = 3;
 
 	public static boolean randomEvent = true;
 	public static int randomMinMinutes = 10;
 	public static int randomMaxMinutes = 30;
 	public static boolean reveal = true;
-	/** Scenes with fast flashing lights, off by default for people sensitive to them. */
-	public static boolean flashing = false;
+	/** Scenes with fast flashing lights. On by default, people sensitive to them can switch them off. */
+	public static boolean flashing = true;
 	/** Scene ids the random event and a plain /fakedeath leave out. Testing a scene by name still works. */
 	public static final Set<String> disabledScenes = new TreeSet<>();
 
@@ -50,13 +50,14 @@ public final class FakeDeathConfig {
 			}
 		}
 
-		// Files from before version 2 only have randomEvent=false because that was the default, not a choice.
-		boolean oldFile = parseInt(properties, "version", 1) < VERSION;
-		randomEvent = oldFile || Boolean.parseBoolean(properties.getProperty("randomEvent", String.valueOf(randomEvent)));
+		// Older files only have randomEvent=false (before version 2) or flashing=false (before version 3)
+		// because that was the default, not a choice.
+		int version = parseInt(properties, "version", 1);
+		randomEvent = version < 2 || Boolean.parseBoolean(properties.getProperty("randomEvent", String.valueOf(randomEvent)));
 		randomMinMinutes = Math.max(1, parseInt(properties, "randomMinMinutes", randomMinMinutes));
 		randomMaxMinutes = Math.max(randomMinMinutes, parseInt(properties, "randomMaxMinutes", randomMaxMinutes));
 		reveal = Boolean.parseBoolean(properties.getProperty("reveal", String.valueOf(reveal)));
-		flashing = Boolean.parseBoolean(properties.getProperty("flashing", String.valueOf(flashing)));
+		flashing = version < 3 || Boolean.parseBoolean(properties.getProperty("flashing", String.valueOf(flashing)));
 
 		disabledScenes.clear();
 		for (String scene : properties.getProperty("disabledScenes", "").split(",")) {

@@ -77,7 +77,7 @@
 	"fakedeath.test.locked": "Flashes fast. Switch on \"Flashing effects\" in the settings first.",
 	"fakedeath.test.switched_off": "Switched off for the random event, testing still works.
 %s",
-	"fakedeath.options.flashing.tooltip": "Allows scenes with fast flashing lights and colors (Glitch, Disco). Do not switch on if you are sensitive to flashing lights.",
+	"fakedeath.options.flashing.tooltip": "Scenes with fast flashing lights and colors (Glitch, Disco). On by default. Switch this off if you are sensitive to flashing lights.",
 	"fakedeath.command.flashing_off": "This scene has fast flashing lights. Switch on \"Flashing effects\" in the settings first.",
 	"fakedeath.glitch.chunk": "Error: chunk %s, %s could not be loaded. World is being corrupted...",
 	"fakedeath.glitch.null": "java.lang.NullPointerException: player \"%s\" is null",
