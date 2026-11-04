@@ -23,7 +23,14 @@ public class MultiPlayerGameModeMixin {
 	}
 
 	@Inject(method = "interact", at = @At("HEAD"), cancellable = true)
-	private void fakedeath$ignoreActorInteract(Player player, Entity target, EntityHitResult hitResult, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+	private void fakedeath$ignoreActorInteract(Player player, Entity target, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+		if (target.getId() < 0) {
+			cir.setReturnValue(InteractionResult.PASS);
+		}
+	}
+
+	@Inject(method = "interactAt", at = @At("HEAD"), cancellable = true)
+	private void fakedeath$ignoreActorInteractAt(Player player, Entity target, EntityHitResult hitResult, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
 		if (target.getId() < 0) {
 			cir.setReturnValue(InteractionResult.PASS);
 		}
