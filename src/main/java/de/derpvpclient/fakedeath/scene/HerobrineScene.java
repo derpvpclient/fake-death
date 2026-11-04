@@ -16,7 +16,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** Someone stands far away and stares. Gone. Then right behind you. */
 public class HerobrineScene extends Scene {
-	private static final DustParticleOptions EYE = new DustParticleOptions(0xFFFFFF, 0.35F);
+	private static final DustParticleOptions EYE = new DustParticleOptions(net.minecraft.world.phys.Vec3.fromRGB24(0xFFFFFF).toVector3f(), 0.35F);
 	private static final UUID STEVE = steveUuid();
 	private static final int VANISH = 80;
 	private static final int BEHIND = 115;

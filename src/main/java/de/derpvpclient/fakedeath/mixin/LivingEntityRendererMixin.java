@@ -1,23 +1,31 @@
 package de.derpvpclient.fakedeath.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import de.derpvpclient.fakedeath.FakeDeath;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntityRenderer.class)
 public class LivingEntityRendererMixin {
 	// In third person the own player tips over and turns red like on a real death. Only on this client.
-	@Inject(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At("TAIL"))
-	private void fakedeath$deathPose(LivingEntity entity, LivingEntityRenderState state, float partialTicks, CallbackInfo ci) {
+	@WrapOperation(method = "setupRotations", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;deathTime:I"))
+	private int fakedeath$deathPose(LivingEntity entity, Operation<Integer> original) {
+		return fakeDeathTime(entity, original);
+	}
+
+	@WrapOperation(method = "getOverlayCoords", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;deathTime:I"))
+	private static int fakedeath$redOverlay(LivingEntity entity, Operation<Integer> original) {
+		return fakeDeathTime(entity, original);
+	}
+
+	private static int fakeDeathTime(LivingEntity entity, Operation<Integer> original) {
 		if (FakeDeath.isActive() && entity == Minecraft.getInstance().player) {
-			state.deathTime = FakeDeath.deathTicks() + partialTicks;
-			state.hasRedOverlay = true;
+			return Math.max(1, FakeDeath.deathTicks());
 		}
+		return original.call(entity);
 	}
 }

@@ -288,7 +288,7 @@ public final class Situations {
 			options.add("ziege", 5, GoatScene::new);
 		}
 
-		if (level.getBiome(feet).is(Biomes.DARK_FOREST) || level.getBiome(feet).is(Biomes.PALE_GARDEN)) {
+		if (level.getBiome(feet).is(Biomes.DARK_FOREST)) {
 			options.add("magier", 5, EvokerScene::new);
 		}
 

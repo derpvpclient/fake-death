@@ -30,7 +30,7 @@ import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntitySpawnReason;
+
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -118,7 +118,7 @@ public abstract class Scene {
 	}
 
 	protected <T extends Entity> T spawn(ClientLevel level, EntityType<T> type, Vec3 pos) {
-		T entity = type.create(level, EntitySpawnReason.COMMAND);
+		T entity = type.create(level);
 		if (entity == null) {
 			throw new IllegalStateException("Could not create " + type);
 		}
@@ -316,7 +316,7 @@ public abstract class Scene {
 	protected static void walk(net.minecraft.world.entity.LivingEntity mob, Vec3 to) {
 		double distance = Math.sqrt(Mth.square(to.x - mob.getX()) + Mth.square(to.z - mob.getZ()));
 		mob.setPos(to.x, to.y, to.z);
-		mob.walkAnimation.update(Math.min((float) distance * 4.0F, 1.0F), 0.4F, mob.isBaby() ? 3.0F : 1.0F);
+		mob.walkAnimation.update(Math.min((float) distance * 4.0F, 1.0F), 0.4F);
 	}
 
 	/** Makes a client-only mob look at a point, head and body together. */

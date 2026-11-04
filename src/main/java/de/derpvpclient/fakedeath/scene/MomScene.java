@@ -219,7 +219,7 @@ public class MomScene extends Scene {
 		if (stack.is(Items.LEATHER_BOOTS)) {
 			return 0.2F;
 		}
-		if (stack.has(DataComponents.EQUIPPABLE)) {
+		if (stack.getItem() instanceof net.minecraft.world.item.Equipable) {
 			return 0.25F;
 		}
 		if (stack.has(DataComponents.FOOD)) {
@@ -238,7 +238,7 @@ public class MomScene extends Scene {
 		if (stack.is(ItemTags.SWORDS) || stack.has(DataComponents.TOOL)) {
 			return SoundEvents.PLAYER_ATTACK_STRONG;
 		}
-		if (stack.has(DataComponents.EQUIPPABLE)) {
+		if (stack.getItem() instanceof net.minecraft.world.item.Equipable) {
 			return SoundEvents.ARMOR_EQUIP_IRON.value();
 		}
 		if (stack.has(DataComponents.FOOD)) {

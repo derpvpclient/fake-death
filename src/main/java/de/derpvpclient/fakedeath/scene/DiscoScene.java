@@ -67,7 +67,7 @@ public class DiscoScene extends Scene {
 
 			if (tick % 2 == 0) {
 				Vec3 spot = player.getEyePosition().add((random.nextDouble() - 0.5) * 8.0, random.nextDouble() * 3.0, (random.nextDouble() - 0.5) * 8.0);
-				particles(level, new DustParticleOptions(LIGHTS[random.nextInt(LIGHTS.length)], 2.0F), spot, 4, 0.3, 0.0);
+				particles(level, new DustParticleOptions(net.minecraft.world.phys.Vec3.fromRGB24(LIGHTS[random.nextInt(LIGHTS.length)]).toVector3f(), 2.0F), spot, 4, 0.3, 0.0);
 				level.addParticle(ParticleTypes.NOTE, spot.x, spot.y, spot.z, random.nextDouble(), 0.0, 0.0);
 			}
 		}
@@ -97,7 +97,7 @@ public class DiscoScene extends Scene {
 			Vec3 blast = creeper.position().add(0.0, 0.8, 0.0);
 			despawn(level, creeper);
 			creeper = null;
-			minecraft.getSoundManager().stop(SoundEvents.MUSIC_DISC_PIGSTEP.value().location(), SoundSource.RECORDS);
+			minecraft.getSoundManager().stop(SoundEvents.MUSIC_DISC_PIGSTEP.value().getLocation(), SoundSource.RECORDS);
 			level.addParticle(ParticleTypes.EXPLOSION_EMITTER, blast.x, blast.y, blast.z, 1.0, 0.0, 0.0);
 			particles(level, ParticleTypes.EXPLOSION, blast, 8, 1.5, 0.0);
 			sound(level, blast, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 4.0F, 0.75F);
@@ -137,7 +137,7 @@ public class DiscoScene extends Scene {
 
 	@Override
 	public void end(ClientLevel level, LocalPlayer player) {
-		Minecraft.getInstance().getSoundManager().stop(SoundEvents.MUSIC_DISC_PIGSTEP.value().location(), SoundSource.RECORDS);
+		Minecraft.getInstance().getSoundManager().stop(SoundEvents.MUSIC_DISC_PIGSTEP.value().getLocation(), SoundSource.RECORDS);
 		for (Parrot parrot : parrots) {
 			parrot.setRecordPlayingNearby(parrot.blockPosition(), false);
 		}

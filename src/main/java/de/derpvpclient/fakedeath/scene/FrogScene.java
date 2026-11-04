@@ -37,7 +37,7 @@ public class FrogScene extends Scene {
 	private static final int TONGUE_EVERY = 11;
 	private static final int TONGUES = 6;
 	private static final int DEATH = FIRST_TONGUE + TONGUE_EVERY * TONGUES + 8;
-	private static final DustParticleOptions TONGUE = new DustParticleOptions(0xE0607E, 0.9F);
+	private static final DustParticleOptions TONGUE = new DustParticleOptions(net.minecraft.world.phys.Vec3.fromRGB24(0xE0607E).toVector3f(), 0.9F);
 
 	private final List<Hopper> frogs = new ArrayList<>();
 	private final Hopper[] snapping = new Hopper[2];

@@ -41,7 +41,7 @@ public class GiantFrogScene extends Scene {
 	private static final int PULL = TONGUE + 12;
 	private static final int PULL_TICKS = 18;
 	private static final int GULP = PULL + PULL_TICKS;
-	private static final DustParticleOptions TONGUE_COLOR = new DustParticleOptions(0xE0607E, 2.2F);
+	private static final DustParticleOptions TONGUE_COLOR = new DustParticleOptions(net.minecraft.world.phys.Vec3.fromRGB24(0xE0607E).toVector3f(), 2.2F);
 	private static final int TASTY = GULP + 35;
 	private static final int DEATH = TASTY + 65;
 	private static final int BURP = DEATH + 15;

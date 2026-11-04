@@ -26,9 +26,9 @@ public class TaxAuditScene extends Scene {
 	private static final List<Item> VALUABLES = List.of(
 		Items.NETHERITE_INGOT, Items.ANCIENT_DEBRIS, Items.DIAMOND_BLOCK, Items.DIAMOND, Items.EMERALD, Items.GOLD_INGOT, Items.IRON_INGOT);
 	private static final Component NAME = Component.translatable("fakedeath.tax.name").withStyle(ChatFormatting.GOLD);
-	private static final DustParticleOptions LASER = new DustParticleOptions(0xFF2020, 1.2F);
-	private static final DustParticleOptions LASER_CORE = new DustParticleOptions(0xFFFFFF, 0.6F);
-	private static final DustParticleOptions AIM = new DustParticleOptions(0xFF2020, 0.5F);
+	private static final DustParticleOptions LASER = new DustParticleOptions(net.minecraft.world.phys.Vec3.fromRGB24(0xFF2020).toVector3f(), 1.2F);
+	private static final DustParticleOptions LASER_CORE = new DustParticleOptions(net.minecraft.world.phys.Vec3.fromRGB24(0xFFFFFF).toVector3f(), 0.6F);
+	private static final DustParticleOptions AIM = new DustParticleOptions(net.minecraft.world.phys.Vec3.fromRGB24(0xFF2020).toVector3f(), 0.5F);
 	// The audit takes its time: about four seconds per line, so every line can be read before the next one.
 	private static final int QUESTIONS = 85;
 	private static final int FINDING = 170;
