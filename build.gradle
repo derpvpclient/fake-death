@@ -29,3 +29,14 @@ java {
 	sourceCompatibility = JavaVersion.VERSION_25
 	targetCompatibility = JavaVersion.VERSION_25
 }
+
+// Only for testing: a client game test creates a world and lets the demo play every scene. Not part of the jar.
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = "fakedeath-gametest"
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}
