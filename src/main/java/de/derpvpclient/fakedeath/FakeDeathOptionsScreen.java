@@ -33,7 +33,6 @@ public class FakeDeathOptionsScreen extends OptionsSubScreen {
 		list.addBig(OptionInstance.createBoolean("fakedeath.options.flashing", tooltip("fakedeath.options.flashing.tooltip"),
 			FakeDeathConfig.flashing, value -> FakeDeathConfig.flashing = value));
 
-		list.addHeader(Component.translatable("fakedeath.options.scenes"));
 		list.addSmall(Situations.NAMES.stream()
 			.map(id -> OptionInstance.createBoolean("fakedeath.scene." + id, FakeDeathConfig.isEnabled(id), value -> FakeDeathConfig.setEnabled(id, value)))
 			.toArray(OptionInstance[]::new));

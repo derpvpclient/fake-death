@@ -12,7 +12,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.illager.Evoker;
+import net.minecraft.world.entity.monster.Evoker;
 import net.minecraft.world.entity.projectile.EvokerFangs;
 import net.minecraft.world.phys.Vec3;
 

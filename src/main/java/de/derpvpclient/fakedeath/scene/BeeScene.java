@@ -13,7 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.bee.Bee;
+import net.minecraft.world.entity.animal.Bee;
 import net.minecraft.world.phys.Vec3;
 
 /** An angry swarm pours out of the hive next to the player, circles them and stings until they drop. */
@@ -51,7 +51,7 @@ public class BeeScene extends Scene {
 			for (int i = 0; i < SWARM; i++) {
 				Bee bee = spawn(level, EntityType.BEE, home);
 				// Angry eyes and the red stinger look, as long as the scene runs.
-				bee.setPersistentAngerEndTime(level.getGameTime() + 2000);
+				bee.setRemainingPersistentAngerTime(2000);
 				bees.add(bee);
 			}
 		}

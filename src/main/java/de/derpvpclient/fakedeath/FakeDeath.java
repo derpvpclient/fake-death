@@ -339,7 +339,7 @@ public final class FakeDeath {
 
 		level.playLocalSound(player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_DEATH, SoundSource.PLAYERS, 1.0F, 1.0F, false);
 		minecraft.gui.getChat().addMessage(message);
-		minecraft.setScreen(new DeathScreen(message, level.getLevelData().isHardcore(), player));
+		minecraft.setScreen(new DeathScreen(message, level.getLevelData().isHardcore()));
 
 		active = true;
 		killed = false;

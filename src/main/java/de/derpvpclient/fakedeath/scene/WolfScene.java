@@ -7,7 +7,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -22,8 +22,8 @@ import net.minecraft.world.phys.Vec3;
  */
 public class WolfScene extends Scene {
 	// Adult wolf sounds depend on the wolf's sound variant in 26.3, these are the angry ones by id.
-	private static final SoundEvent GROWL = SoundEvent.createVariableRangeEvent(Identifier.withDefaultNamespace("entity.wolf_angry.growl"));
-	private static final SoundEvent SNARL = SoundEvent.createVariableRangeEvent(Identifier.withDefaultNamespace("entity.wolf_angry.ambient"));
+	private static final SoundEvent GROWL = SoundEvent.createVariableRangeEvent(ResourceLocation.withDefaultNamespace("entity.wolf_angry.growl"));
+	private static final SoundEvent SNARL = SoundEvent.createVariableRangeEvent(ResourceLocation.withDefaultNamespace("entity.wolf_angry.ambient"));
 	private static final int PACK = 5;
 	private static final double FAR = 14.0;
 	private static final double CLOSE = 3.0;
@@ -64,7 +64,7 @@ public class WolfScene extends Scene {
 				starts.add(start);
 				Wolf wolf = spawn(level, EntityType.WOLF, start);
 				// Red eyes and bared teeth.
-				wolf.setPersistentAngerEndTime(level.getGameTime() + 2000);
+				wolf.setRemainingPersistentAngerTime(2000);
 				wolf.noPhysics = true;
 				wolves.add(wolf);
 			}
