@@ -28,8 +28,6 @@ public class FakeDeathOptionsScreen extends OptionsSubScreen {
 		list.addSmall(
 			minutes("fakedeath.options.min", FakeDeathConfig.randomMinMinutes, value -> FakeDeathConfig.randomMinMinutes = value),
 			minutes("fakedeath.options.max", FakeDeathConfig.randomMaxMinutes, value -> FakeDeathConfig.randomMaxMinutes = value));
-		list.addBig(OptionInstance.createBoolean("fakedeath.options.reveal", tooltip("fakedeath.options.reveal.tooltip"),
-			FakeDeathConfig.reveal, value -> FakeDeathConfig.reveal = value));
 		list.addBig(OptionInstance.createBoolean("fakedeath.options.flashing", tooltip("fakedeath.options.flashing.tooltip"),
 			FakeDeathConfig.flashing, value -> FakeDeathConfig.flashing = value));
 
