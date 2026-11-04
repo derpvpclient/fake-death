@@ -12,7 +12,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.entity.player.Inventory;
@@ -95,7 +95,7 @@ public class TaxAuditScene extends Scene {
 		}
 
 		if (tick == 0) {
-			villager = spawn(level, EntityTypes.VILLAGER, groundSpot(level, player, 3.5, 0.0));
+			villager = spawn(level, EntityType.VILLAGER, groundSpot(level, player, 3.5, 0.0));
 			villager.setVillagerData(villager.getVillagerData().withProfession(level.registryAccess(), VillagerProfession.LIBRARIAN));
 			villager.setCustomName(NAME);
 			villager.setCustomNameVisible(true);

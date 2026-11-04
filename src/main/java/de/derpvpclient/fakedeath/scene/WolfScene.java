@@ -12,7 +12,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.phys.Vec3;
 
@@ -48,7 +48,7 @@ public class WolfScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.mob", player.getDisplayName(), EntityTypes.WOLF.getDescription());
+		return Component.translatable("death.attack.mob", player.getDisplayName(), EntityType.WOLF.getDescription());
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class WolfScene extends Scene {
 				angles.add(angle);
 				Vec3 start = ring(level, player, angle, FAR + random.nextDouble() * 2.0);
 				starts.add(start);
-				Wolf wolf = spawn(level, EntityTypes.WOLF, start);
+				Wolf wolf = spawn(level, EntityType.WOLF, start);
 				// Red eyes and bared teeth.
 				wolf.setPersistentAngerEndTime(level.getGameTime() + 2000);
 				wolf.noPhysics = true;

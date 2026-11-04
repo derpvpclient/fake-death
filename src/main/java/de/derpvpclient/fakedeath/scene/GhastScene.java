@@ -11,7 +11,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Display;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -51,7 +51,7 @@ public class GhastScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.fireball", player.getDisplayName(), EntityTypes.GHAST.getDescription());
+		return Component.translatable("death.attack.fireball", player.getDisplayName(), EntityType.GHAST.getDescription());
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class GhastScene extends Scene {
 
 		if (tick == APPEAR) {
 			home = freeSpot(level, player);
-			ghast = spawn(level, EntityTypes.GHAST, home);
+			ghast = spawn(level, EntityType.GHAST, home);
 			ghast.noPhysics = true;
 			sound(level, home, SoundEvents.GHAST_SCREAM, SoundSource.HOSTILE, 3.0F, 1.0F);
 		}

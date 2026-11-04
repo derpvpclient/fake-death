@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Hud;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -195,7 +195,7 @@ public final class FakeDeath {
 		// mobs around; should one really hit, the scene ends right away anyway.
 		String reason = waiting ? unsafeReason(level, player, pendingTicks < 0) : null;
 		// No open screen either: closing an inventory or chest would tell the server.
-		if (reason == null && minecraft.gui.screen() != null) {
+		if (reason == null && minecraft.screen != null) {
 			reason = "menu";
 		}
 		safeTicks = waiting && reason == null ? safeTicks + 1 : 0;
@@ -208,7 +208,7 @@ public final class FakeDeath {
 		} else if (pendingTicks == 0 && !safe && reason != null && ++pendingWaited == WAIT_NOTICE) {
 			// Tell the player once what it is waiting for, so nobody thinks the scene is broken.
 			FakeDeathClient.LOGGER.info("Fake death {} is waiting: {}", pendingScene != null ? pendingScene : "(fitting scene)", reason);
-			minecraft.gui.hud.getChat().addClientSystemMessage(Component.literal("[Fake Death] ").withStyle(ChatFormatting.DARK_RED)
+			minecraft.gui.getChat().addClientSystemMessage(Component.literal("[Fake Death] ").withStyle(ChatFormatting.DARK_RED)
 				.append(Component.translatable("fakedeath.message.waiting", Component.translatable("fakedeath.wait." + reason))
 					.withStyle(ChatFormatting.GRAY)));
 		} else if (pendingTicks == 0 && safe) {
@@ -221,7 +221,7 @@ public final class FakeDeath {
 				begin(minecraft, next);
 			} else {
 				Component why = name != null ? Component.translatable("fakedeath.message.missing", name) : Component.translatable("fakedeath.message.all_off");
-				minecraft.gui.hud.getChat().addClientSystemMessage(Component.literal("[Fake Death] ").withStyle(ChatFormatting.DARK_RED)
+				minecraft.gui.getChat().addClientSystemMessage(Component.literal("[Fake Death] ").withStyle(ChatFormatting.DARK_RED)
 					.append(why.copy().withStyle(ChatFormatting.GRAY)));
 			}
 		}
@@ -277,7 +277,7 @@ public final class FakeDeath {
 			boolean onDeathScreen = active;
 			finish(level, player);
 			if (onDeathScreen) {
-				minecraft.gui.setScreen(null);
+				minecraft.setScreen(null);
 			}
 			return;
 		}
@@ -300,7 +300,7 @@ public final class FakeDeath {
 		deathTicks++;
 
 		// Any other screen ends it too, for example when the server opens something.
-		if (!(minecraft.gui.screen() instanceof DeathScreen)) {
+		if (!(minecraft.screen instanceof DeathScreen)) {
 			finish(level, player);
 		}
 	}
@@ -338,8 +338,8 @@ public final class FakeDeath {
 		Component message = scene.deathMessage(player);
 
 		level.playLocalSound(player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_DEATH, SoundSource.PLAYERS, 1.0F, 1.0F, false);
-		minecraft.gui.hud.getChat().addServerSystemMessage(message);
-		minecraft.gui.setScreen(new DeathScreen(message, level.getLevelData().isHardcore(), player));
+		minecraft.gui.getChat().addServerSystemMessage(message);
+		minecraft.setScreen(new DeathScreen(message, level.getLevelData().isHardcore(), player));
 
 		active = true;
 		killed = false;
@@ -425,10 +425,10 @@ public final class FakeDeath {
 			}
 		}
 
-		minecraft.gui.setScreen(null);
+		minecraft.setScreen(null);
 
 		if (FakeDeathConfig.reveal) {
-			Hud hud = minecraft.gui.hud;
+			Gui hud = minecraft.gui;
 			hud.setTimes(5, 40, 15);
 			hud.setSubtitle(Component.translatable("fakedeath.reveal.subtitle").withStyle(ChatFormatting.GRAY));
 			hud.setTitle(Component.translatable("fakedeath.reveal.title").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));

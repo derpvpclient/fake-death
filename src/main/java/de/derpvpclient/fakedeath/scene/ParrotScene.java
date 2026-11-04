@@ -8,7 +8,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.parrot.Parrot;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.phys.Vec3;
@@ -43,14 +43,14 @@ public class ParrotScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.explosion.player", player.getDisplayName(), EntityTypes.CREEPER.getDescription());
+		return Component.translatable("death.attack.explosion.player", player.getDisplayName(), EntityType.CREEPER.getDescription());
 	}
 
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
 		if (tick == 0) {
 			front = player.getEyePosition().add(horizontalLook(player).scale(5.0));
-			parrot = spawn(level, EntityTypes.PARROT, groundSpot(level, player, 2.2, 180.0));
+			parrot = spawn(level, EntityType.PARROT, groundSpot(level, player, 2.2, 180.0));
 			parrot.noPhysics = true;
 		}
 
@@ -83,7 +83,7 @@ public class ParrotScene extends Scene {
 
 		if (tick == REAL_HISS - 10) {
 			Vec3 spot = groundSpot(level, player, 1.6, 100.0 + random.nextDouble() * 40.0 * (random.nextBoolean() ? 1 : -1));
-			creeper = spawn(level, EntityTypes.CREEPER, spot);
+			creeper = spawn(level, EntityType.CREEPER, spot);
 		}
 
 		if (creeper != null) {

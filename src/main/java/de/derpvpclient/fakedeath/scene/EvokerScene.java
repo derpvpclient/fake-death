@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.illager.Evoker;
 import net.minecraft.world.entity.projectile.EvokerFangs;
 import net.minecraft.world.phys.Vec3;
@@ -52,7 +52,7 @@ public class EvokerScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.indirectMagic", player.getDisplayName(), EntityTypes.EVOKER.getDescription());
+		return Component.translatable("death.attack.indirectMagic", player.getDisplayName(), EntityType.EVOKER.getDescription());
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class EvokerScene extends Scene {
 			Vec3 spot = groundSpot(level, player, 8.0, (random.nextDouble() - 0.5) * 60.0);
 			Vec3 away = spot.subtract(player.position());
 			direction = new Vec3(away.x, 0.0, away.z).normalize();
-			evoker = spawn(level, EntityTypes.EVOKER, spot);
+			evoker = spawn(level, EntityType.EVOKER, spot);
 			evoker.noPhysics = true;
 			particles(level, ParticleTypes.WITCH, spot.add(0.0, 1.0, 0.0), 20, 0.5, 0.1);
 			particles(level, ParticleTypes.POOF, spot.add(0.0, 1.0, 0.0), 10, 0.4, 0.05);

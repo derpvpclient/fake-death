@@ -4,13 +4,13 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import de.derpvpclient.fakedeath.FakeDeath;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.Hud;
+import net.minecraft.client.gui.Gui;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(Hud.class)
+@Mixin(Gui.class)
 public class HudMixin {
 	// Some scenes cover the world in a color, drawn first so hearts and hotbar stay on top of it.
 	@Inject(method = "extractRenderState", at = @At("HEAD"))

@@ -14,7 +14,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Silverfish;
 import net.minecraft.world.phys.Vec3;
 
@@ -52,7 +52,7 @@ public class SilverfishScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.mob", player.getDisplayName(), EntityTypes.SILVERFISH.getDescription());
+		return Component.translatable("death.attack.mob", player.getDisplayName(), EntityType.SILVERFISH.getDescription());
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class SilverfishScene extends Scene {
 	}
 
 	private void crawlOut(ClientLevel level, Hole hole) {
-		Silverfish silverfish = spawn(level, EntityTypes.SILVERFISH, hole.exit);
+		Silverfish silverfish = spawn(level, EntityType.SILVERFISH, hole.exit);
 		silverfish.noPhysics = true;
 		crawlers.add(new Crawler(silverfish, hole.exit));
 

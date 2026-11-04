@@ -29,9 +29,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntitySpawnRequest;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -119,8 +118,7 @@ public abstract class Scene {
 	}
 
 	protected <T extends Entity> T spawn(ClientLevel level, EntityType<T> type, Vec3 pos) {
-		// Ignoring the spawn checks: on peaceful, monsters could not be created otherwise. They only exist on this client anyway.
-		T entity = type.create(level, new EntitySpawnRequest(EntitySpawnReason.COMMAND, true));
+		T entity = type.create(level, EntitySpawnReason.COMMAND);
 		if (entity == null) {
 			throw new IllegalStateException("Could not create " + type);
 		}
@@ -199,7 +197,7 @@ public abstract class Scene {
 
 	/** A block as a client-only display entity, so it can be moved and turned freely. */
 	protected Display.BlockDisplay blockDisplay(ClientLevel level, BlockState state, Vec3 pos, float cullSize) {
-		Display.BlockDisplay display = spawn(level, EntityTypes.BLOCK_DISPLAY, pos);
+		Display.BlockDisplay display = spawn(level, EntityType.BLOCK_DISPLAY, pos);
 		((BlockDisplayAccessor) display).fakedeath$setBlockState(state);
 		// Display entities are culled by a box around their position, the moving blocks reach far beyond it.
 		((DisplayAccessor) display).fakedeath$setWidth(cullSize);
@@ -243,7 +241,7 @@ public abstract class Scene {
 
 	/** A chat line that looks like a normal player message. */
 	protected static void say(Minecraft minecraft, Component speaker, Component text) {
-		minecraft.gui.hud.getChat().addServerSystemMessage(Component.literal("<").append(speaker).append("> ").append(text));
+		minecraft.gui.getChat().addServerSystemMessage(Component.literal("<").append(speaker).append("> ").append(text));
 	}
 
 	protected static void sound(ClientLevel level, Vec3 pos, SoundEvent sound, SoundSource source, float volume, float pitch) {

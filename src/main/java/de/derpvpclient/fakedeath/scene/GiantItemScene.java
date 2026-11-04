@@ -16,7 +16,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Display;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -113,7 +113,7 @@ public class GiantItemScene extends Scene {
 		if (tick == OUT) {
 			handPos = handPosition(player);
 			above = player.getEyePosition().add(0.0, hover, 0.0);
-			display = spawn(level, EntityTypes.ITEM_DISPLAY, handPos);
+			display = spawn(level, EntityType.ITEM_DISPLAY, handPos);
 			((ItemDisplayAccessor) display).fakedeath$setItemStack(stack);
 			((ItemDisplayAccessor) display).fakedeath$setItemTransform(ItemDisplayContext.FIXED);
 			// Always turned to the camera, so a flat item like a sword is never seen edge-on.

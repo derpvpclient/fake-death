@@ -7,7 +7,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.phys.Vec3;
 
@@ -85,7 +85,7 @@ public class LightningScene extends Scene {
 	}
 
 	private void strike(ClientLevel level, Vec3 pos) {
-		LightningBolt bolt = spawn(level, EntityTypes.LIGHTNING_BOLT, pos);
+		LightningBolt bolt = spawn(level, EntityType.LIGHTNING_BOLT, pos);
 		bolt.setVisualOnly(true);
 		// The bolt plays its own thunder on the client.
 		bolt.setSilent(false);

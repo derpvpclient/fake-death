@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.EnderMan;
 
 /** A tall dark figure between the trees, a little closer every time you look. */
@@ -44,7 +44,7 @@ public class SlendermanScene extends Scene {
 			}
 
 			// Never seen moving, it is just somewhere else the next moment.
-			figure = spawn(level, EntityTypes.ENDERMAN, groundSpot(level, player, DISTANCES[step], ANGLES[step]));
+			figure = spawn(level, EntityType.ENDERMAN, groundSpot(level, player, DISTANCES[step], ANGLES[step]));
 			sound(level, player.position(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.HOSTILE, 0.6F + step * 0.2F, 0.7F + step * 0.05F);
 
 			if (step == 2) {

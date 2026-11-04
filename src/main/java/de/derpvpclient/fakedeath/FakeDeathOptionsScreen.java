@@ -42,7 +42,7 @@ public class FakeDeathOptionsScreen extends OptionsSubScreen {
 	@Override
 	protected void addFooter() {
 		LinearLayout footer = layout.addToFooter(LinearLayout.horizontal().spacing(8));
-		footer.addChild(Button.builder(Component.translatable("fakedeath.test.open"), button -> minecraft.gui.setScreen(new TestScreen(this))).build());
+		footer.addChild(Button.builder(Component.translatable("fakedeath.test.open"), button -> minecraft.setScreen(new TestScreen(this))).build());
 		footer.addChild(Button.builder(CommonComponents.GUI_DONE, button -> onClose()).build());
 	}
 

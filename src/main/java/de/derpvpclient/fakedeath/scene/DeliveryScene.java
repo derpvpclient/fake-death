@@ -12,7 +12,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Display;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -69,7 +69,7 @@ public class DeliveryScene extends Scene {
 			Vec3 toward = player.position().subtract(start);
 			Vec3 flat = new Vec3(toward.x, 0.0, toward.z).normalize();
 			stand = player.position().subtract(flat.scale(2.8));
-			courier = spawn(level, EntityTypes.VILLAGER, start);
+			courier = spawn(level, EntityType.VILLAGER, start);
 			courier.setCustomName(NAME);
 			courier.setCustomNameVisible(true);
 			courier.noPhysics = true;

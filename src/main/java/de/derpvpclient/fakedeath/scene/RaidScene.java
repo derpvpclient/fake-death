@@ -9,7 +9,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Ravager;
@@ -56,7 +56,7 @@ public class RaidScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.mob", player.getDisplayName(), EntityTypes.RAVAGER.getDescription());
+		return Component.translatable("death.attack.mob", player.getDisplayName(), EntityType.RAVAGER.getDescription());
 	}
 
 	@Override
@@ -150,7 +150,7 @@ public class RaidScene extends Scene {
 		side = new Vec3(-direction.z, 0.0, direction.x);
 
 		for (double offset : SIDES) {
-			Pillager pillager = spawn(level, EntityTypes.PILLAGER, spot.add(side.scale(offset)));
+			Pillager pillager = spawn(level, EntityType.PILLAGER, spot.add(side.scale(offset)));
 			pillager.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.CROSSBOW));
 			Walker walker = new Walker(pillager, spot.add(side.scale(offset)));
 			walker.walkTo(player.position().add(direction.scale(9.0)).add(side.scale(offset * 0.7)), APPEAR, ARRIVE - APPEAR, false);
@@ -158,7 +158,7 @@ public class RaidScene extends Scene {
 		}
 
 		Vec3 behind = spot.add(direction.scale(3.0));
-		ravager = new Walker(spawn(level, EntityTypes.RAVAGER, behind), behind);
+		ravager = new Walker(spawn(level, EntityType.RAVAGER, behind), behind);
 		ravager.walkTo(player.position().add(direction.scale(13.0)), APPEAR, ARRIVE - APPEAR + 20, false);
 	}
 

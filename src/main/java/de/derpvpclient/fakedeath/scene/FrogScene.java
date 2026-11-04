@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.animal.frog.Frog;
 import net.minecraft.world.entity.animal.frog.FrogVariant;
@@ -116,7 +116,7 @@ public class FrogScene extends Scene {
 		double angle = random.nextDouble() * Mth.TWO_PI;
 		double distance = 1.5 + random.nextDouble() * 4.5;
 		Vec3 start = player.position().add(Math.cos(angle) * distance, DROP_HEIGHT, Math.sin(angle) * distance);
-		Frog frog = spawn(level, EntityTypes.FROG, start);
+		Frog frog = spawn(level, EntityType.FROG, start);
 
 		level.registryAccess().lookupOrThrow(Registries.FROG_VARIANT).get(COLORS.get(index % COLORS.size()))
 			.ifPresent(color -> ((FrogAccessor) frog).fakedeath$setVariant(color));

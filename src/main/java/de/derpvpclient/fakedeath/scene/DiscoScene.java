@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.parrot.Parrot;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.phys.Vec3;
@@ -45,7 +45,7 @@ public class DiscoScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.explosion.player", player.getDisplayName(), EntityTypes.CREEPER.getDescription());
+		return Component.translatable("death.attack.explosion.player", player.getDisplayName(), EntityType.CREEPER.getDescription());
 	}
 
 	@Override
@@ -73,12 +73,12 @@ public class DiscoScene extends Scene {
 		}
 
 		if (tick == CREEPER) {
-			creeper = spawn(level, EntityTypes.CREEPER, floor);
+			creeper = spawn(level, EntityType.CREEPER, floor);
 			creeper.noPhysics = true;
 
 			Vec3 side = horizontalLook(player).yRot(Mth.HALF_PI);
 			for (int s : new int[] {-1, 1}) {
-				Parrot parrot = spawn(level, EntityTypes.PARROT, groundSpot(level, player, 3.0, 0.0).add(side.scale(s * 1.6)));
+				Parrot parrot = spawn(level, EntityType.PARROT, groundSpot(level, player, 3.0, 0.0).add(side.scale(s * 1.6)));
 				parrot.noPhysics = true;
 				parrots.add(parrot);
 			}

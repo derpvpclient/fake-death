@@ -98,7 +98,7 @@ final class Demo {
 			finish();
 			return;
 		}
-		if ((!player.onGround() || minecraft.gui.screen() != null) && ++waitedForGround < GIVE_UP) {
+		if ((!player.onGround() || minecraft.screen != null) && ++waitedForGround < GIVE_UP) {
 			return;
 		}
 		waitedForGround = 0;
@@ -128,7 +128,7 @@ final class Demo {
 	}
 
 	private static void photo(Minecraft minecraft, String name) {
-		Screenshot.grab(minecraft.gameDirectory, "fakedeath-" + name + ".png", minecraft.gameRenderer.mainRenderTarget(), 1,
+		Screenshot.grab(minecraft.gameDirectory, "fakedeath-" + name + ".png", minecraft.getMainRenderTarget(), 1,
 			message -> FakeDeathClient.LOGGER.info("[Fake Death demo] {}", message.getString()));
 	}
 

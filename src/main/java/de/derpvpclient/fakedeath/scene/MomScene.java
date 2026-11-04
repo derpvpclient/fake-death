@@ -23,7 +23,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Display;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.BlockItem;
@@ -105,7 +105,7 @@ public class MomScene extends Scene {
 
 		if (tick == DOOR) {
 			sound(level, behind, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 1.0F, 1.0F);
-			mom = spawn(level, EntityTypes.VILLAGER, behind);
+			mom = spawn(level, EntityType.VILLAGER, behind);
 			mom.setCustomName(NAME);
 			mom.setCustomNameVisible(true);
 			mom.noPhysics = true;
@@ -171,7 +171,7 @@ public class MomScene extends Scene {
 	private void throwNext(ClientLevel level, int tick) {
 		flyingStack = ammo.get(throwIndex++);
 		throwFrom = mom.getEyePosition().add(0.0, 0.2, 0.0);
-		flying = spawn(level, EntityTypes.ITEM_DISPLAY, throwFrom);
+		flying = spawn(level, EntityType.ITEM_DISPLAY, throwFrom);
 		((ItemDisplayAccessor) flying).fakedeath$setItemStack(flyingStack);
 		((ItemDisplayAccessor) flying).fakedeath$setItemTransform(ItemDisplayContext.FIXED);
 		((DisplayAccessor) flying).fakedeath$setInterpolationDuration(1);

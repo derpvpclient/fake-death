@@ -8,7 +8,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Giant;
 import net.minecraft.world.phys.Vec3;
 
@@ -64,7 +64,7 @@ public class GiantScene extends Scene {
 			start = groundSpot(level, player, DISTANCE, (random.nextDouble() - 0.5) * 30.0);
 			Vec3 away = start.subtract(player.position());
 			direction = new Vec3(-away.x, 0.0, -away.z).normalize();
-			giant = spawn(level, EntityTypes.GIANT, start);
+			giant = spawn(level, EntityType.GIANT, start);
 			giant.noPhysics = true;
 			sound(level, start, SoundEvents.ZOMBIE_AMBIENT, SoundSource.HOSTILE, 6.0F, 0.3F);
 		}

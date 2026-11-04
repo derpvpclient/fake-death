@@ -7,7 +7,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.goat.Goat;
 import net.minecraft.world.phys.Vec3;
 
@@ -52,7 +52,7 @@ public class GoatScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.mob", player.getDisplayName(), EntityTypes.GOAT.getDescription());
+		return Component.translatable("death.attack.mob", player.getDisplayName(), EntityType.GOAT.getDescription());
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class GoatScene extends Scene {
 			Vec3 away = spot.subtract(player.position());
 			direction = new Vec3(away.x, 0.0, away.z).normalize();
 			pos = new Vec3(spot.x, floor(level, spot.x, spot.z, player.getY()), spot.z);
-			goat = spawn(level, EntityTypes.GOAT, pos);
+			goat = spawn(level, EntityType.GOAT, pos);
 			goat.setScreamingGoat(true);
 			goat.noPhysics = true;
 		}

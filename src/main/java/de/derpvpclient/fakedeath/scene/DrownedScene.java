@@ -8,7 +8,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.zombie.Drowned;
 import net.minecraft.world.item.ItemStack;
@@ -37,7 +37,7 @@ public class DrownedScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.trident", player.getDisplayName(), EntityTypes.DROWNED.getDescription());
+		return Component.translatable("death.attack.trident", player.getDisplayName(), EntityType.DROWNED.getDescription());
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class DrownedScene extends Scene {
 		turnTowards(player, surface.add(0, 1.5, 0), 0.1F);
 
 		if (tick == RISE) {
-			drowned = spawn(level, EntityTypes.DROWNED, surface.add(0, -2.0, 0));
+			drowned = spawn(level, EntityType.DROWNED, surface.add(0, -2.0, 0));
 			drowned.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.TRIDENT));
 			// Arm raised for the throw.
 			drowned.setAggressive(true);

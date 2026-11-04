@@ -7,7 +7,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.item.ItemStack;
@@ -28,13 +28,13 @@ public class SkeletonScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.arrow", player.getDisplayName(), EntityTypes.SKELETON.getDescription());
+		return Component.translatable("death.attack.arrow", player.getDisplayName(), EntityType.SKELETON.getDescription());
 	}
 
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
 		if (tick == 0) {
-			skeleton = spawn(level, EntityTypes.SKELETON, groundSpot(level, player, 10.0, 160.0));
+			skeleton = spawn(level, EntityType.SKELETON, groundSpot(level, player, 10.0, 160.0));
 			skeleton.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
 			// Drawn bow.
 			skeleton.setAggressive(true);

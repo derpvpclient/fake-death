@@ -11,7 +11,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.phys.Vec3;
 
@@ -78,7 +78,7 @@ public class GhostScene extends Scene {
 		for (int i = 0; i < APPEAR.length; i++) {
 			if (tick == APPEAR[i]) {
 				Vec3 spot = orbit(head, i, tick);
-				ghosts.add(spawn(level, EntityTypes.VEX, spot));
+				ghosts.add(spawn(level, EntityType.VEX, spot));
 				particles(level, ParticleTypes.SOUL, spot, 12, 0.4, 0.05);
 				sound(level, spot, SoundEvents.VEX_AMBIENT, SoundSource.HOSTILE, 1.2F, 0.7F);
 			}

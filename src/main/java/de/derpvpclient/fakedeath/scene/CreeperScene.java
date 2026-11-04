@@ -7,7 +7,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.phys.Vec3;
 
@@ -38,7 +38,7 @@ public class CreeperScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.explosion.player", player.getDisplayName(), EntityTypes.CREEPER.getDescription());
+		return Component.translatable("death.attack.explosion.player", player.getDisplayName(), EntityType.CREEPER.getDescription());
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class CreeperScene extends Scene {
 			// Out of sight behind the player, then it walks up quietly.
 			from = groundSpot(level, player, 7.0, 180.0);
 			to = groundSpot(level, player, 1.6, 180.0);
-			creeper = spawn(level, EntityTypes.CREEPER, from);
+			creeper = spawn(level, EntityType.CREEPER, from);
 			creeper.setInvisible(invisible);
 		}
 

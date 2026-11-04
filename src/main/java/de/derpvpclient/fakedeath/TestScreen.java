@@ -37,9 +37,9 @@ public class TestScreen extends Screen {
 	}
 
 	static void tick(Minecraft minecraft) {
-		if (openNextTick && minecraft.gui.screen() == null) {
+		if (openNextTick && minecraft.screen == null) {
 			openNextTick = false;
-			minecraft.gui.setScreen(new TestScreen(null));
+			minecraft.setScreen(new TestScreen(null));
 		}
 	}
 
@@ -101,10 +101,10 @@ public class TestScreen extends Screen {
 	}
 
 	private void start(String id) {
-		minecraft.gui.setScreen(null);
+		minecraft.setScreen(null);
 		FakeDeath.schedule(0, id);
 		Component scene = id != null ? Component.translatable("fakedeath.scene." + id) : Component.translatable("fakedeath.test.fitting");
-		minecraft.gui.hud.getChat().addClientSystemMessage(Component.literal("[Fake Death] ").withStyle(ChatFormatting.DARK_RED)
+		minecraft.gui.getChat().addClientSystemMessage(Component.literal("[Fake Death] ").withStyle(ChatFormatting.DARK_RED)
 			.append(Component.translatable("fakedeath.command.test", scene).withStyle(ChatFormatting.GRAY)));
 	}
 
@@ -118,6 +118,6 @@ public class TestScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		minecraft.gui.setScreen(parent);
+		minecraft.setScreen(parent);
 	}
 }

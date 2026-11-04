@@ -81,7 +81,7 @@ public class GlitchScene extends Scene {
 			error(minecraft, Component.translatable("fakedeath.glitch.null", player.getName()));
 		}
 		if (tick == ERROR_3) {
-			minecraft.gui.hud.getChat().addServerSystemMessage(Component.translatable("fakedeath.glitch.broken").withStyle(ChatFormatting.OBFUSCATED, ChatFormatting.DARK_PURPLE));
+			minecraft.gui.getChat().addServerSystemMessage(Component.translatable("fakedeath.glitch.broken").withStyle(ChatFormatting.OBFUSCATED, ChatFormatting.DARK_PURPLE));
 		}
 
 		if (tick >= TEAR && tick < FALL && tick % 3 == 0) {
@@ -115,6 +115,6 @@ public class GlitchScene extends Scene {
 	}
 
 	private static void error(Minecraft minecraft, Component text) {
-		minecraft.gui.hud.getChat().addServerSystemMessage(text.copy().withStyle(ChatFormatting.RED));
+		minecraft.gui.getChat().addServerSystemMessage(text.copy().withStyle(ChatFormatting.RED));
 	}
 }

@@ -12,7 +12,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.bee.Bee;
 import net.minecraft.world.phys.Vec3;
 
@@ -49,7 +49,7 @@ public class BeeScene extends Scene {
 			home = hive != null ? Vec3.atCenterOf(hive) : groundSpot(level, player, 6.0, 40.0).add(0, 1.5, 0);
 
 			for (int i = 0; i < SWARM; i++) {
-				Bee bee = spawn(level, EntityTypes.BEE, home);
+				Bee bee = spawn(level, EntityType.BEE, home);
 				// Angry eyes and the red stinger look, as long as the scene runs.
 				bee.setPersistentAngerEndTime(level.getGameTime() + 2000);
 				bees.add(bee);

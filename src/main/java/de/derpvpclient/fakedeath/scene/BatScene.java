@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.phys.Vec3;
 
@@ -61,7 +61,7 @@ public class BatScene extends Scene {
 
 		int since = tick - SWARM;
 		if (since >= 0 && since < COUNT) {
-			Bat bat = spawn(level, EntityTypes.BAT, cave);
+			Bat bat = spawn(level, EntityType.BAT, cave);
 			bat.setResting(false);
 			bat.noPhysics = true;
 			bats.add(new Flyer(bat, cave, random.nextFloat() * Mth.TWO_PI, (0.12F + random.nextFloat() * 0.15F) * (random.nextBoolean() ? 1 : -1),

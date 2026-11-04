@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -110,7 +110,7 @@ public class GiantFrogScene extends Scene {
 		direction = new Vec3(away.x, 0.0, away.z).normalize();
 		pos = new Vec3(spot.x, floor(level, spot.x, spot.z, player.getY()), spot.z);
 
-		frog = spawn(level, EntityTypes.FROG, pos);
+		frog = spawn(level, EntityType.FROG, pos);
 		level.registryAccess().lookupOrThrow(Registries.FROG_VARIANT).get(COLORS.get(random.nextInt(COLORS.size())))
 			.ifPresent(color -> ((FrogAccessor) frog).fakedeath$setVariant(color));
 

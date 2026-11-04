@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Phantom;
 import net.minecraft.world.phys.Vec3;
 
@@ -33,7 +33,7 @@ public class PhantomScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.mob", player.getDisplayName(), EntityTypes.PHANTOM.getDescription());
+		return Component.translatable("death.attack.mob", player.getDisplayName(), EntityType.PHANTOM.getDescription());
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class PhantomScene extends Scene {
 			center = player.position().add(0, CIRCLE_HEIGHT, 0);
 
 			for (int i = 0; i < COUNT; i++) {
-				phantoms.add(spawn(level, EntityTypes.PHANTOM, circle(i, 0)));
+				phantoms.add(spawn(level, EntityType.PHANTOM, circle(i, 0)));
 			}
 
 			sound(level, center, SoundEvents.PHANTOM_AMBIENT, SoundSource.HOSTILE, 3.0F, 0.8F);
