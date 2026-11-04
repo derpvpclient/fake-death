@@ -5,8 +5,8 @@
 	"name": "Fake Death game test",
 	"environment": "client",
 	"entrypoints": {
-		"fabric-client-gametest": [
-			"de.derpvpclient.fakedeath.gametest.DemoGameTest"
+		"client": [
+			"de.derpvpclient.fakedeath.gametest.DemoStarter"
 		]
 	}
 }
