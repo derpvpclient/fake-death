@@ -18,7 +18,7 @@ public class DemoGameTest implements FabricClientGameTest {
 		Path marker = FabricLoader.getInstance().getConfigDir().resolve("fakedeath-demo.txt");
 
 		try {
-			Files.writeString(marker, "demo");
+			Files.writeString(marker, System.getProperty("fakedeath.demoScenes", "demo"));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
