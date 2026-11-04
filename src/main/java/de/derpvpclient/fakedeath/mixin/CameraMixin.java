@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Camera.class)
 public abstract class CameraMixin {
 	@Shadow
-	public abstract Vec3 position();
+	public abstract Vec3 getPosition();
 
 	@Shadow
 	protected abstract void setPosition(Vec3 position);
@@ -32,7 +32,7 @@ public abstract class CameraMixin {
 		Vec3 offset = CameraDirector.positionOffset();
 
 		if (offset.lengthSqr() > 1.0E-6) {
-			setPosition(position().add(offset));
+			setPosition(getPosition().add(offset));
 		}
 	}
 

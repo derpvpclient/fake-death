@@ -18,7 +18,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// Only for the settings button in Mod Menu, the mod runs without it.
-	modCompileOnly "maven.modrinth:modmenu:15.0.2"
+	modCompileOnly "maven.modrinth:modmenu:14.0.2"
 }
 
 processResources {

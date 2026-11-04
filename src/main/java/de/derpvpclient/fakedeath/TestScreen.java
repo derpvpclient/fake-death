@@ -5,7 +5,6 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ScrollableLayout;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
@@ -23,8 +22,9 @@ public class TestScreen extends Screen {
 	private static boolean openNextTick;
 
 	private final Screen parent;
-	private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
-	private ScrollableLayout scroll;
+	private HeaderAndFooterLayout layout;
+	// No scrolling layout before 1.21.6, so the scenes are split into pages that fit the screen.
+	private int page;
 
 	public TestScreen(Screen parent) {
 		super(Component.translatable("fakedeath.test.title"));
@@ -45,6 +45,7 @@ public class TestScreen extends Screen {
 
 	@Override
 	protected void init() {
+		layout = new HeaderAndFooterLayout(this);
 		layout.addTitleHeader(title, font);
 
 		GridLayout grid = new GridLayout().columnSpacing(4).rowSpacing(4);
@@ -55,14 +56,21 @@ public class TestScreen extends Screen {
 			.sorted(Comparator.comparing(id -> Component.translatable("fakedeath.scene." + id).getString()))
 			.toList();
 
-		for (String id : scenes) {
+		int perPage = Math.max(1, (layout.getContentHeight() + 4) / 24) * COLUMNS;
+		int pages = (scenes.size() + perPage - 1) / perPage;
+		page = Math.min(page, pages - 1);
+
+		for (String id : scenes.subList(page * perPage, Math.min(scenes.size(), (page + 1) * perPage))) {
 			rows.addChild(sceneButton(id));
 		}
 
-		scroll = new ScrollableLayout(minecraft, grid, layout.getContentHeight());
-		layout.addToContents(scroll);
+		layout.addToContents(grid);
 
 		LinearLayout footer = layout.addToFooter(LinearLayout.horizontal().spacing(8));
+		if (pages > 1) {
+			Button back = footer.addChild(Button.builder(Component.literal("<"), button -> turn(-1)).width(20).build());
+			back.active = page > 0;
+		}
 		footer.addChild(Button.builder(Component.translatable("fakedeath.test.fitting"), button -> start(null))
 			.width(BUTTON_WIDTH).tooltip(Tooltip.create(Component.translatable("fakedeath.test.fitting.tooltip"))).build());
 		footer.addChild(Button.builder(Component.translatable("fakedeath.test.cancel"), button -> {
@@ -70,9 +78,13 @@ public class TestScreen extends Screen {
 			onClose();
 		}).width(BUTTON_WIDTH).build());
 		footer.addChild(Button.builder(Component.translatable("gui.done"), button -> onClose()).width(BUTTON_WIDTH).build());
+		if (pages > 1) {
+			Button next = footer.addChild(Button.builder(Component.literal(">"), button -> turn(1)).width(20).build());
+			next.active = page < pages - 1;
+		}
 
 		layout.visitWidgets(this::addRenderableWidget);
-		repositionElements();
+		layout.arrangeElements();
 	}
 
 	private Button sceneButton(String id) {
@@ -108,12 +120,15 @@ public class TestScreen extends Screen {
 			.append(Component.translatable("fakedeath.command.test", scene).withStyle(ChatFormatting.GRAY)));
 	}
 
+	private void turn(int pages) {
+		page += pages;
+		rebuildWidgets();
+	}
+
+	// A new size can fit a different number of scenes per page.
 	@Override
 	protected void repositionElements() {
-		if (scroll != null) {
-			scroll.setMaxHeight(layout.getContentHeight());
-		}
-		layout.arrangeElements();
+		rebuildWidgets();
 	}
 
 	@Override

@@ -128,7 +128,7 @@ final class Demo {
 	}
 
 	private static void photo(Minecraft minecraft, String name) {
-		Screenshot.grab(minecraft.gameDirectory, "fakedeath-" + name + ".png", minecraft.getMainRenderTarget(), 1,
+		Screenshot.grab(minecraft.gameDirectory, "fakedeath-" + name + ".png", minecraft.getMainRenderTarget(),
 			message -> FakeDeathClient.LOGGER.info("[Fake Death demo] {}", message.getString()));
 	}
 
