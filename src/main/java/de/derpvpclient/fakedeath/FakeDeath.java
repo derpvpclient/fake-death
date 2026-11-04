@@ -426,12 +426,5 @@ public final class FakeDeath {
 		}
 
 		minecraft.setScreen(null);
-
-		if (FakeDeathConfig.reveal) {
-			Gui hud = minecraft.gui;
-			hud.setTimes(5, 40, 15);
-			hud.setSubtitle(Component.translatable("fakedeath.reveal.subtitle").withStyle(ChatFormatting.GRAY));
-			hud.setTitle(Component.translatable("fakedeath.reveal.title").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
-		}
 	}
 }
