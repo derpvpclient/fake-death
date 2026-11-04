@@ -40,3 +40,12 @@ fabricApi {
 		eula = true
 	}
 }
+
+// ./gradlew runClientGameTest -PdemoScenes=tornado,mond plays only those scenes.
+loom {
+	runs {
+		clientGameTest {
+			vmArg "-Dfakedeath.demoScenes=" + (project.findProperty("demoScenes") ?: "demo")
+		}
+	}
+}
