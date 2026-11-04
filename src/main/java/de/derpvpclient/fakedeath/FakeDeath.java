@@ -116,7 +116,7 @@ public final class FakeDeath {
 
 		fakeHealth = Math.max(1.0F, fakeHealth - startHealth * share);
 		// Makes the hearts blink like on real damage. Only the client reads it for that.
-		player.damageCooldownTime = 10;
+		player.invulnerableTime = 10;
 	}
 
 	/** The killing blow of a scene: no hearts left, and the death screen opens at the end of this tick. */
@@ -126,7 +126,7 @@ public final class FakeDeath {
 		}
 
 		fakeHealth = 0.0F;
-		player.damageCooldownTime = 10;
+		player.invulnerableTime = 10;
 		killed = true;
 	}
 
@@ -345,7 +345,7 @@ public final class FakeDeath {
 		killed = false;
 		deathTicks = 0;
 		fakeHealth = 0.0F;
-		player.damageCooldownTime = 10;
+		player.invulnerableTime = 10;
 	}
 
 	private static void finish(ClientLevel level, LocalPlayer player) {

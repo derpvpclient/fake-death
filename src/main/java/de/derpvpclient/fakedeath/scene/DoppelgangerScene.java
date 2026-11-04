@@ -14,7 +14,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.PlayerSkin;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -85,7 +84,7 @@ public class DoppelgangerScene extends Scene {
 
 		for (int hit : HITS) {
 			if (tick == hit) {
-				copy.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+				copy.swing(InteractionHand.MAIN_HAND);
 				hit(level, player, SoundEvents.PLAYER_HURT, 0.3F, hit == HITS[HITS.length - 1]);
 			}
 		}

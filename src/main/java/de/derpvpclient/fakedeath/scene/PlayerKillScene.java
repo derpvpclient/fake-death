@@ -16,7 +16,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -72,7 +71,7 @@ public class PlayerKillScene extends Scene {
 			if (tick == start() + hit) {
 				boolean last = hit == HITS[HITS.length - 1];
 				if (stranger != null) {
-					stranger.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+					stranger.swing(InteractionHand.MAIN_HAND);
 				}
 				sound(level, player.position(), last ? SoundEvents.PLAYER_ATTACK_CRIT : SoundEvents.PLAYER_ATTACK_STRONG, SoundSource.PLAYERS, 1.0F, 1.0F);
 				particles(level, ParticleTypes.CRIT, player.getEyePosition().add(0, -0.4, 0), last ? 16 : 8, 0.3, 0.3);

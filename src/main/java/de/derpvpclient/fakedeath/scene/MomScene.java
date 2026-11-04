@@ -31,7 +31,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -177,7 +176,7 @@ public class MomScene extends Scene {
 		((ItemDisplayAccessor) flying).fakedeath$setItemTransform(ItemDisplayContext.FIXED);
 		((DisplayAccessor) flying).fakedeath$setInterpolationDuration(1);
 		thrown = tick;
-		mom.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+		mom.swing(InteractionHand.MAIN_HAND);
 		sound(level, throwFrom, SoundEvents.WITCH_THROW, SoundSource.NEUTRAL, 1.0F, 1.0F + random.nextFloat() * 0.3F);
 	}
 

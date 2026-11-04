@@ -35,12 +35,12 @@ public abstract class CameraMixin {
 
 	// Lets the vanilla death camera roll play, without the player really being dead.
 	@Inject(method = "extractRenderState", at = @At("TAIL"))
-	private void fakedeath$deathRoll(CameraRenderState state, DeltaTracker deltaTracker, CallbackInfo ci) {
+	private void fakedeath$deathRoll(CameraRenderState state, float partialTicks, CallbackInfo ci) {
 		CameraEntityRenderState entity = state.entityRenderState;
 
 		if (FakeDeath.isActive() && entity != null && entity.isLiving) {
 			entity.isDeadOrDying = true;
-			entity.deathTime = FakeDeath.deathTicks() + state.cameraEntityPartialTicks;
+			entity.deathTime = FakeDeath.deathTicks() + partialTicks;
 		}
 	}
 

@@ -8,7 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.EnderMan;
 
 /** A tall dark figure between the trees, a little closer every time you look. */
 public class SlendermanScene extends Scene {
@@ -17,7 +17,7 @@ public class SlendermanScene extends Scene {
 	private static final int STEP = 34;
 	private static final int SCARE = STEP * (DISTANCES.length - 1);
 
-	private Enderman figure;
+	private EnderMan figure;
 
 	@Override
 	public int length() {
