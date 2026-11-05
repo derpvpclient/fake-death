@@ -84,7 +84,7 @@ public class HazardScene extends Scene {
 		if (extra != Extra.HUNGER || now < FOOD_GONE) {
 			return 0;
 		}
-		return Math.min(130, (now - FOOD_GONE) * 130 / (LENGTH - FOOD_GONE)) << 24;
+		return Math.min(170, 30 + (now - FOOD_GONE) * 140 / (LENGTH - FOOD_GONE)) << 24;
 	}
 
 	@Override
@@ -105,6 +105,15 @@ public class HazardScene extends Scene {
 				}
 				default -> {
 				}
+			}
+		}
+
+		if (extra == Extra.HUNGER) {
+			// Weaker with every second: the view sways, sinks lower and the stomach growls.
+			float weak = tick / (float) LENGTH;
+			moveCamera(new Vec3(Math.sin(tick * 0.09) * 0.25 * weak, -weak * weak * 0.9 + Math.sin(tick * 0.05) * 0.08, 0.0));
+			if (tick % 35 == 10) {
+				sound(level, body, SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.7F, 0.4F);
 			}
 		}
 
