@@ -81,11 +81,21 @@ public class PistonScene extends Scene {
 
 		for (int i = 0; i < bodies.size(); i++) {
 			Vec3 side = new Vec3(SIDES[i].getStepX(), 0.0, SIDES[i].getStepZ());
-			Vec3 at = center.add(side.scale(FAR));
+			double rise = Math.min(1.0, (tick - 5 - i * 8) / 8.0);
+			Vec3 at = center.add(side.scale(FAR)).add(0.0, (rise - 1.0) * 1.1, 0.0);
 			place(bodies.get(i), at, new Vector3f(1.0F), new Quaternionf());
+			if (rise < 1.0 && tick % 2 == 0) {
+				particles(level, new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK, net.minecraft.world.level.block.Blocks.DIRT.defaultBlockState()), center.add(side.scale(FAR)).add(0.0, -0.4, 0.0), 4, 0.4, 0.2);
+			}
 			// The head only shows while it moves out, resting it would flicker inside the piston face.
 			place(heads.get(i), at.subtract(side.scale(extend * 0.95)), new Vector3f(extend > 0.02 ? 1.0F : 0.001F), new Quaternionf());
 		}
-		turnTowards(player, center.add(horizontalLook(player).scale(FAR)), 0.1F);
+		// From a little above and behind, so all four pistons can be seen closing in.
+		if (tick < PUSHES[PUSHES.length - 1] + PUSH) {
+			moveCamera(horizontalLook(player).scale(-1.6).add(0.0, 1.8, 0.0));
+		} else {
+			moveCamera(Vec3.ZERO);
+		}
+		turnTowards(player, center.add(0.0, -0.3, 0.0), 0.2F);
 	}
 }
