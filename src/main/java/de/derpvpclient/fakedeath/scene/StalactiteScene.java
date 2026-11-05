@@ -21,12 +21,12 @@ public class StalactiteScene extends Scene {
 	private static final int CRACK_ID = -2_100_000;
 
 	/** The dripstone column, the tip first. Empty when testing without one: then it falls from out of sight. */
-	private final List<BlockPos> column;
+	private final List<BlockPos> column = new ArrayList<>();
 	private final List<FallingBlockEntity> falling = new ArrayList<>();
 	private int impact = -1;
 
 	private StalactiteScene(List<BlockPos> column) {
-		this.column = column;
+		this.column.addAll(column);
 	}
 
 	/** The lowest pointed dripstone right above the player, with the ones hanging above it. */
@@ -71,6 +71,9 @@ public class StalactiteScene extends Scene {
 
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
+		if (tick == 0) {
+			prepare(level, player);
+		}
 		Vec3 tip = column.isEmpty() ? player.getEyePosition().add(0, 8, 0) : Vec3.atBottomCenterOf(column.getFirst());
 
 		if (tick < FALL) {
@@ -110,6 +113,32 @@ public class StalactiteScene extends Scene {
 			sound(level, player.position(), SoundEvents.POINTED_DRIPSTONE_LAND, SoundSource.BLOCKS, 2.0F, 1.0F);
 			level.addDestroyBlockEffect(player.blockPosition().above(), Blocks.POINTED_DRIPSTONE.defaultBlockState());
 			kill(level, player, SoundEvents.PLAYER_HURT);
+		}
+	}
+
+	/**
+	 * In a dark cave nothing could be seen, so a soft light comes up around the player, only on this client. Without a
+	 * real dripstone above, one grows out of the ceiling first, so there is something to come down.
+	 */
+	private void prepare(ClientLevel level, LocalPlayer player) {
+		BlockPos head = player.blockPosition().above();
+		if (level.getMaxLocalRawBrightness(head) < 8) {
+			addEffect(player, net.minecraft.world.effect.MobEffects.NIGHT_VISION, FALL + 100);
+		}
+		if (!column.isEmpty()) {
+			return;
+		}
+		for (int up = 3; up <= 12; up++) {
+			BlockPos ceiling = head.above(up);
+			if (!level.getBlockState(ceiling).isAir()) {
+				BlockPos base = ceiling.below();
+				BlockPos tipPos = base.below();
+				if (placeBlock(level, base, Looks.dripstone(false)) && placeBlock(level, tipPos, Looks.dripstone(true))) {
+					column.add(tipPos);
+					column.add(base);
+				}
+				return;
+			}
 		}
 	}
 
