@@ -22,6 +22,16 @@ public class LightningScene extends Scene {
 	private static final int DEATH = STRIKE + 45;
 
 	private Vec3 distantBolt;
+	private int now;
+
+	@Override
+	public int screenTint() {
+		// Darker and darker under the storm, white for a moment at the strike.
+		if (now >= STRIKE && now < STRIKE + 4) {
+			return 0xC0FFFFFF;
+		}
+		return (Math.min(120, now * 2) << 24) | 0x101828;
+	}
 
 	@Override
 	public int length() {
@@ -36,6 +46,17 @@ public class LightningScene extends Scene {
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
 		Vec3 far = player.position().add(horizontalLook(player).scale(-40.0)).add(0, 20, 0);
+		now = tick;
+		if (tick < DEATH) {
+			for (int i = 0; i < 12; i++) {
+				level.addParticle(ParticleTypes.FALLING_WATER, player.getX() + (random.nextDouble() - 0.5) * 14, player.getY() + 6 + random.nextDouble() * 3, player.getZ() + (random.nextDouble() - 0.5) * 14, 0, -1.0, 0);
+			}
+		}
+		if (tick == 12 || tick == 48) {
+			// Bolts far away, closer each time.
+			strike(level, groundSpot(level, player, tick == 12 ? 40.0 : 25.0, tick == 12 ? -50.0 : 60.0));
+			level.setSkyFlashTime(2);
+		}
 
 		if (tick == 0) {
 			sound(level, far, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 2.0F, 0.55F);
