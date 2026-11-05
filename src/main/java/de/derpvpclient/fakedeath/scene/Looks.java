@@ -27,6 +27,7 @@ final class Looks {
 	static final SoundEvent CHICKEN = SoundEvent.createVariableRangeEvent(net.minecraft.resources.Identifier.withDefaultNamespace("entity.chicken.ambient"));
 	static final SoundEvent CHICKEN_HURT = SoundEvent.createVariableRangeEvent(net.minecraft.resources.Identifier.withDefaultNamespace("entity.chicken.hurt"));
 	static final BlockState CHAIN = Blocks.IRON_CHAIN.defaultBlockState();
+	static final SoundEvent SADDLE = SoundEvents.HORSE_SADDLE.value();
 
 	private Looks() {
 	}
@@ -47,6 +48,21 @@ final class Looks {
 	/** Draws a display at full brightness, so it never shows up dark against the sky. */
 	static void glow(net.minecraft.world.entity.Display display) {
 		((de.derpvpclient.fakedeath.mixin.DisplayAccessor) display).fakedeath$setBrightnessOverride(net.minecraft.util.Brightness.FULL_BRIGHT);
+	}
+
+	/** Puts a saddle on a horse. */
+	static void saddle(net.minecraft.world.entity.animal.equine.AbstractHorse horse) {
+		horse.setItemSlot(net.minecraft.world.entity.EquipmentSlot.SADDLE, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SADDLE));
+	}
+
+	/** Up on its hind legs. */
+	static void rear(net.minecraft.world.entity.animal.equine.AbstractHorse horse) {
+		horse.setStanding(40);
+	}
+
+	/** Bamboo crumbs, for the panda munching. */
+	static net.minecraft.core.particles.ParticleOptions bambooCrumbs() {
+		return new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK, Blocks.BAMBOO_BLOCK.defaultBlockState());
 	}
 
 	/** Swings the main hand, like hitting or throwing. */
