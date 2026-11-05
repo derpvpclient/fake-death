@@ -3,6 +3,7 @@
 	"package": "de.derpvpclient.fakedeath.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"AxolotlAccessor",
 		"BlockDisplayAccessor",
 		"CameraMixin",
 		"DeathScreenMixin",

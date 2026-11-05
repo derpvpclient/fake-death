@@ -165,6 +165,9 @@
 	"fakedeath.scene.trainer": "Fitnesstrainer",
 	"fakedeath.scene.friseur": "Friseur",
 	"fakedeath.scene.koch": "Koch",
+	"fakedeath.scene.fahrlehrer": "Fahrlehrer",
+	"fakedeath.scene.axolotl": "Axolotl-Armee",
+	"fakedeath.scene.panda": "Hungriger Panda",
 
 	"fakedeath.death.tornado": "%1$s wurde von einem Tornado davongetragen",
 	"fakedeath.death.mond": "%1$s wurde vom Mond getroffen",
@@ -197,6 +200,9 @@
 	"fakedeath.death.trainer": "%1$s hat sich zu Tode trainiert",
 	"fakedeath.death.friseur": "%1$s hat einen etwas zu kurzen Haarschnitt bekommen",
 	"fakedeath.death.koch": "%1$s wurde vom Koch vergiftet",
+	"fakedeath.death.fahrlehrer": "%1$s ist durch die Reitprüfung gefallen",
+	"fakedeath.death.axolotl": "%1$s wurde von Axolotln angeknabbert",
+	"fakedeath.death.panda": "%1$s wurde von einem Panda mit Bambus verwechselt",
 
 	"fakedeath.influencer.name": "Influencer",
 	"fakedeath.influencer.1": "Hey Leute, willkommen zurück auf meinem Kanal!",
@@ -276,5 +282,12 @@
 	"fakedeath.koch.1": "Bonjour! Ich habe etwas Besonderes gekocht.",
 	"fakedeath.koch.2": "Hier, probier mal!",
 	"fakedeath.koch.good": "Lecker, oder? Ein geheimes Familienrezept.",
-	"fakedeath.koch.spider": "Gewürzt mit Spinnenauge. Oh, bist du allergisch?"
+	"fakedeath.koch.spider": "Gewürzt mit Spinnenauge. Oh, bist du allergisch?",
+	"fakedeath.fahrlehrer.name": "Fahrlehrer",
+	"fakedeath.fahrlehrer.1": "Guten Tag! Ihre Fahrstunde. Aufsitzen bitte, ich setze mich hinter Sie.",
+	"fakedeath.fahrlehrer.2": "Hände an die Zügel. Ganz ruhig, da kann gar nichts passieren.",
+	"fakedeath.fahrlehrer.left": "Und jetzt links …",
+	"fakedeath.fahrlehrer.wrong": "Nein, das ANDERE Links!",
+	"fakedeath.fahrlehrer.brake": "Bremsen! BREMSEN!",
+	"fakedeath.fahrlehrer.fail": "Tja. Durchgefallen. Wir machen einen neuen Termin."
 }
