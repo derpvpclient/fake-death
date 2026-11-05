@@ -29,6 +29,9 @@ final class Demo {
 	private static final int GIVE_UP = 60 * 20;
 
 	private static Boolean wanted;
+	// With -Dfakedeath.demoFrames=N every scene is also filmed as N pictures over its length.
+	private static final int FRAMES = Integer.getInteger("fakedeath.demoFrames", 0);
+	private static int lastFrame = -1;
 	private static List<String> names = Situations.NAMES;
 	private static boolean running;
 	private static int index;
@@ -69,6 +72,14 @@ final class Demo {
 				index++;
 				wait = PAUSE;
 				return;
+			}
+
+			if (FRAMES > 0 && !FakeDeath.isActive()) {
+				int frame = FakeDeath.currentSceneTick() * FRAMES / Math.max(1, scene.length());
+				if (frame > lastFrame && frame < FRAMES) {
+					lastFrame = frame;
+					photo(minecraft, name + "-f" + frame);
+				}
 			}
 
 			if (!photo && !FakeDeath.isActive() && FakeDeath.currentSceneTick() >= scene.photoTick()) {
@@ -124,6 +135,7 @@ final class Demo {
 
 		FakeDeathClient.LOGGER.info("[Fake Death demo] {} ({}/{})", name, index + 1, names.size());
 		current = next;
+		lastFrame = -1;
 		photo = false;
 		deathPhoto = false;
 		FakeDeath.startNow(minecraft, next);
