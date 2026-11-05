@@ -30,6 +30,14 @@ final class Looks {
 	private Looks() {
 	}
 
+	/** A pointed dripstone hanging down, the tip or the thicker part above it. */
+	static BlockState dripstone(boolean tip) {
+		return Blocks.POINTED_DRIPSTONE.defaultBlockState()
+			.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.VERTICAL_DIRECTION, net.minecraft.core.Direction.DOWN)
+			.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.SPELEOTHEM_THICKNESS,
+				tip ? net.minecraft.world.level.block.state.properties.SpeleothemThickness.TIP : net.minecraft.world.level.block.state.properties.SpeleothemThickness.FRUSTUM);
+	}
+
 	/** Lets a display be drawn from far away, like the moon. */
 	static void farView(net.minecraft.world.entity.Display display) {
 		((de.derpvpclient.fakedeath.mixin.DisplayAccessor) display).fakedeath$setViewRange(16.0F);
