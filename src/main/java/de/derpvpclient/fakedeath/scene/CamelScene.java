@@ -64,6 +64,12 @@ public class CamelScene extends Scene {
 			} else if (t >= 0 && t < KICK) {
 				kickBack = -0.3 + Mth.sin(t / (float) KICK * Mth.PI) * -0.8;
 			}
+			if (t == 0) {
+				camel.setDashing(true);
+			}
+			if (t == KICK + 2) {
+				camel.setDashing(false);
+			}
 			if (t == -10) {
 				sound(level, at, SoundEvents.CAMEL_AMBIENT, SoundSource.NEUTRAL, 1.2F, 0.8F);
 			}
@@ -72,7 +78,9 @@ public class CamelScene extends Scene {
 				sound(level, player.position(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, SoundSource.PLAYERS, 1.5F, 0.7F);
 				particles(level, new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SAND.defaultBlockState()), player.position(), 20, 0.5, 0.2);
 				hit(level, player, SoundEvents.PLAYER_HURT, 0.45F, kick == KICKS[KICKS.length - 1]);
-				moveCamera(away.scale(-0.8).add(0.0, 0.2, 0.0));
+				moveCamera(away.scale(-1.8).add(0.0, 0.5, 0.0));
+				cameraShake(0.5F);
+				particles(level, ParticleTypes.CLOUD, player.position(), 15, 0.6, 0.15);
 			}
 			if (t == KICK + 6) {
 				moveCamera(Vec3.ZERO);
