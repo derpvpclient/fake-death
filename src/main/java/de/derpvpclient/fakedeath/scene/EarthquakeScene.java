@@ -57,14 +57,26 @@ public class EarthquakeScene extends Scene {
 		if (since >= 0 && since % CRACK_EVERY == 0 && since / CRACK_EVERY < CRACK_LENGTH) {
 			int step = CRACK_LENGTH - since / CRACK_EVERY;
 			BlockPos column = BlockPos.containing(player.position().add(dir.scale(step))).below();
-			for (int i = 0; i < 5; i++) {
-				hideBlock(level, column.below(i));
+			Vec3 side = dir.yRot((float) (Math.PI / 2));
+			// Three blocks wide in the middle, the crack tears open with chunks flying out.
+			int width = step > 1 && step < CRACK_LENGTH - 1 ? 1 : 0;
+			for (int s = -width; s <= width; s++) {
+				BlockPos part = BlockPos.containing(player.position().add(dir.scale(step)).add(side.scale(s))).below();
+				BlockState torn = level.getBlockState(part);
+				for (int i = 0; i < 6; i++) {
+					hideBlock(level, part.below(i));
+				}
+				if (!torn.isAir()) {
+					for (int i = 0; i < 12; i++) {
+						level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, torn), part.getX() + random.nextDouble(), part.getY() + 1.0, part.getZ() + random.nextDouble(), (random.nextDouble() - 0.5) * 0.4, 0.4 + random.nextDouble() * 0.4, (random.nextDouble() - 0.5) * 0.4);
+					}
+				}
 			}
 			sound(level, Vec3.atCenterOf(column), SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1.5F, 0.6F);
 			particles(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, Vec3.atCenterOf(column).add(0.0, 1.0, 0.0), 2, 0.3, 0.02);
 		}
 		if (tick < OPEN) {
-			turnTowards(player, player.position().add(dir.scale(4.0)), 0.08F);
+			turnTowards(player, player.position().add(dir.scale(3.5)).add(0.0, -0.5, 0.0), 0.08F);
 		}
 		if (tick == OPEN) {
 			cameraShake(0.0F);
