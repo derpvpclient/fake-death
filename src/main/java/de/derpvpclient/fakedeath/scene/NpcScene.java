@@ -29,6 +29,8 @@ public abstract class NpcScene extends Scene {
 	protected Villager npc;
 	protected Vec3 start;
 	protected Vec3 stand;
+	// Where the walk in ends, a little further away than stand, the rest it comes closer while talking.
+	private Vec3 approach;
 
 	protected NpcScene(String id, ChatFormatting color) {
 		this.id = id;
@@ -99,6 +101,7 @@ public abstract class NpcScene extends Scene {
 			Vec3 flat = new Vec3(toward.x, 0.0, toward.z).normalize();
 			stand = player.position().subtract(flat.scale(standDistance()));
 			stand = new Vec3(stand.x, floor(level, stand.x, stand.z, player.getY()), stand.z);
+			approach = player.position().subtract(flat.scale(standDistance() + 0.9));
 			npc = spawn(level, EntityType.VILLAGER, walksIn() ? start : stand);
 			npc.setCustomName(name);
 			npc.setCustomNameVisible(true);
@@ -113,7 +116,7 @@ public abstract class NpcScene extends Scene {
 		}
 
 		if (tick <= ARRIVE && walksIn()) {
-			Vec3 pos = start.lerp(stand, tick / (double) ARRIVE);
+			Vec3 pos = start.lerp(approach, tick / (double) ARRIVE);
 			walk(npc, new Vec3(pos.x, floor(level, pos.x, pos.z, player.getY()), pos.z));
 			if (tick % 6 == 0) {
 				sound(level, pos, SoundEvents.GRASS_STEP, SoundSource.NEUTRAL, 0.7F, 1.1F);
@@ -121,7 +124,11 @@ public abstract class NpcScene extends Scene {
 		}
 
 		if (tick < actStart()) {
-			face(npc, player.getEyePosition());
+			if (tick > ARRIVE && walksIn()) {
+				live(level, player, tick);
+			} else {
+				face(npc, player.getEyePosition());
+			}
 			turnTowards(player, npc.getEyePosition(), 0.12F);
 		} else {
 			turnTowards(player, focus(player), 0.25F);
@@ -134,6 +141,34 @@ public abstract class NpcScene extends Scene {
 
 		if (tick >= actStart()) {
 			act(minecraft, level, player, tick - actStart());
+		}
+	}
+
+	/**
+	 * While talking the character is never a statue: it nods along with each line, bobs a little, looks around between
+	 * the lines and comes a step closer every time it starts a new one.
+	 */
+	private void live(ClientLevel level, LocalPlayer player, int tick) {
+		int sinceLine = (tick - ARRIVE - 2) % LINE;
+		int line = (tick - ARRIVE - 2) / LINE;
+		Vec3 eyes = player.getEyePosition();
+		Vec3 look;
+		if (sinceLine < 35) {
+			look = eyes.add(0.0, Math.sin(sinceLine * 0.55) * 0.35, 0.0);
+		} else if (sinceLine < 55 && line % 2 == 0) {
+			look = eyes.add(towardPlayer(player).yRot(1.2F).scale(3.0)).add(0.0, -0.8, 0.0);
+		} else {
+			look = eyes;
+		}
+		face(npc, look);
+
+		// A step closer with every line, never closer than where it does its thing.
+		double closer = Math.min(1.0, (tick - ARRIVE) / (double) (actStart() - ARRIVE));
+		Vec3 at = approach.lerp(stand, closer);
+		double bob = sinceLine < 8 ? Math.sin(sinceLine / 8.0 * Math.PI) * 0.12 : 0.0;
+		walk(npc, new Vec3(at.x, floor(level, at.x, at.z, player.getY()) + bob, at.z));
+		if (sinceLine == 0) {
+			Looks.swing(npc);
 		}
 	}
 

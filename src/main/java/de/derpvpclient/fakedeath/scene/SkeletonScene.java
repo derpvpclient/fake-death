@@ -17,9 +17,10 @@ import net.minecraft.world.phys.Vec3;
 /** A skeleton rattles somewhere behind and shoots from a distance, the first arrow misses, the rest hit. */
 public class SkeletonScene extends Scene {
 	private static final int[] ARROWS = {35, 60, 82, 100};
-	private static final int FLIGHT = 4;
+	private static final int FLIGHT = 7;
 
 	private Skeleton skeleton;
+	private net.minecraft.world.entity.Entity arrow;
 
 	@Override
 	public int length() {
@@ -34,7 +35,7 @@ public class SkeletonScene extends Scene {
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
 		if (tick == 0) {
-			skeleton = spawn(level, EntityType.SKELETON, groundSpot(level, player, 10.0, 160.0));
+			skeleton = spawn(level, EntityType.SKELETON, groundSpot(level, player, 7.0, 160.0));
 			skeleton.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
 			// Drawn bow.
 			skeleton.setAggressive(true);
@@ -67,9 +68,25 @@ public class SkeletonScene extends Scene {
 			if (tick >= shot && tick < shot + FLIGHT) {
 				Vec3 delta = target.subtract(from);
 				line(level, ParticleTypes.CRIT, from.add(delta.scale((tick - shot) / (double) FLIGHT)), from.add(delta.scale((tick - shot + 1) / (double) FLIGHT)), 0.3);
+				// A real arrow in the air, not only a trail.
+				if (tick == shot) {
+					arrow = spawn(level, EntityType.ARROW, from);
+					arrow.setNoGravity(true);
+				}
+				Vec3 at = from.add(delta.scale((tick - shot + 1) / (double) FLIGHT));
+				arrow.setPos(at.x, at.y, at.z);
+				arrow.setYRot((float) (Math.atan2(delta.x, delta.z) * 180.0 / Math.PI));
+				arrow.setXRot((float) (Math.atan2(delta.y, delta.horizontalDistance()) * 180.0 / Math.PI));
+				arrow.yRotO = arrow.getYRot();
+				arrow.xRotO = arrow.getXRot();
+				turnTowards(player, at, 0.25F);
 			}
 
 			if (tick == shot + FLIGHT) {
+				if (arrow != null) {
+					despawn(level, arrow);
+					arrow = null;
+				}
 				if (miss) {
 					sound(level, target, SoundEvents.ARROW_HIT, SoundSource.HOSTILE, 1.0F, 1.0F);
 				} else {
