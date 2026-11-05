@@ -27,6 +27,23 @@ final class Looks {
 	static final SoundEvent CHICKEN_HURT = SoundEvent.createVariableRangeEvent(net.minecraft.resources.ResourceLocation.withDefaultNamespace("entity.chicken.hurt"));
 	static final BlockState CHAIN = Blocks.CHAIN.defaultBlockState();
 
+	static final SoundEvent SADDLE = SoundEvents.HORSE_SADDLE;
+
+	/** Puts a saddle on a horse. */
+	static void saddle(net.minecraft.world.entity.animal.horse.AbstractHorse horse) {
+		horse.equipSaddle(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SADDLE), null);
+	}
+
+	/** Up on its hind legs. */
+	static void rear(net.minecraft.world.entity.animal.horse.AbstractHorse horse) {
+		horse.setStanding(true);
+	}
+
+	/** Bamboo crumbs, for the panda munching. */
+	static net.minecraft.core.particles.ParticleOptions bambooCrumbs() {
+		return new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK, Blocks.BAMBOO_BLOCK.defaultBlockState());
+	}
+
 	private Looks() {
 	}
 

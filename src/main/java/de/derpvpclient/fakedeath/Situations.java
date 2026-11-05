@@ -35,6 +35,9 @@ import de.derpvpclient.fakedeath.scene.StalactiteScene;
 import de.derpvpclient.fakedeath.scene.TaxAuditScene;
 import de.derpvpclient.fakedeath.scene.TreeScene;
 import de.derpvpclient.fakedeath.scene.WolfScene;
+import de.derpvpclient.fakedeath.scene.InstructorScene;
+import de.derpvpclient.fakedeath.scene.AxolotlScene;
+import de.derpvpclient.fakedeath.scene.PandaScene;
 import de.derpvpclient.fakedeath.scene.BarberScene;
 import de.derpvpclient.fakedeath.scene.BeeNestScene;
 import de.derpvpclient.fakedeath.scene.BuildingOfficeScene;
@@ -101,7 +104,8 @@ public final class Situations {
 		"doppelgaenger", "ertrunkener", "woelfe", "froesche", "riesenfrosch", "silberfische", "ziege", "magier", "ueberfall", "meteorit", "ghast", "fledermaeuse", "riesenitem", "paketbote", "mama", "papagei", "glitch", "disco",
 		"tornado", "mond", "sonnenbrand", "truhe", "ofen", "delfin", "kronleuchter", "kolben", "kamel", "fuchs", "enderman", "huehner",
 		"dornen", "erdbeben", "vulkan", "bienennest", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer",
-		"klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch");
+		"klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch",
+		"fahrlehrer", "axolotl", "panda");
 
 	/** English scene names, both work in every language. Names that are the same in both are left out. */
 	private static final Map<String, String> ENGLISH = Map.ofEntries(
@@ -117,7 +121,8 @@ public final class Situations {
 		Map.entry("thorns", "dornen"), Map.entry("earthquake", "erdbeben"), Map.entry("volcano", "vulkan"), Map.entry("beenest", "bienennest"),
 		Map.entry("licensefee", "rundfunk"), Map.entry("dentist", "zahnarzt"), Map.entry("buildingoffice", "bauamt"), Map.entry("movers", "umzug"),
 		Map.entry("electrician", "elektriker"), Map.entry("magician", "zauberer"), Map.entry("plumber", "klempner"), Map.entry("caretaker", "hausmeister"),
-		Map.entry("doctor", "arzt"), Map.entry("police", "polizist"), Map.entry("chimneysweep", "schornsteinfeger"), Map.entry("barber", "friseur"), Map.entry("chef", "koch"));
+		Map.entry("doctor", "arzt"), Map.entry("police", "polizist"), Map.entry("chimneysweep", "schornsteinfeger"), Map.entry("barber", "friseur"), Map.entry("chef", "koch"),
+		Map.entry("instructor", "fahrlehrer"));
 
 	public static final List<String> ENGLISH_NAMES = NAMES.stream()
 		.map(name -> ENGLISH.entrySet().stream().filter(entry -> entry.getValue().equals(name)).map(Map.Entry::getKey).findFirst().orElse(name))
@@ -449,10 +454,29 @@ public final class Situations {
 			options.add("bienennest", 4, BeeNestScene::new);
 		}
 
+		// 1.0.40: a riding lesson where horses are, the axolotl army in lush caves and swamps, the hungry panda in the jungle.
+		if (sky && (biome.is(Biomes.PLAINS) || biome.is(Biomes.SUNFLOWER_PLAINS) || !level.getEntitiesOfClass(net.minecraft.world.entity.animal.horse.AbstractHorse.class, player.getBoundingBox().inflate(16.0)).isEmpty())) {
+			options.add("fahrlehrer", 3, InstructorScene::new);
+		}
+		if (biome.is(Biomes.LUSH_CAVES)) {
+			options.add("axolotl", 6, AxolotlScene::new);
+		} else if (biome.is(Biomes.SWAMP) || biome.is(Biomes.MANGROVE_SWAMP) || !level.getEntitiesOfClass(net.minecraft.world.entity.animal.axolotl.Axolotl.class, player.getBoundingBox().inflate(16.0)).isEmpty()) {
+			options.add("axolotl", 4, AxolotlScene::new);
+		} else {
+			options.add("axolotl", 1, AxolotlScene::new);
+		}
+		if (biome.is(Biomes.BAMBOO_JUNGLE) || !level.getEntitiesOfClass(net.minecraft.world.entity.animal.Panda.class, player.getBoundingBox().inflate(16.0)).isEmpty()) {
+			options.add("panda", 6, PandaScene::new);
+		} else if (biome.is(BiomeTags.IS_JUNGLE)) {
+			options.add("panda", 3, PandaScene::new);
+		} else {
+			options.add("panda", 1, PandaScene::new);
+		}
+
 		// The characters, each one rare. The chimney sweep needs a sky for his roof.
 		if (sky) {
 			for (String npc : List.of("influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer", "klempner",
-				"hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch")) {
+				"hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch", "fahrlehrer")) {
 				options.add(npc, 1, () -> npcScene(npc));
 			}
 		}
@@ -475,6 +499,7 @@ public final class Situations {
 			case "trainer" -> new TrainerScene();
 			case "friseur" -> new BarberScene();
 			case "koch" -> new ChefScene();
+			case "fahrlehrer" -> new InstructorScene();
 			default -> null;
 		};
 	}
@@ -596,6 +621,8 @@ public final class Situations {
 			case "erdbeben" -> new EarthquakeScene();
 			case "vulkan" -> new VolcanoScene();
 			case "bienennest" -> new BeeNestScene();
+			case "axolotl" -> new AxolotlScene();
+			case "panda" -> new PandaScene();
 			default -> npcScene(id);
 		};
 	}
