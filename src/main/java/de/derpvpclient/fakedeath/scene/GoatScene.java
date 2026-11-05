@@ -19,7 +19,7 @@ public class GoatScene extends Scene {
 	private static final byte LOWER_HEAD = 58;
 	private static final byte RAISE_HEAD = 59;
 	private static final int APPEAR = 10;
-	private static final double DISTANCE = 12.0;
+	private static final double DISTANCE = 7.5;
 	private static final int[] SCREAMS = {16, 36, 54};
 	private static final int LOWER_1 = 66;
 	private static final int CHARGE_1 = 100;
