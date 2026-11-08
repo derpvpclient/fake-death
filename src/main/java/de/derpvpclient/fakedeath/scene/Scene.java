@@ -376,6 +376,11 @@ public abstract class Scene {
 		CameraDirector.moveTo(fromEyes);
 	}
 
+	/** True while the player looks at themselves from outside (F5), some scenes then pick a different view. */
+	protected static boolean thirdPerson() {
+		return !Minecraft.getInstance().options.getCameraType().isFirstPerson();
+	}
+
 	/** Pans the camera towards a point. Only the camera, the player's real rotation is left alone. */
 	protected static void turnTowards(LocalPlayer player, Vec3 target, float speed) {
 		CameraDirector.turnTowards(player, target, speed);

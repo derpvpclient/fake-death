@@ -29,6 +29,9 @@ final class Looks {
 
 	static final SoundEvent SADDLE = SoundEvents.HORSE_SADDLE.value();
 	static final BlockState PURPLE_GLASS = Blocks.STAINED_GLASS.purple().defaultBlockState();
+	/** The glowing tiles of the disco floor. */
+	static final BlockState[] DISCO_FLOOR = {Blocks.CONCRETE.magenta().defaultBlockState(), Blocks.CONCRETE.lightBlue().defaultBlockState(),
+		Blocks.CONCRETE.yellow().defaultBlockState(), Blocks.CONCRETE.lime().defaultBlockState(), Blocks.CONCRETE.purple().defaultBlockState()};
 	static final SoundEvent CAT_PURR = SoundEvent.createVariableRangeEvent(net.minecraft.resources.Identifier.withDefaultNamespace("entity.cat.purr"));
 	static final SoundEvent CAT_PURREOW = SoundEvent.createVariableRangeEvent(net.minecraft.resources.Identifier.withDefaultNamespace("entity.cat.purreow"));
 	static final SoundEvent PLING = SoundEvents.NOTE_BLOCK_PLING.value();
