@@ -31,7 +31,7 @@ public class InstructorScene extends NpcScene {
 	private static final int THROW = 185;
 	private static final int LAND = 203;
 	/** Camera height above the horse's feet while sitting in the saddle. */
-	private static final double SEAT = 2.25;
+	private static final double SEAT = 2.4;
 
 	private Horse horse;
 	private Vec3 at;
@@ -40,6 +40,8 @@ public class InstructorScene extends NpcScene {
 	private Vec3 flyFrom;
 	private Vec3 flyTo;
 	private boolean riding;
+	/** Where the camera looks, worked out in act() and handed to the character scene as its focus. */
+	private Vec3 lookAt;
 
 	@Override
 	public boolean seated() {
@@ -80,8 +82,7 @@ public class InstructorScene extends NpcScene {
 		if (at == null) {
 			return npc.getEyePosition();
 		}
-		// Looking where the horse goes, a little down onto its head.
-		return at.add(forward().scale(4.0)).add(0.0, 0.7, 0.0);
+		return lookAt != null ? lookAt : ahead(0.6);
 	}
 
 	@Override
@@ -118,6 +119,13 @@ public class InstructorScene extends NpcScene {
 		if (t <= MOUNT) {
 			// The horse steps under the player, and they climb up.
 			float p = t / (float) MOUNT;
+			if (t == MOUNT / 2) {
+				// Sitting right behind the player his name would hang in the middle of the F5 view, also when the crosshair is
+				// on him. The chat still shows who talks.
+				npc.setCustomNameVisible(false);
+				npc.setCustomName(null);
+			}
+			lookAt = ahead(thirdPerson() ? 8.0 : 0.6);
 			at = at.lerp(player.position(), 0.25);
 			moveCamera(new Vec3(0.0, (SEAT - player.getEyeHeight()) * p * p, 0.0));
 			placeHorse(level, player);
@@ -168,15 +176,12 @@ public class InstructorScene extends NpcScene {
 			placeInstructor();
 		}
 
-		// Bouncing in the saddle, more the faster it goes, and the glance back at the instructor when he shouts.
+		// Bouncing in the saddle, more the faster it goes.
 		double bounce = Math.abs(Mth.sin(t * (speed > 0.3F ? 0.7F : 0.35F))) * speed * 0.6;
 		if (t < THROW) {
 			double rear = t >= REAR ? Mth.sin(Math.min(1.0F, (t - REAR) / 12.0F) * Mth.HALF_PI) * 1.2 : 0.0;
 			Vec3 seat = at.add(0.0, SEAT + bounce + rear, 0.0).subtract(forward().scale(rear * 0.4));
 			moveCamera(seat.subtract(player.getEyePosition()));
-		}
-		if (t >= WRONG && t < WRONG + 18) {
-			turnTowards(player, npc.getEyePosition(), 0.35F);
 		}
 
 		if (t == REAR) {
@@ -185,8 +190,10 @@ public class InstructorScene extends NpcScene {
 			sound(level, at, SoundEvents.HORSE_ANGRY, SoundSource.NEUTRAL, 1.5F, 0.8F);
 			hurt(level, player, SoundEvents.PLAYER_HURT, 0.3F);
 		}
-		if (t > REAR && t < THROW) {
-			turnTowards(player, at.add(forward().scale(3.0)).add(0.0, SEAT + 2.5, 0.0), 0.2F);
+		if (t < THROW) {
+			// Straight ahead over the horse's head, up into the sky when it rears. In F5 steeply from above and behind, so
+			// the instructor sitting behind the player does not block the view and the camera never dips into the ground.
+			lookAt = thirdPerson() ? ahead(8.0) : t > REAR ? at.add(forward().scale(3.0)).add(0.0, SEAT + 2.5, 0.0) : ahead(0.6);
 		}
 
 		if (t == THROW) {
@@ -201,7 +208,7 @@ public class InstructorScene extends NpcScene {
 			Vec3 fly = flyFrom.lerp(flyTo, p).add(0.0, Mth.sin(p * Mth.PI) * 1.8, 0.0);
 			moveCamera(fly.subtract(player.getEyePosition()));
 			// Head over heels: the view tips down to the ground ahead.
-			turnTowards(player, fly.add(forward().scale(2.0)).add(0.0, -2.5 * p, 0.0), 0.35F);
+			lookAt = fly.add(forward().scale(2.0)).add(0.0, thirdPerson() ? -2.5 : -2.5 * p, 0.0);
 		}
 		if (t == LAND) {
 			particles(level, ParticleTypes.CRIT, flyTo, 25, 0.6, 0.3);
@@ -210,11 +217,17 @@ public class InstructorScene extends NpcScene {
 		}
 		if (t > LAND) {
 			moveCamera(flyTo.subtract(player.getEyePosition()));
-			turnTowards(player, horse.getEyePosition(), 0.1F);
+			// Looking back at the horse from the ground, in F5 level with the ground so the camera stays above it.
+			lookAt = thirdPerson() ? horse.position().add(0.0, 0.3, 0.0) : horse.getEyePosition();
 		}
 		if (t == LAND + 25) {
 			speak(minecraft, level, "fakedeath.fahrlehrer.fail");
 		}
+	}
+
+	/** A point far ahead in the riding direction, the given height below the seat. */
+	private Vec3 ahead(double drop) {
+		return at.add(forward().scale(8.0)).add(0.0, SEAT - drop, 0.0);
 	}
 
 	private Vec3 forward() {
