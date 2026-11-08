@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Something dangerous right next to the player: lava, fire, a cactus, berry bushes, powder snow, water or hunger.
+ * Something dangerous right next to the player: lava, fire, a cactus, powder snow, water or hunger.
  * It takes a few seconds, the hearts go down hit by hit, fire spreads around the player.
  */
 public class HazardScene extends Scene {
@@ -54,10 +54,6 @@ public class HazardScene extends Scene {
 
 	public static HazardScene cactus(BlockPos cactus) {
 		return new HazardScene("death.attack.cactus", SoundEvents.PLAYER_HURT, ParticleTypes.CRIT, Extra.NONE, cactus);
-	}
-
-	public static HazardScene berries(BlockPos bush) {
-		return new HazardScene("death.attack.sweetBerryBush", SoundEvents.PLAYER_HURT_SWEET_BERRY_BUSH, ParticleTypes.CRIT, Extra.NONE, bush);
 	}
 
 	public static HazardScene freeze(BlockPos snow) {

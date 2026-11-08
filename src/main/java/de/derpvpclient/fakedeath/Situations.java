@@ -2,6 +2,7 @@ package de.derpvpclient.fakedeath;
 
 import de.derpvpclient.fakedeath.scene.AnvilScene;
 import de.derpvpclient.fakedeath.scene.BatScene;
+import de.derpvpclient.fakedeath.scene.BerryScene;
 import de.derpvpclient.fakedeath.scene.BeeScene;
 import de.derpvpclient.fakedeath.scene.CaveInScene;
 import de.derpvpclient.fakedeath.scene.CreeperScene;
@@ -245,7 +246,7 @@ public final class Situations {
 		if (options.wants("beeren")) {
 			BlockPos bush = find(level, feet, 1, 1, state -> state.is(Blocks.SWEET_BERRY_BUSH));
 			if (bush != null) {
-				options.add("beeren", 5, () -> HazardScene.berries(bush));
+				options.add("beeren", 5, () -> new BerryScene(bush));
 			}
 		}
 
@@ -593,7 +594,7 @@ public final class Situations {
 			case "blitz" -> new LightningScene();
 			case "lava" -> HazardScene.lava(orFeet(find(level, feet, 4, 2, state -> state.getFluidState().is(FluidTags.LAVA)), feet));
 			case "kaktus" -> HazardScene.cactus(orFeet(find(level, feet, 2, 1, state -> state.is(Blocks.CACTUS)), feet));
-			case "beeren" -> HazardScene.berries(orFeet(find(level, feet, 2, 1, state -> state.is(Blocks.SWEET_BERRY_BUSH)), feet));
+			case "beeren" -> new BerryScene(find(level, feet, 2, 1, state -> state.is(Blocks.SWEET_BERRY_BUSH)));
 			case "schnee" -> HazardScene.freeze(orFeet(find(level, feet, 2, 1, state -> state.is(Blocks.POWDER_SNOW)), feet));
 			case "hunger" -> HazardScene.starve();
 			case "feuer" -> HazardScene.fire();
