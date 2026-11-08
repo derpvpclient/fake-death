@@ -373,10 +373,6 @@ public class BerryScene extends Scene {
 		return new BlockParticleOption(ParticleTypes.BLOCK, RIPE);
 	}
 
-	private static boolean thirdPerson() {
-		return !Minecraft.getInstance().options.getCameraType().isFirstPerson();
-	}
-
 	private static double ease(double f) {
 		return f * f * (3.0 - 2.0 * f);
 	}
