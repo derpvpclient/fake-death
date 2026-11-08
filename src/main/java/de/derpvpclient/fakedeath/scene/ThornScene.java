@@ -78,7 +78,7 @@ public class ThornScene extends Scene {
 				// On the ground next to the player, wherever there is room.
 				for (int dy : new int[] {0, 1, -1}) {
 					BlockPos pos = feet.offset(dx, dy, dz);
-					if (level.getBlockState(pos).isAir() && !level.getBlockState(pos.below()).isAir()
+					if (level.getBlockState(pos).isAir() && !level.getBlockState(pos.below()).isAir() && !onTree(level, pos)
 						&& placeBlock(level, pos, Blocks.SWEET_BERRY_BUSH.defaultBlockState())) {
 						grown.add(pos);
 						particles(level, ParticleTypes.HAPPY_VILLAGER, Vec3.atCenterOf(pos), 2, 0.3, 0.0);
