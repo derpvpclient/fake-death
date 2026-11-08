@@ -146,7 +146,7 @@ public final class Situations {
 		"hoehle", "höhle", "doppelgaenger", "doppelgänger", "fledermaeuse", "fledermäuse", "froesche", "frösche", "ueberfall", "überfall", "huehner", "hühner");
 
 	/** Scenes with fast flashing lights, they only play with that setting switched on. */
-	public static final java.util.Set<String> FLASHING = java.util.Set.of("glitch", "disco");
+	public static final java.util.Set<String> FLASHING = java.util.Set.of("glitch");
 
 	public static final List<String> GERMAN_NAMES = NAMES.stream().map(name -> UMLAUTS.getOrDefault(name, name)).toList();
 
@@ -391,9 +391,10 @@ public final class Situations {
 		// Fast flashing lights only with the setting switched on.
 		if (FakeDeathConfig.flashing) {
 			options.add("glitch", 1, GlitchScene::new);
-			boolean music = options.wants("disco") && find(level, feet, 8, 3, state -> state.is(Blocks.JUKEBOX)) != null;
-			options.add("disco", music ? 6 : 1, DiscoScene::new);
 		}
+		// The disco has its lights in the world and never flashes the screen, it needs no setting.
+		boolean music = options.wants("disco") && find(level, feet, 8, 3, state -> state.is(Blocks.JUKEBOX)) != null;
+		options.add("disco", music ? 6 : 1, DiscoScene::new);
 
 		addNewer(options, level, player, feet, head, sky, dark);
 
