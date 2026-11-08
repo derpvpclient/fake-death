@@ -35,6 +35,7 @@
 	"fakedeath.wait.hurt": "du nimmst gerade echten Schaden, zum Beispiel von einem Kaktus. Geh einen Schritt weg",
 	"fakedeath.wait.monster": "ein Monster ist in der Nähe",
 	"fakedeath.wait.menu": "ein Menü ist offen",
+	"fakedeath.wait.tree": "du stehst auf einem Baum",
 	"fakedeath.scene.baum": "Baum",
 	"fakedeath.scene.hoehle": "Höhle",
 	"fakedeath.scene.blitz": "Blitz",
