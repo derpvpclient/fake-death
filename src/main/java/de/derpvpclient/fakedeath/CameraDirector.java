@@ -1,6 +1,13 @@
 package de.derpvpclient.fakedeath;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -18,6 +25,9 @@ public final class CameraDirector {
 	private static boolean released;
 	private static Vec3 offset = Vec3.ZERO;
 	private static Vec3 prevOffset = Vec3.ZERO;
+	private static float walkPos;
+	private static float prevWalkPos;
+	private static float walkSpeed;
 
 	private CameraDirector() {
 	}
@@ -28,9 +38,47 @@ public final class CameraDirector {
 	}
 
 	public static void startTick() {
+		// The body in third person walks as far as the camera went last tick.
+		double moved = Math.sqrt(Mth.square(offset.x - prevOffset.x) + Mth.square(offset.z - prevOffset.z));
+		prevWalkPos = walkPos;
+		walkSpeed = Math.min(1.0F, (float) moved * 4.0F);
+		walkPos += walkSpeed;
 		prevYaw = yaw;
 		prevPitch = pitch;
 		prevOffset = offset;
+	}
+
+	public static float walkPos() {
+		return Mth.lerp(partialTick, prevWalkPos, walkPos);
+	}
+
+	public static float walkSpeed() {
+		return walkSpeed;
+	}
+
+	/**
+	 * Where the player's own body is drawn in third person: wherever the scene took the camera, so the body rides the
+	 * horse or hangs in the panda's paws instead of standing alone where the player really is. It never sinks into the
+	 * ground, a camera lying low means a body lying on the floor. The invisible barrier under the feet of a shaft does
+	 * not count as floor.
+	 */
+	public static Vec3 bodyOffset(Entity body) {
+		Vec3 shift = positionOffset();
+		if (shift.lengthSqr() < 1.0E-6) {
+			return Vec3.ZERO;
+		}
+		Level level = body.level();
+		Vec3 feet = body.getPosition(partialTick).add(shift);
+		for (int i = 0; i < 4; i++) {
+			BlockPos pos = BlockPos.containing(feet.x, feet.y + 0.05, feet.z);
+			BlockState state = level.getBlockState(pos);
+			VoxelShape shape = state.getCollisionShape(level, pos);
+			if (shape.isEmpty() || state.is(Blocks.BARRIER)) {
+				break;
+			}
+			feet = new Vec3(feet.x, pos.getY() + shape.max(Direction.Axis.Y), feet.z);
+		}
+		return feet.subtract(body.getPosition(partialTick));
 	}
 
 	/** Without a scene the camera glides back to where the player really looks. */
