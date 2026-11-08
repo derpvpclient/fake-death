@@ -79,6 +79,16 @@ public abstract class Scene {
 		return null;
 	}
 
+	/** True while the player sits on something the scene brought, like a horse: in third person the body sits too. */
+	public boolean seated() {
+		return false;
+	}
+
+	/** True while the moved camera walks along: in third person the body moves its legs. */
+	public boolean walking() {
+		return false;
+	}
+
 	/** The best moment of the scene for a picture, used by the demo run. */
 	public int photoTick() {
 		return length() * 2 / 3;

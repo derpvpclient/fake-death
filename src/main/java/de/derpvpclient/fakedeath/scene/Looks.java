@@ -28,6 +28,10 @@ final class Looks {
 	static final SoundEvent CHICKEN_HURT = SoundEvent.createVariableRangeEvent(net.minecraft.resources.Identifier.withDefaultNamespace("entity.chicken.hurt"));
 	static final BlockState CHAIN = Blocks.IRON_CHAIN.defaultBlockState();
 	static final SoundEvent SADDLE = SoundEvents.HORSE_SADDLE.value();
+	static final BlockState PURPLE_GLASS = Blocks.STAINED_GLASS.purple().defaultBlockState();
+	static final SoundEvent CAT_PURR = SoundEvent.createVariableRangeEvent(net.minecraft.resources.Identifier.withDefaultNamespace("entity.cat.purr"));
+	static final SoundEvent CAT_PURREOW = SoundEvent.createVariableRangeEvent(net.minecraft.resources.Identifier.withDefaultNamespace("entity.cat.purreow"));
+	static final SoundEvent PLING = SoundEvents.NOTE_BLOCK_PLING.value();
 
 	private Looks() {
 	}
@@ -58,6 +62,19 @@ final class Looks {
 	/** Up on its hind legs. */
 	static void rear(net.minecraft.world.entity.animal.equine.AbstractHorse horse) {
 		horse.setStanding(40);
+	}
+
+	/** Gives each cat of a crowd its own coat. */
+	static void catColor(net.minecraft.world.entity.Entity cat, int i) {
+		var coats = cat.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.CAT_VARIANT).listElements().toList();
+		if (!coats.isEmpty()) {
+			cat.setComponent(net.minecraft.core.component.DataComponents.CAT_VARIANT, coats.get(i % coats.size()));
+		}
+	}
+
+	/** The snowy village coat, for Santa. */
+	static void snowCoat(net.minecraft.world.entity.npc.villager.Villager villager, net.minecraft.client.multiplayer.ClientLevel level) {
+		villager.setVillagerData(villager.getVillagerData().withType(level.registryAccess(), net.minecraft.world.entity.npc.villager.VillagerType.SNOW));
 	}
 
 	/** Bamboo crumbs, for the panda munching. */

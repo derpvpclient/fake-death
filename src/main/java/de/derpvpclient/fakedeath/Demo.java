@@ -31,6 +31,8 @@ final class Demo {
 	private static Boolean wanted;
 	// With -Dfakedeath.demoFrames=N every scene is also filmed as N pictures over its length.
 	private static final int FRAMES = Integer.getInteger("fakedeath.demoFrames", 0);
+	// With -Dfakedeath.demoView=back (or front) the scenes are filmed in third person, like after pressing F5.
+	private static final String VIEW = System.getProperty("fakedeath.demoView", "");
 	private static int lastFrame = -1;
 	private static List<String> names = Situations.NAMES;
 	private static boolean running;
@@ -72,6 +74,10 @@ final class Demo {
 				index++;
 				wait = PAUSE;
 				return;
+			}
+
+			if (!VIEW.isEmpty() && minecraft.options.getCameraType().isFirstPerson()) {
+				minecraft.options.setCameraType(VIEW.equals("front") ? net.minecraft.client.CameraType.THIRD_PERSON_FRONT : net.minecraft.client.CameraType.THIRD_PERSON_BACK);
 			}
 
 			if (FRAMES > 0 && !FakeDeath.isActive()) {

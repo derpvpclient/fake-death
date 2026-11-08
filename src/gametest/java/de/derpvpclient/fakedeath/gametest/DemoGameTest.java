@@ -15,6 +15,25 @@ public class DemoGameTest implements FabricClientGameTest {
 	public void runTest(ClientGameTestContext context) {
 		// Tests run silently.
 		context.runOnClient(client -> client.options.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.MASTER).set(0.0));
+		if (Boolean.getBoolean("fakedeath.demoUi")) {
+			// Only the test screen: opened by the real command, a tab, a search, each one as a picture.
+			try (TestSingleplayerContext singleplayer = context.worldBuilder().create()) {
+				context.waitTicks(60);
+				context.runOnClient(client -> client.player.connection.sendCommand("fakedeath test"));
+				context.waitTicks(10);
+				context.takeScreenshot("ui-1-all");
+				context.runOnClient(client -> client.gui.screen().children().stream()
+					.filter(child -> child instanceof net.minecraft.client.gui.components.Button button
+						&& button.getMessage().getString().contains(net.minecraft.network.chat.Component.translatable("fakedeath.test.tab.characters").getString()))
+					.findFirst().ifPresent(child -> ((net.minecraft.client.gui.components.Button) child).onPress(null)));
+				context.waitTicks(5);
+				context.takeScreenshot("ui-2-characters");
+				context.getInput().typeChars("ko");
+				context.waitTicks(5);
+				context.takeScreenshot("ui-3-search");
+			}
+			return;
+		}
 		Path marker = FabricLoader.getInstance().getConfigDir().resolve("fakedeath-demo.txt");
 
 		try {

@@ -24,7 +24,8 @@ public abstract class CameraMixin {
 	protected abstract void setPosition(Vec3 position);
 
 	// Some scenes pull the camera away from the eyes, like the giant frog's tongue. Only the camera moves.
-	@Inject(method = "alignWithEntity", at = @At("TAIL"))
+	// Moved before the third-person view steps back, so in F5 it steps back from there and stops at walls.
+	@Inject(method = "alignWithEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V", shift = At.Shift.AFTER))
 	private void fakedeath$sceneOffset(float partialTicks, CallbackInfo ci) {
 		Vec3 offset = CameraDirector.positionOffset();
 

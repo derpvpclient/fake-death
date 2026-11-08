@@ -47,6 +47,8 @@ loom {
 		clientGameTest {
 			vmArg "-Dfakedeath.demoScenes=" + (project.findProperty("demoScenes") ?: "demo")
 			vmArg "-Dfakedeath.demoFrames=" + (project.findProperty("demoFrames") ?: "0")
+			vmArg "-Dfakedeath.demoView=" + (project.findProperty("demoView") ?: "")
+			vmArg "-Dfakedeath.demoUi=" + (project.findProperty("demoUi") ?: "false")
 		}
 	}
 }
