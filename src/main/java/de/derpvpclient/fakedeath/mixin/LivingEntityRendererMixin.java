@@ -2,15 +2,48 @@ package de.derpvpclient.fakedeath.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.vertex.PoseStack;
+import de.derpvpclient.fakedeath.CameraDirector;
 import de.derpvpclient.fakedeath.FakeDeath;
+import de.derpvpclient.fakedeath.scene.Scene;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntityRenderer.class)
 public class LivingEntityRendererMixin {
+	// In third person the body goes where the scene took the camera: it rides the horse, hangs in the panda's paws,
+	// walks into the wall. Only on this client.
+	@Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At("HEAD"))
+	private void fakedeath$bodyFollows(LivingEntity entity, float yaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffers, int light, CallbackInfo ci) {
+		if (entity == Minecraft.getInstance().player) {
+			Vec3 shift = CameraDirector.bodyOffset(entity);
+			poseStack.translate(shift.x, shift.y, shift.z);
+		}
+	}
+
+	// And it turns where the camera looks.
+	@WrapOperation(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;setupRotations(Lnet/minecraft/world/entity/LivingEntity;Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V"))
+	private void fakedeath$bodyTurns(LivingEntityRenderer<?, ?> renderer, LivingEntity entity, PoseStack poseStack, float bob, float bodyRot, float partialTicks, float scale, Operation<Void> original) {
+		float turn = entity == Minecraft.getInstance().player ? CameraDirector.yawOffset() : 0.0F;
+		original.call(renderer, entity, poseStack, bob, bodyRot + turn, partialTicks, scale);
+	}
+
+	// Sitting on the horse of the riding lesson.
+	@WrapOperation(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isPassenger()Z", ordinal = 0))
+	private boolean fakedeath$seated(LivingEntity entity, Operation<Boolean> original) {
+		Scene scene = FakeDeath.currentScene();
+		return original.call(entity) || entity == Minecraft.getInstance().player && scene != null && scene.seated();
+	}
+
 	// In third person the own player tips over and turns red like on a real death. Only on this client.
 	@WrapOperation(method = "setupRotations", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;deathTime:I"))
 	private int fakedeath$deathPose(LivingEntity entity, Operation<Integer> original) {

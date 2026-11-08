@@ -38,6 +38,15 @@ import de.derpvpclient.fakedeath.scene.WolfScene;
 import de.derpvpclient.fakedeath.scene.InstructorScene;
 import de.derpvpclient.fakedeath.scene.AxolotlScene;
 import de.derpvpclient.fakedeath.scene.PandaScene;
+import de.derpvpclient.fakedeath.scene.FortuneTellerScene;
+import de.derpvpclient.fakedeath.scene.SantaScene;
+import de.derpvpclient.fakedeath.scene.SalesmanScene;
+import de.derpvpclient.fakedeath.scene.GrandmaScene;
+import de.derpvpclient.fakedeath.scene.NavScene;
+import de.derpvpclient.fakedeath.scene.WaiterScene;
+import de.derpvpclient.fakedeath.scene.CatScene;
+import de.derpvpclient.fakedeath.scene.AllayScene;
+import de.derpvpclient.fakedeath.scene.GoatChoirScene;
 import de.derpvpclient.fakedeath.scene.BarberScene;
 import de.derpvpclient.fakedeath.scene.BeeNestScene;
 import de.derpvpclient.fakedeath.scene.BuildingOfficeScene;
@@ -105,7 +114,8 @@ public final class Situations {
 		"tornado", "mond", "sonnenbrand", "truhe", "ofen", "delfin", "kronleuchter", "kolben", "kamel", "fuchs", "enderman", "huehner",
 		"dornen", "erdbeben", "vulkan", "bienennest", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer",
 		"klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch",
-		"fahrlehrer", "axolotl", "panda");
+		"fahrlehrer", "axolotl", "panda",
+		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor");
 
 	/** English scene names, both work in every language. Names that are the same in both are left out. */
 	private static final Map<String, String> ENGLISH = Map.ofEntries(
@@ -122,7 +132,9 @@ public final class Situations {
 		Map.entry("licensefee", "rundfunk"), Map.entry("dentist", "zahnarzt"), Map.entry("buildingoffice", "bauamt"), Map.entry("movers", "umzug"),
 		Map.entry("electrician", "elektriker"), Map.entry("magician", "zauberer"), Map.entry("plumber", "klempner"), Map.entry("caretaker", "hausmeister"),
 		Map.entry("doctor", "arzt"), Map.entry("police", "polizist"), Map.entry("chimneysweep", "schornsteinfeger"), Map.entry("barber", "friseur"), Map.entry("chef", "koch"),
-		Map.entry("instructor", "fahrlehrer"));
+		Map.entry("instructor", "fahrlehrer"),
+		Map.entry("fortuneteller", "wahrsagerin"), Map.entry("santa", "weihnachtsmann"), Map.entry("salesman", "werbung"), Map.entry("grandma", "oma"),
+		Map.entry("satnav", "navi"), Map.entry("waiter", "kellner"), Map.entry("cats", "katzen"), Map.entry("goatchoir", "ziegenchor"));
 
 	public static final List<String> ENGLISH_NAMES = NAMES.stream()
 		.map(name -> ENGLISH.entrySet().stream().filter(entry -> entry.getValue().equals(name)).map(Map.Entry::getKey).findFirst().orElse(name))
@@ -473,10 +485,20 @@ public final class Situations {
 			options.add("panda", 1, PandaScene::new);
 		}
 
+		// 1.0.41: Santa mostly in December and in the snow, the goat choir in the mountains, cats where cats are, allays where allays are.
+		boolean december = java.time.LocalDate.now().getMonthValue() == 12;
+		options.add("weihnachtsmann", december ? 5 : biome.is(BiomeTags.SPAWNS_SNOW_FOXES) ? 2 : 1, SantaScene::new);
+		options.add("ziegenchor", biome.is(BiomeTags.IS_MOUNTAIN) || !level.getEntitiesOfClass(net.minecraft.world.entity.animal.goat.Goat.class, player.getBoundingBox().inflate(16.0)).isEmpty() ? 5 : 1, GoatChoirScene::new);
+		options.add("katzen", !level.getEntitiesOfClass(net.minecraft.world.entity.animal.Cat.class, player.getBoundingBox().inflate(16.0)).isEmpty() ? 5 : 1, CatScene::new);
+		options.add("allay", !level.getEntitiesOfClass(net.minecraft.world.entity.animal.allay.Allay.class, player.getBoundingBox().inflate(16.0)).isEmpty() ? 5 : 1, AllayScene::new);
+		if (sky) {
+			options.add("navi", 1, NavScene::new);
+		}
+
 		// The characters, each one rare. The chimney sweep needs a sky for his roof.
 		if (sky) {
 			for (String npc : List.of("influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer", "klempner",
-				"hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch", "fahrlehrer")) {
+				"hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch", "fahrlehrer", "wahrsagerin", "werbung", "oma", "kellner")) {
 				options.add(npc, 1, () -> npcScene(npc));
 			}
 		}
@@ -500,6 +522,10 @@ public final class Situations {
 			case "friseur" -> new BarberScene();
 			case "koch" -> new ChefScene();
 			case "fahrlehrer" -> new InstructorScene();
+			case "wahrsagerin" -> new FortuneTellerScene();
+			case "werbung" -> new SalesmanScene();
+			case "oma" -> new GrandmaScene();
+			case "kellner" -> new WaiterScene();
 			default -> null;
 		};
 	}
@@ -623,6 +649,11 @@ public final class Situations {
 			case "bienennest" -> new BeeNestScene();
 			case "axolotl" -> new AxolotlScene();
 			case "panda" -> new PandaScene();
+			case "weihnachtsmann" -> new SantaScene();
+			case "navi" -> new NavScene();
+			case "katzen" -> new CatScene();
+			case "allay" -> new AllayScene();
+			case "ziegenchor" -> new GoatChoirScene();
 			default -> npcScene(id);
 		};
 	}

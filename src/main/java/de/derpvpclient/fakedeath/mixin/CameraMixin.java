@@ -27,7 +27,7 @@ public abstract class CameraMixin {
 	}
 
 	// Some scenes pull the camera away from the eyes, like the giant frog's tongue. Only the camera moves.
-	@Inject(method = "setup", at = @At("TAIL"))
+	@Inject(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V", shift = At.Shift.AFTER))
 	private void fakedeath$sceneOffset(BlockGetter level, Entity entity, boolean detached, boolean mirrored, float partialTicks, CallbackInfo ci) {
 		Vec3 offset = CameraDirector.positionOffset();
 
