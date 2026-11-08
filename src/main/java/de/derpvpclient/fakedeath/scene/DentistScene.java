@@ -19,7 +19,7 @@ public class DentistScene extends NpcScene {
 	private int dark;
 
 	public DentistScene() {
-		super("zahnarzt", ChatFormatting.WHITE);
+		super("zahnarzt", ChatFormatting.DARK_AQUA);
 	}
 
 	@Override
