@@ -391,6 +391,10 @@ public final class FakeDeath {
 		if (player.hurtTime > 0) {
 			return "hurt";
 		}
+		// Up in a tree no scene looks right: the bushes, people and animals of the scenes would end up in the leaves.
+		if (onTree(level, player)) {
+			return "tree";
+		}
 
 		if (!checkMonsters) {
 			return null;
@@ -403,6 +407,24 @@ public final class FakeDeath {
 		}
 
 		return monsterNearby ? "monster" : null;
+	}
+
+	/** Standing on leaves, or on a log with leaves around it. A floor made of logs, like in a cabin, does not count. */
+	private static boolean onTree(ClientLevel level, LocalPlayer player) {
+		net.minecraft.core.BlockPos below = player.getOnPos();
+		net.minecraft.world.level.block.state.BlockState ground = level.getBlockState(below);
+		if (ground.is(net.minecraft.tags.BlockTags.LEAVES)) {
+			return true;
+		}
+		if (!ground.is(net.minecraft.tags.BlockTags.LOGS)) {
+			return false;
+		}
+		for (net.minecraft.core.BlockPos pos : net.minecraft.core.BlockPos.betweenClosed(below.offset(-2, -1, -2), below.offset(2, 2, 2))) {
+			if (level.getBlockState(pos).is(net.minecraft.tags.BlockTags.LEAVES)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/** Called instead of respawning or leaving to the title screen while the fake is running. */
