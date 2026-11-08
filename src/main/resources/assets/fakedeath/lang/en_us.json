@@ -66,7 +66,7 @@
 	"fakedeath.giantfrog.croak": "CROOOAK.",
 	"fakedeath.giantfrog.tasty": "Mmm. Tasty.",
 	"fakedeath.scene.glitch": "Glitch (flashing)",
-	"fakedeath.scene.disco": "Disco (flashing)",
+	"fakedeath.scene.disco": "Disco",
 	"fakedeath.options.flashing": "Flashing effects",
 	"fakedeath.test.open": "Test scenes...",
 	"fakedeath.test.title": "Fake Death – Test Scenes",
@@ -86,7 +86,7 @@
 	"fakedeath.test.locked": "Flashes fast. Switch on \"Flashing effects\" in the settings first.",
 	"fakedeath.test.switched_off": "Switched off for the random event, testing still works.
 %s",
-	"fakedeath.options.flashing.tooltip": "Scenes with fast flashing lights and colors (Glitch, Disco). On by default. Switch this off if you are sensitive to flashing lights.",
+	"fakedeath.options.flashing.tooltip": "Scenes with fast flashing lights and colors (Glitch). On by default. Switch this off if you are sensitive to flashing lights.",
 	"fakedeath.command.flashing_off": "This scene has fast flashing lights. Switch on \"Flashing effects\" in the settings first.",
 	"fakedeath.glitch.chunk": "Error: chunk %s, %s could not be loaded. World is being corrupted...",
 	"fakedeath.glitch.null": "java.lang.NullPointerException: player \"%s\" is null",
