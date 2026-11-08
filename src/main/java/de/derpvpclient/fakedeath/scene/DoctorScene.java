@@ -24,7 +24,7 @@ public class DoctorScene extends NpcScene {
 	private Display.BlockDisplay needle;
 
 	public DoctorScene() {
-		super("arzt", ChatFormatting.WHITE);
+		super("arzt", ChatFormatting.AQUA);
 	}
 
 	@Override

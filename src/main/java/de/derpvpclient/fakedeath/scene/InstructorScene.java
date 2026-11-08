@@ -39,6 +39,12 @@ public class InstructorScene extends NpcScene {
 	private float speed;
 	private Vec3 flyFrom;
 	private Vec3 flyTo;
+	private boolean riding;
+
+	@Override
+	public boolean seated() {
+		return riding;
+	}
 
 	public InstructorScene() {
 		super("fahrlehrer", ChatFormatting.GOLD);
@@ -100,6 +106,7 @@ public class InstructorScene extends NpcScene {
 
 	@Override
 	protected void act(Minecraft minecraft, ClientLevel level, LocalPlayer player, int t) {
+		riding = t >= MOUNT / 2 && t < THROW;
 		if (t == 0) {
 			at = horse.position();
 			Vec3 look = horizontalLook(player);
