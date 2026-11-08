@@ -89,6 +89,11 @@ public abstract class Scene {
 		return false;
 	}
 
+	/** How flat the body lies on the ground in third person, from 0 standing to 1 face down, like after falling into a bush. */
+	public float lying() {
+		return 0.0F;
+	}
+
 	/** The best moment of the scene for a picture, used by the demo run. */
 	public int photoTick() {
 		return length() * 2 / 3;
@@ -195,7 +200,7 @@ public abstract class Scene {
 		for (int attempt = 0; attempt < 10; attempt++) {
 			BlockPos pos = feet.offset(random.nextInt(radius * 2 + 1) - radius, random.nextInt(3) - 1, random.nextInt(radius * 2 + 1) - radius);
 
-			if (!pos.equals(feet) && !pos.equals(feet.above()) && level.getBlockState(pos.below()).isFaceSturdy(level, pos.below(), Direction.UP)
+			if (!pos.equals(feet) && !pos.equals(feet.above()) && level.getBlockState(pos.below()).isFaceSturdy(level, pos.below(), Direction.UP) && !onTree(level, pos)
 				&& placeBlock(level, pos, Blocks.FIRE.defaultBlockState())) {
 				return true;
 			}
@@ -416,7 +421,7 @@ public abstract class Scene {
 		for (int dy : new int[] {0, 1, -1, 2, -2, 3, -3}) {
 			BlockPos feet = base.above(dy);
 
-			if (isFree(level, feet) && isFree(level, feet.above()) && !isFree(level, feet.below())) {
+			if (isFree(level, feet) && isFree(level, feet.above()) && !isFree(level, feet.below()) && !onTree(level, feet)) {
 				return new Vec3(spot.x, feet.getY(), spot.z);
 			}
 		}
@@ -431,12 +436,21 @@ public abstract class Scene {
 		for (int dy : new int[] {0, 1, -1, 2, -2, 3, -3}) {
 			BlockPos feet = base.above(dy);
 
-			if (isFree(level, feet) && !isFree(level, feet.below())) {
+			if (isFree(level, feet) && !isFree(level, feet.below()) && !onTree(level, feet)) {
 				return feet.getY();
 			}
 		}
 
 		return around;
+	}
+
+	/**
+	 * True if a spot is on top of a tree, on its leaves or trunk. Nothing of a scene should stand or grow up there, a
+	 * villager on a treetop just looks wrong.
+	 */
+	protected static boolean onTree(ClientLevel level, BlockPos feet) {
+		BlockState below = level.getBlockState(feet.below());
+		return below.is(net.minecraft.tags.BlockTags.LEAVES) || below.is(net.minecraft.tags.BlockTags.LOGS);
 	}
 
 	private static boolean isFree(ClientLevel level, BlockPos pos) {

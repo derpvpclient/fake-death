@@ -34,6 +34,30 @@ public class DemoGameTest implements FabricClientGameTest {
 			}
 			return;
 		}
+		if (Boolean.getBoolean("fakedeath.demoTree")) {
+			// Up in a tree the fake death waits, back on the ground it starts.
+			try (TestSingleplayerContext singleplayer = context.worldBuilder().create()) {
+				context.waitTicks(60);
+				singleplayer.getServer().runCommand("execute as @a at @s run setblock ~ ~3 ~ minecraft:oak_leaves[persistent=true]");
+				singleplayer.getServer().runCommand("execute as @a at @s run tp @s ~ ~4 ~");
+				context.waitTicks(40);
+				context.runOnClient(client -> client.player.connection.sendCommand("fakedeath test beeren"));
+				context.waitTicks(180);
+				context.takeScreenshot("tree-1-waiting");
+				boolean early = context.computeOnClient(client -> de.derpvpclient.fakedeath.FakeDeath.currentScene() != null);
+				singleplayer.getServer().runCommand("execute as @a at @s run setblock ~ ~-1 ~ minecraft:air");
+				context.waitTicks(120);
+				boolean started = context.computeOnClient(client -> de.derpvpclient.fakedeath.FakeDeath.currentScene() != null);
+				context.takeScreenshot("tree-2-ground");
+				try {
+					Files.writeString(FabricLoader.getInstance().getGameDir().resolve("fakedeath-tree-result.txt"),
+						"on the tree: " + (early ? "STARTED" : "waited") + ", on the ground: " + (started ? "started" : "DID NOT START") + System.lineSeparator());
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			}
+			return;
+		}
 		Path marker = FabricLoader.getInstance().getConfigDir().resolve("fakedeath-demo.txt");
 
 		try {

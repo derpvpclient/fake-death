@@ -49,6 +49,7 @@ loom {
 			vmArg "-Dfakedeath.demoFrames=" + (project.findProperty("demoFrames") ?: "0")
 			vmArg "-Dfakedeath.demoView=" + (project.findProperty("demoView") ?: "")
 			vmArg "-Dfakedeath.demoUi=" + (project.findProperty("demoUi") ?: "false")
+			vmArg "-Dfakedeath.demoTree=" + (project.findProperty("demoTree") ?: "false")
 		}
 	}
 }

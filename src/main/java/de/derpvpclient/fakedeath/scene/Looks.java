@@ -82,6 +82,11 @@ final class Looks {
 		return new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK, Blocks.BAMBOO_BLOCK.defaultBlockState());
 	}
 
+	/** Bits of a sweet berry, for munching. */
+	static net.minecraft.core.particles.ParticleOptions berryCrumbs() {
+		return new net.minecraft.core.particles.ItemParticleOption(net.minecraft.core.particles.ParticleTypes.ITEM, net.minecraft.world.item.Items.SWEET_BERRIES);
+	}
+
 	/** Swings the main hand, like hitting or throwing. */
 	static void swing(LivingEntity entity) {
 		entity.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
