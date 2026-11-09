@@ -11,6 +11,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 
 /** A fitness trainer: "Ten more push-ups!" The camera goes down and up, the hunger bar runs empty, and the player gives out. */
@@ -18,6 +20,8 @@ public class TrainerScene extends NpcScene {
 	private static final int REP = 14;
 	private static final int REPS = 8;
 	private static final int DONE = REP * REPS;
+	private static final int DROP = 8;
+	private int acting = -1;
 
 	public TrainerScene() {
 		super("trainer", ChatFormatting.RED);
@@ -34,17 +38,56 @@ public class TrainerScene extends NpcScene {
 	}
 
 	@Override
+	protected ItemStack held() {
+		return Looks.prop(Items.IRON_INGOT, "dumbbell");
+	}
+
+	@Override
 	protected VillagerProfession profession() {
 		return VillagerProfession.LEATHERWORKER;
 	}
 
 	@Override
+	public float lying() {
+		// In third person the player really is down on the floor for the push-ups.
+		return acting < 0 ? 0.0F : Math.min(1.0F, (acting + 1) / (float) DROP);
+	}
+
+	@Override
+	public boolean pushUp() {
+		return acting >= 0 && acting < DONE;
+	}
+
+	@Override
+	protected Vec3 focus(LocalPlayer player) {
+		// From outside the camera films from the side: the body on the floor pumping up and down, the trainer in front.
+		if (!thirdPerson() || acting < 0) {
+			return npc.getEyePosition();
+		}
+		Vec3 feet = player.position();
+		Vec3 mid = feet.lerp(npc.position(), 0.5);
+		Vec3 side = towardPlayer(player).yRot(Mth.HALF_PI);
+		return mid.add(side.scale(2.5)).add(0.0, 0.2, 0.0);
+	}
+
+	@Override
+	public Vec3 bodyFaces() {
+		return acting >= 0 && npc != null ? npc.position() : null;
+	}
+
+	@Override
 	protected void act(Minecraft minecraft, ClientLevel level, LocalPlayer player, int t) {
+		acting = t;
 		if (t < DONE) {
 			// Down to the floor and up again, slower with every one.
 			int rep = t / REP;
 			float phase = (t % REP) / (float) REP;
-			moveCamera(new Vec3(0.0, -Mth.sin(phase * Mth.PI) * 1.1, 0.0));
+			if (thirdPerson()) {
+				// From outside the body lies on the floor and pushes itself up and down a little, the camera rides along.
+				moveCamera(new Vec3(0.0, Mth.sin(phase * Mth.PI) * 0.3, 0.0));
+			} else {
+				moveCamera(new Vec3(0.0, -Mth.sin(phase * Mth.PI) * 1.1, 0.0));
+			}
 			if (t % REP == 0) {
 				FakeDeath.setFakeFood(20 - rep * 3);
 				sound(level, npc.position(), SoundEvents.VILLAGER_AMBIENT, SoundSource.NEUTRAL, 0.8F, 1.3F);
@@ -59,7 +102,7 @@ public class TrainerScene extends NpcScene {
 		}
 		if (t == DONE) {
 			FakeDeath.setFakeFood(0);
-			moveCamera(new Vec3(0.0, -1.2, 0.0));
+			moveCamera(new Vec3(0.0, thirdPerson() ? 0.0 : -1.2, 0.0));
 			kill(level, player, SoundEvents.PLAYER_HURT);
 		}
 		if (t == DONE + 30) {

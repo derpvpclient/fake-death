@@ -68,8 +68,8 @@ public class BombPrankScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		// The phone he films with.
-		return new ItemStack(Items.SPYGLASS);
+		// The phone on a selfie stick he films with.
+		return Looks.prop(Items.SPYGLASS, "selfie_stick");
 	}
 
 	@Override

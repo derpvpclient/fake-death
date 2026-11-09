@@ -1,5 +1,6 @@
 package de.derpvpclient.fakedeath.mixin;
 
+import de.derpvpclient.fakedeath.CameraDirector;
 import de.derpvpclient.fakedeath.FakeDeath;
 import de.derpvpclient.fakedeath.scene.Scene;
 import net.minecraft.client.Minecraft;
@@ -17,6 +18,9 @@ public class PlayerRendererMixin {
 	@Inject(method = "extractRenderState(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;F)V", at = @At("TAIL"))
 	private void fakedeath$lying(AbstractClientPlayer entity, PlayerRenderState state, float partialTicks, CallbackInfo ci) {
 		Scene scene = FakeDeath.currentScene();
+		if (entity == Minecraft.getInstance().player) {
+			CameraDirector.pushUpState = scene != null && scene.pushUp() ? state : null;
+		}
 		if (entity != Minecraft.getInstance().player || scene == null || scene.lying() <= 0.0F) {
 			return;
 		}
@@ -25,5 +29,8 @@ public class PlayerRendererMixin {
 		state.isVisuallySwimming = scene.lying() >= 1.0F;
 		state.walkAnimationPos = state.ageInTicks * 0.8F;
 		state.walkAnimationSpeed = 0.5F;
+		if (scene.pushUp()) {
+			state.walkAnimationSpeed = 0.0F;
+		}
 	}
 }

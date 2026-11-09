@@ -51,7 +51,7 @@ public class LicenseFeeScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		return new ItemStack(Items.PAPER);
+		return Looks.prop(Items.PAPER, "invoice");
 	}
 
 	@Override

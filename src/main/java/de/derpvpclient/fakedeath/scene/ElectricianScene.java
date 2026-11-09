@@ -41,7 +41,7 @@ public class ElectricianScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		return new ItemStack(Items.REDSTONE);
+		return Looks.prop(Items.REDSTONE, "screwdriver");
 	}
 
 	@Override
