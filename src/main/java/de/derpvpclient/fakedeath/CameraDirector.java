@@ -96,6 +96,9 @@ public final class CameraDirector {
 		}
 	}
 
+	/** The render state of the own body while it does push-ups, so the player model can pose its arms. */
+	public static Object pushUpState;
+
 	public static void reset() {
 		yaw = pitch = prevYaw = prevPitch = 0.0F;
 		offset = prevOffset = Vec3.ZERO;
