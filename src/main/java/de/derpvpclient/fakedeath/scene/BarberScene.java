@@ -44,7 +44,7 @@ public class BarberScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		return new ItemStack(Items.SHEARS);
+		return Looks.prop(Items.SHEARS, "barber_scissors");
 	}
 
 	@Override

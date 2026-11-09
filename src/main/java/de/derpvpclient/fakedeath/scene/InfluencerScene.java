@@ -41,7 +41,7 @@ public class InfluencerScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		return new ItemStack(Items.SPYGLASS);
+		return Looks.prop(Items.SPYGLASS, "phone");
 	}
 
 	@Override
