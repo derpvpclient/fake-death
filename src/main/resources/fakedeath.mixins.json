@@ -21,6 +21,7 @@
 		"LocalPlayerMixin",
 		"MultiPlayerGameModeMixin",
 		"OptionsScreenMixin",
+		"PlayerModelMixin",
 		"SpellcasterIllagerAccessor"
 	],
 	"injectors": {
