@@ -1,0 +1,11 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:item/spyglass"
+  },
+  "overrides": [
+    { "predicate": { "custom_model_data": 4711009 }, "model": "fakedeath:item/phone" },
+    { "predicate": { "custom_model_data": 4711012 }, "model": "fakedeath:item/police_camera" },
+    { "predicate": { "custom_model_data": 4711015 }, "model": "fakedeath:item/selfie_stick" }
+  ]
+}

@@ -69,7 +69,7 @@ public class CaretakerScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		return new ItemStack(Items.BRUSH);
+		return Looks.prop(Items.BRUSH, "mop");
 	}
 
 	@Override

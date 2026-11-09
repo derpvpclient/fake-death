@@ -87,8 +87,17 @@ final class Looks {
 	 * One of the mod's own props, drawn with its own model and texture from the mod's assets. It is only a look: the
 	 * item underneath stays a normal one, so the mod still needs nothing on the server.
 	 */
+	/** 1.21.1 has no item_model component: the props are custom_model_data overrides on the base item, ids 4711000 + index. */
+	private static final java.util.List<String> PROPS = java.util.List.of("barber_scissors", "briefcase", "chimney_brush", "clipboard",
+		"dental_drill", "dumbbell", "invoice", "magic_saw", "mop", "phone", "pipe_wrench", "police_baton", "police_camera", "present",
+		"screwdriver", "selfie_stick", "soup_ladle", "syringe", "tarot_card");
+
 	static net.minecraft.world.item.ItemStack prop(net.minecraft.world.item.Item base, String model) {
 		net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(base);
+		int index = PROPS.indexOf(model);
+		if (index >= 0) {
+			stack.set(net.minecraft.core.component.DataComponents.CUSTOM_MODEL_DATA, new net.minecraft.world.item.component.CustomModelData(4711000 + index));
+		}
 		return stack;
 	}
 

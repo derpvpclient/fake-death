@@ -32,8 +32,17 @@ public class LivingEntityRendererMixin {
 	@WrapOperation(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;setupRotations(Lnet/minecraft/world/entity/LivingEntity;Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V"))
 	private void fakedeath$bodyTurns(LivingEntityRenderer<?, ?> renderer, LivingEntity entity, PoseStack poseStack, float bob, float bodyRot, float partialTicks, float scale, Operation<Void> original) {
-		float turn = entity == Minecraft.getInstance().player ? CameraDirector.yawOffset() : 0.0F;
-		original.call(renderer, entity, poseStack, bob, bodyRot + turn, partialTicks, scale);
+		float turned = bodyRot;
+		if (entity == Minecraft.getInstance().player) {
+			turned += CameraDirector.yawOffset();
+			Scene scene = FakeDeath.currentScene();
+			Vec3 faces = scene != null ? scene.bodyFaces() : null;
+			if (faces != null) {
+				Vec3 delta = faces.subtract(entity.getPosition(partialTicks).add(CameraDirector.bodyOffset(entity)));
+				turned = (float) (net.minecraft.util.Mth.atan2(delta.z, delta.x) * net.minecraft.util.Mth.RAD_TO_DEG) - 90.0F;
+			}
+		}
+		original.call(renderer, entity, poseStack, bob, turned, partialTicks, scale);
 	}
 
 	// Sitting on the horse of the riding lesson.

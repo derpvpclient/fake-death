@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:item/paper"
+  },
+  "overrides": [
+    { "predicate": { "custom_model_data": 4711003 }, "model": "fakedeath:item/clipboard" },
+    { "predicate": { "custom_model_data": 4711006 }, "model": "fakedeath:item/invoice" },
+    { "predicate": { "custom_model_data": 4711013 }, "model": "fakedeath:item/present" },
+    { "predicate": { "custom_model_data": 4711018 }, "model": "fakedeath:item/tarot_card" }
+  ]
+}

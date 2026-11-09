@@ -11,6 +11,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -40,6 +42,11 @@ public class DoctorScene extends NpcScene {
 	@Override
 	protected double standDistance() {
 		return 3.2;
+	}
+
+	@Override
+	protected ItemStack held() {
+		return Looks.prop(Items.GLASS_BOTTLE, "syringe");
 	}
 
 	@Override

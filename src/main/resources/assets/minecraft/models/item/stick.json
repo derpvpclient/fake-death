@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "minecraft:item/stick"
+  },
+  "overrides": [
+    { "predicate": { "custom_model_data": 4711011 }, "model": "fakedeath:item/police_baton" }
+  ]
+}
