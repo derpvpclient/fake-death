@@ -299,6 +299,13 @@ public final class FakeDeath {
 			return;
 		}
 
+		// The same on the fake death screen: a mob hitting the player while they sit there must not get a free kill.
+		if (active && player.getHealth() < startHealth - 0.01F) {
+			FakeDeathClient.LOGGER.info("Real damage on the fake death screen, back to the game");
+			reveal(minecraft);
+			return;
+		}
+
 		try {
 			scene.tick(minecraft, level, player, sceneTick++);
 		} catch (RuntimeException e) {
