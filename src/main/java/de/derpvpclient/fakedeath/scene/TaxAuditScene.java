@@ -1,6 +1,5 @@
 package de.derpvpclient.fakedeath.scene;
 
-import de.derpvpclient.fakedeath.FakeDeath;
 import java.time.Year;
 import java.util.List;
 import net.minecraft.ChatFormatting;
@@ -157,8 +156,10 @@ public class TaxAuditScene extends Scene {
 			sound(level, villager.position(), SoundEvents.BEACON_ACTIVATE, SoundSource.HOSTILE, 1.5F, 1.5F);
 		}
 
-		if (tick == LASER_START + 10 || tick == LASER_FULL || tick == LASER_FULL + 40) {
-			sound(level, villager.position(), SoundEvents.GUARDIAN_ATTACK, SoundSource.HOSTILE, 1.5F, 1.2F);
+		if (tick == LASER_FULL) {
+			// One beam sound when the laser fires for real. It is a long one, started several times it piled up and
+			// droned on into the death screen.
+			sound(level, villager.position(), SoundEvents.GUARDIAN_ATTACK, SoundSource.HOSTILE, 1.2F, 1.0F);
 		}
 
 		if (tick >= LASER_START && tick <= ZAP) {
@@ -176,12 +177,13 @@ public class TaxAuditScene extends Scene {
 			}
 
 			if (tick == LASER_FULL + 15 || tick == LASER_FULL + 35 || tick == LASER_FULL + 55) {
-				player.animateHurt(random.nextFloat() * 360.0F);
-				FakeDeath.fakeDamage(player, 0.25F);
+				// Every hit can be heard, not only seen in the hearts.
+				hurt(level, player, SoundEvents.PLAYER_HURT_ON_FIRE, 0.25F);
 			}
 		}
 
 		if (tick == ZAP) {
+			stopLaser(minecraft);
 			sound(level, player.position(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 1.5F, 1.4F);
 			particles(level, ParticleTypes.ELECTRIC_SPARK, player.getEyePosition(), 40, 0.5, 0.8);
 			kill(level, player, SoundEvents.PLAYER_HURT);
@@ -206,6 +208,7 @@ public class TaxAuditScene extends Scene {
 
 	@Override
 	public void end(ClientLevel level, LocalPlayer player) {
+		stopLaser(Minecraft.getInstance());
 		if (villager != null) {
 			particles(level, ParticleTypes.POOF, villager.position().add(0, 1, 0), 20, 0.5, 0.1);
 			sound(level, villager.position(), SoundEvents.VILLAGER_AMBIENT, SoundSource.NEUTRAL, 1.0F, 1.2F);
@@ -213,6 +216,12 @@ public class TaxAuditScene extends Scene {
 		}
 
 		super.end(level, player);
+	}
+
+	/** Ends the laser sounds, so they do not drone on over the death screen. */
+	private static void stopLaser(Minecraft minecraft) {
+		minecraft.getSoundManager().stop(SoundEvents.GUARDIAN_ATTACK.getLocation(), SoundSource.HOSTILE);
+		minecraft.getSoundManager().stop(SoundEvents.BEACON_ACTIVATE.getLocation(), SoundSource.HOSTILE);
 	}
 
 	/** Picks the most valuable thing the player carries as the reason for the audit. */

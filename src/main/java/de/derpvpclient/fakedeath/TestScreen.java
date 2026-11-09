@@ -33,7 +33,7 @@ public class TestScreen extends Screen {
 			"doppelgaenger", "ertrunkener", "magier", "ueberfall", "ghast", "enderman"),
 		"characters", List.of("finanzamt", "paketbote", "mama", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker",
 			"zauberer", "klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch", "fahrlehrer",
-			"wahrsagerin", "weihnachtsmann", "werbung", "oma", "kellner"));
+			"wahrsagerin", "weihnachtsmann", "werbung", "oma", "kellner", "navi", "bombenprank"));
 	private static boolean openNextTick;
 	// Remembered while the game runs, so the screen opens again on the same tab.
 	private static String category = "all";
@@ -114,11 +114,37 @@ public class TestScreen extends Screen {
 		int columns = Math.max(2, Math.min(4, (width - 20) / (BUTTON_WIDTH + 4)));
 		GridLayout grid = new GridLayout().columnSpacing(4).rowSpacing(4);
 		GridLayout.RowHelper rows = grid.createRowHelper(columns);
+		// Under "all" the scenes come in groups, each with its heading: nature and world, animals, monsters, characters.
+		// A heading takes a whole row, the empty cells only count for the paging.
+		List<String> cells = new java.util.ArrayList<>();
+		if (category.equals("all")) {
+			for (String group : CATEGORIES.subList(1, CATEGORIES.size())) {
+				List<String> ids = shown.stream().filter(id -> categoryOf(id).equals(group)).toList();
+				if (ids.isEmpty()) {
+					continue;
+				}
+				while (cells.size() % columns != 0) {
+					cells.add("");
+				}
+				cells.add("#" + group);
+				for (int i = 1; i < columns; i++) {
+					cells.add("");
+				}
+				cells.addAll(ids);
+			}
+		} else {
+			cells.addAll(shown);
+		}
 		int perPage = Math.max(1, (layout.getContentHeight() - 4) / 24) * columns;
-		int pages = Math.max(1, (shown.size() + perPage - 1) / perPage);
+		int pages = Math.max(1, (cells.size() + perPage - 1) / perPage);
 		page = Math.min(page, pages - 1);
-		for (String id : shown.subList(Math.min(shown.size(), page * perPage), Math.min(shown.size(), (page + 1) * perPage))) {
-			rows.addChild(sceneButton(id));
+		for (String id : cells.subList(Math.min(cells.size(), page * perPage), Math.min(cells.size(), (page + 1) * perPage))) {
+			if (id.startsWith("#")) {
+				Component heading = Component.translatable("fakedeath.test.tab." + id.substring(1)).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD);
+				rows.addChild(new StringWidget(heading, font), columns);
+			} else if (!id.isEmpty()) {
+				rows.addChild(sceneButton(id));
+			}
 		}
 		if (shown.isEmpty()) {
 			rows.addChild(new StringWidget(Component.translatable("fakedeath.test.none").withStyle(ChatFormatting.GRAY), font));

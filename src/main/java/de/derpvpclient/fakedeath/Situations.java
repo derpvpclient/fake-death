@@ -2,6 +2,7 @@ package de.derpvpclient.fakedeath;
 
 import de.derpvpclient.fakedeath.scene.AnvilScene;
 import de.derpvpclient.fakedeath.scene.BatScene;
+import de.derpvpclient.fakedeath.scene.BombPrankScene;
 import de.derpvpclient.fakedeath.scene.BerryScene;
 import de.derpvpclient.fakedeath.scene.BeeScene;
 import de.derpvpclient.fakedeath.scene.CaveInScene;
@@ -52,6 +53,7 @@ import de.derpvpclient.fakedeath.scene.BarberScene;
 import de.derpvpclient.fakedeath.scene.BeeNestScene;
 import de.derpvpclient.fakedeath.scene.BuildingOfficeScene;
 import de.derpvpclient.fakedeath.scene.CamelScene;
+import de.derpvpclient.fakedeath.scene.CactusScene;
 import de.derpvpclient.fakedeath.scene.CaretakerScene;
 import de.derpvpclient.fakedeath.scene.ChandelierScene;
 import de.derpvpclient.fakedeath.scene.ChefScene;
@@ -64,6 +66,7 @@ import de.derpvpclient.fakedeath.scene.DolphinScene;
 import de.derpvpclient.fakedeath.scene.EarthquakeScene;
 import de.derpvpclient.fakedeath.scene.ElectricianScene;
 import de.derpvpclient.fakedeath.scene.EndermanScene;
+import de.derpvpclient.fakedeath.scene.FireScene;
 import de.derpvpclient.fakedeath.scene.FoxScene;
 import de.derpvpclient.fakedeath.scene.FurnaceScene;
 import de.derpvpclient.fakedeath.scene.InfluencerScene;
@@ -108,7 +111,7 @@ import net.minecraft.world.level.block.state.BlockState;
 /** Looks at what the player is doing and what is around them, and picks a fake death that fits. */
 public final class Situations {
 	public static final List<String> NAMES = List.of(
-		"baum", "hoehle", "blitz", "lava", "kaktus", "beeren", "schnee", "hunger", "feuer",
+		"baum", "hoehle", "blitz", "kaktus", "beeren", "schnee", "hunger", "feuer",
 		"spieler", "riese", "skelett", "creeper", "finanzamt", "herobrine", "slenderman",
 		"tropfstein", "bienen", "phantom", "amboss", "unsichtbar", "geister",
 		"doppelgaenger", "ertrunkener", "woelfe", "froesche", "riesenfrosch", "silberfische", "ziege", "magier", "ueberfall", "meteorit", "ghast", "fledermaeuse", "riesenitem", "paketbote", "mama", "papagei", "glitch", "disco",
@@ -116,7 +119,7 @@ public final class Situations {
 		"dornen", "erdbeben", "vulkan", "bienennest", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer",
 		"klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch",
 		"fahrlehrer", "axolotl", "panda",
-		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor");
+		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor", "bombenprank");
 
 	/** English scene names, both work in every language. Names that are the same in both are left out. */
 	private static final Map<String, String> ENGLISH = Map.ofEntries(
@@ -135,7 +138,7 @@ public final class Situations {
 		Map.entry("doctor", "arzt"), Map.entry("police", "polizist"), Map.entry("chimneysweep", "schornsteinfeger"), Map.entry("barber", "friseur"), Map.entry("chef", "koch"),
 		Map.entry("instructor", "fahrlehrer"),
 		Map.entry("fortuneteller", "wahrsagerin"), Map.entry("santa", "weihnachtsmann"), Map.entry("salesman", "werbung"), Map.entry("grandma", "oma"),
-		Map.entry("satnav", "navi"), Map.entry("waiter", "kellner"), Map.entry("cats", "katzen"), Map.entry("goatchoir", "ziegenchor"));
+		Map.entry("satnav", "navi"), Map.entry("waiter", "kellner"), Map.entry("cats", "katzen"), Map.entry("goatchoir", "ziegenchor"), Map.entry("bombprank", "bombenprank"));
 
 	public static final List<String> ENGLISH_NAMES = NAMES.stream()
 		.map(name -> ENGLISH.entrySet().stream().filter(entry -> entry.getValue().equals(name)).map(Map.Entry::getKey).findFirst().orElse(name))
@@ -146,7 +149,7 @@ public final class Situations {
 		"hoehle", "höhle", "doppelgaenger", "doppelgänger", "fledermaeuse", "fledermäuse", "froesche", "frösche", "ueberfall", "überfall", "huehner", "hühner");
 
 	/** Scenes with fast flashing lights, they only play with that setting switched on. */
-	public static final java.util.Set<String> FLASHING = java.util.Set.of("glitch");
+	public static final java.util.Set<String> FLASHING = java.util.Set.of();
 
 	public static final List<String> GERMAN_NAMES = NAMES.stream().map(name -> UMLAUTS.getOrDefault(name, name)).toList();
 
@@ -229,17 +232,11 @@ public final class Situations {
 			options.add("blitz", 6, LightningScene::new);
 		}
 
-		if (options.wants("lava")) {
-			BlockPos lava = find(level, feet, 4, 2, state -> state.getFluidState().is(FluidTags.LAVA));
-			if (lava != null) {
-				options.add("lava", 5, () -> HazardScene.lava(lava));
-			}
-		}
-
 		if (options.wants("kaktus")) {
-			BlockPos cactus = find(level, feet, 1, 1, state -> state.is(Blocks.CACTUS));
+			// Cacti around, as in a desert: the cactus pinball, with the closest one as the first.
+			BlockPos cactus = find(level, feet, 4, 2, state -> state.is(Blocks.CACTUS));
 			if (cactus != null) {
-				options.add("kaktus", 5, () -> HazardScene.cactus(cactus));
+				options.add("kaktus", 5, () -> new CactusScene(cactus.distSqr(feet) <= 2 ? cactus : null));
 			}
 		}
 
@@ -261,8 +258,11 @@ public final class Situations {
 			options.add("hunger", 3, HazardScene::starve);
 		}
 
+		// In the Nether, or where something is burning already: a campfire, a fire.
 		if (level.dimension() == Level.NETHER) {
-			options.add("feuer", 3, HazardScene::fire);
+			options.add("feuer", 3, FireScene::new);
+		} else if (options.wants("feuer") && find(level, feet, 5, 2, state -> state.is(Blocks.FIRE) || state.is(BlockTags.CAMPFIRES)) != null) {
+			options.add("feuer", 4, FireScene::new);
 		}
 
 		AbstractClientPlayer killer = nearestPlayer(level, player, 10.0);
@@ -388,10 +388,8 @@ public final class Situations {
 			options.add("papagei", 5, ParrotScene::new);
 		}
 
-		// Fast flashing lights only with the setting switched on.
-		if (FakeDeathConfig.flashing) {
-			options.add("glitch", 1, GlitchScene::new);
-		}
+		// Without flashing effects the glitch plays without its colored flicker.
+		options.add("glitch", 1, GlitchScene::new);
 		// The disco has its lights in the world and never flashes the screen, it needs no setting.
 		boolean music = options.wants("disco") && find(level, feet, 8, 3, state -> state.is(Blocks.JUKEBOX)) != null;
 		options.add("disco", music ? 6 : 1, DiscoScene::new);
@@ -500,7 +498,7 @@ public final class Situations {
 		// The characters, each one rare. The chimney sweep needs a sky for his roof.
 		if (sky) {
 			for (String npc : List.of("influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer", "klempner",
-				"hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch", "fahrlehrer", "wahrsagerin", "werbung", "oma", "kellner")) {
+				"hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch", "fahrlehrer", "wahrsagerin", "werbung", "oma", "kellner", "bombenprank")) {
 				options.add(npc, 1, () -> npcScene(npc));
 			}
 		}
@@ -528,6 +526,7 @@ public final class Situations {
 			case "werbung" -> new SalesmanScene();
 			case "oma" -> new GrandmaScene();
 			case "kellner" -> new WaiterScene();
+			case "bombenprank" -> new BombPrankScene();
 			default -> null;
 		};
 	}
@@ -593,12 +592,11 @@ public final class Situations {
 			}
 			case "hoehle" -> new CaveInScene();
 			case "blitz" -> new LightningScene();
-			case "lava" -> HazardScene.lava(orFeet(find(level, feet, 4, 2, state -> state.getFluidState().is(FluidTags.LAVA)), feet));
-			case "kaktus" -> HazardScene.cactus(orFeet(find(level, feet, 2, 1, state -> state.is(Blocks.CACTUS)), feet));
+			case "kaktus" -> new CactusScene(find(level, feet, 1, 1, state -> state.is(Blocks.CACTUS)));
 			case "beeren" -> new BerryScene(find(level, feet, 2, 1, state -> state.is(Blocks.SWEET_BERRY_BUSH)));
 			case "schnee" -> HazardScene.freeze(orFeet(find(level, feet, 2, 1, state -> state.is(Blocks.POWDER_SNOW)), feet));
 			case "hunger" -> HazardScene.starve();
-			case "feuer" -> HazardScene.fire();
+			case "feuer" -> new FireScene();
 			case "spieler" -> {
 				AbstractClientPlayer killer = nearestPlayer(level, player, 32.0);
 				yield killer != null ? new PlayerKillScene(killer) : PlayerKillScene.stranger();
@@ -637,7 +635,11 @@ public final class Situations {
 			case "mond" -> new MoonScene();
 			case "sonnenbrand" -> new SunburnScene();
 			case "truhe" -> new ChestScene(find(level, feet, 6, 3, state -> state.is(Blocks.CHEST) || state.is(Blocks.TRAPPED_CHEST)));
-			case "ofen" -> new FurnaceScene(find(level, feet, 6, 3, Situations::isFurnace));
+			case "ofen" -> {
+				// Always a real furnace of the player's, none is put down. Without one nearby the scene can not play.
+				BlockPos furnace = find(level, feet, 12, 4, Situations::isFurnace);
+				yield furnace != null ? new FurnaceScene(furnace) : null;
+			}
 			case "delfin" -> new DolphinScene(find(level, feet, 10, 3, state -> state.getFluidState().is(FluidTags.WATER)));
 			case "kronleuchter" -> new ChandelierScene();
 			case "kolben" -> new PistonScene();
