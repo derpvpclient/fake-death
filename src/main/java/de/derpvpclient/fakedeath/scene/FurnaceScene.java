@@ -56,11 +56,8 @@ public class FurnaceScene extends Scene {
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
 		if (tick == 0) {
+			// Always the player's own furnace, none is ever put down.
 			furnace = found;
-			if (furnace == null) {
-				furnace = BlockPos.containing(groundSpot(level, player, 2.5, 0.0));
-				placeBlock(level, furnace, Blocks.FURNACE.defaultBlockState().setValue(FurnaceBlock.LIT, true));
-			}
 			center = Vec3.atCenterOf(furnace);
 			look = level.getBlockState(furnace);
 		}

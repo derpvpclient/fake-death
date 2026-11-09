@@ -45,7 +45,8 @@ public class PlumberScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		return new ItemStack(Items.IRON_INGOT);
+		// His pipe wrench, the mod's own prop.
+		return Looks.prop(Items.IRON_INGOT, "pipe_wrench");
 	}
 
 	@Override

@@ -54,8 +54,14 @@ public class MoonScene extends Scene {
 		if (tick <= FALL) {
 			// Faster and faster towards the player, and bigger.
 			float p = tick / (float) FALL;
-			Vec3 at = sky.lerp(player.getEyePosition().add(horizontalLook(player).scale(6.0)).add(0.0, 4.0, 0.0), p * p * p);
 			float size = 8.0F + p * p * 40.0F;
+			// Straight at the eyes, but its near side always stays in front of them: with the camera inside the huge
+			// block its faces would vanish and the moon would be gone right before the hit.
+			Vec3 eyes = player.getEyePosition();
+			Vec3 way = sky.subtract(eyes);
+			double start = way.length();
+			double distance = start + (size * 0.9 + 1.2 - start) * p * p * p;
+			Vec3 at = eyes.add(way.normalize().scale(distance));
 			place(moon, at, new Vector3f(size), new Quaternionf().rotateY(tick * 0.004F).rotateX(0.3F));
 			turnTowards(player, at, 0.08F);
 			cameraShake(p * p * 0.35F);
