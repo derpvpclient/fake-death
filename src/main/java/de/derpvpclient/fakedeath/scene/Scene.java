@@ -94,6 +94,16 @@ public abstract class Scene {
 		return 0.0F;
 	}
 
+	/** True while the player does push-ups: in third person the arms go straight down to the floor and the legs stay still. */
+	public boolean pushUp() {
+		return false;
+	}
+
+	/** A point the own body faces in third person whatever way the camera looks, so the camera can film it from the side. Null to turn with the camera. */
+	public Vec3 bodyFaces() {
+		return null;
+	}
+
 	/** The best moment of the scene for a picture, used by the demo run. */
 	public int photoTick() {
 		return length() * 2 / 3;

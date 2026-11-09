@@ -33,6 +33,13 @@ public class LivingEntityRendererMixin {
 		state.xRot = Mth.clamp(state.xRot + CameraDirector.pitchOffset(), -90.0F, 90.0F);
 
 		Scene scene = FakeDeath.currentScene();
+		Vec3 faces = scene != null ? scene.bodyFaces() : null;
+		if (faces != null) {
+			Vec3 delta = faces.subtract(entity.getPosition(partialTicks).add(shift));
+			state.bodyRot = (float) (Mth.atan2(delta.z, delta.x) * Mth.RAD_TO_DEG) - 90.0F;
+			state.yRot = 0.0F;
+			state.xRot = 0.0F;
+		}
 		if (scene != null && state instanceof HumanoidRenderState humanoid && scene.seated()) {
 			humanoid.isPassenger = true;
 		}
