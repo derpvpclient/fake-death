@@ -21,8 +21,16 @@ public class FakeDeathOptionsScreen extends OptionsSubScreen {
 		super(parent, Minecraft.getInstance().options, Component.translatable("fakedeath.options.title"));
 	}
 
+	/** A heading row, this version has no header rows in option lists. */
+	private void header(Component text) {
+		net.minecraft.client.gui.components.StringWidget title = new net.minecraft.client.gui.components.StringWidget(150, 20,
+			text.copy().withStyle(net.minecraft.ChatFormatting.YELLOW, net.minecraft.ChatFormatting.BOLD), font).alignLeft();
+		list.addSmall(title, new net.minecraft.client.gui.components.StringWidget(150, 20, Component.empty(), font));
+	}
+
 	@Override
 	protected void addOptions() {
+		header(Component.translatable("fakedeath.options.general"));
 		list.addBig(OptionInstance.createBoolean("fakedeath.options.random", tooltip("fakedeath.options.random.tooltip"),
 			FakeDeathConfig.randomEvent, value -> FakeDeathConfig.randomEvent = value));
 		list.addSmall(
@@ -31,16 +39,40 @@ public class FakeDeathOptionsScreen extends OptionsSubScreen {
 		list.addBig(OptionInstance.createBoolean("fakedeath.options.flashing", tooltip("fakedeath.options.flashing.tooltip"),
 			FakeDeathConfig.flashing, value -> FakeDeathConfig.flashing = value));
 
-		list.addSmall(Situations.NAMES.stream()
-			.map(id -> OptionInstance.createBoolean("fakedeath.scene." + id, FakeDeathConfig.isEnabled(id), value -> FakeDeathConfig.setEnabled(id, value)))
-			.toArray(OptionInstance[]::new));
+		// The scenes in the same groups as in the test screen, each sorted by name, with a switch for all of them at once.
+		header(Component.translatable("fakedeath.options.scenes"));
+		list.addSmall(
+			Button.builder(Component.translatable("fakedeath.options.all_on"), button -> setAll(true)).build(),
+			Button.builder(Component.translatable("fakedeath.options.all_off"), button -> setAll(false)).build());
+		for (String group : java.util.List.of("world", "animals", "monsters", "characters")) {
+			java.util.List<String> ids = Situations.NAMES.stream()
+				.filter(id -> TestScreen.categoryOf(id).equals(group))
+				.sorted(java.util.Comparator.comparing(id -> Component.translatable("fakedeath.scene." + id).getString()))
+				.toList();
+			header(Component.translatable("fakedeath.test.tab." + group).append(" (" + ids.size() + ")"));
+			list.addSmall(ids.stream()
+				.map(id -> OptionInstance.createBoolean("fakedeath.scene." + id, FakeDeathConfig.isEnabled(id), value -> FakeDeathConfig.setEnabled(id, value)))
+				.toArray(OptionInstance[]::new));
+		}
 	}
 
 	@Override
 	protected void addFooter() {
 		LinearLayout footer = layout.addToFooter(LinearLayout.horizontal().spacing(8));
-		footer.addChild(Button.builder(Component.translatable("fakedeath.test.open"), button -> minecraft.setScreen(new TestScreen(this))).build());
+		// The test screen is only for the developer.
+		if (FakeDeathClient.isDeveloper()) {
+			footer.addChild(Button.builder(Component.translatable("fakedeath.test.open"), button -> minecraft.setScreen(new TestScreen(this))).build());
+		}
 		footer.addChild(Button.builder(CommonComponents.GUI_DONE, button -> onClose()).build());
+	}
+
+	/** Every scene on or off at once, then the page is drawn again with the new switches. */
+	private void setAll(boolean enabled) {
+		for (String id : Situations.NAMES) {
+			FakeDeathConfig.setEnabled(id, enabled);
+		}
+		FakeDeathConfig.save();
+		minecraft.setScreen(new FakeDeathOptionsScreen(lastScreen));
 	}
 
 	private static OptionInstance<Integer> minutes(String key, int value, Consumer<Integer> setter) {

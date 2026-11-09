@@ -31,6 +31,13 @@ public class DemoGameTest implements FabricClientGameTest {
 				context.getInput().typeChars("ko");
 				context.waitTicks(5);
 				context.takeScreenshot("ui-3-search");
+				// The settings page, at the top and further down among the scenes.
+				context.runOnClient(client -> client.setScreen(new de.derpvpclient.fakedeath.FakeDeathOptionsScreen(null)));
+				context.waitTicks(10);
+				context.takeScreenshot("ui-4-options");
+				context.runOnClient(client -> client.screen.mouseScrolled(client.getWindow().getGuiScaledWidth() / 2.0, 120.0, 0.0, -12.0));
+				context.waitTicks(5);
+				context.takeScreenshot("ui-5-options-scenes");
 			}
 			return;
 		}

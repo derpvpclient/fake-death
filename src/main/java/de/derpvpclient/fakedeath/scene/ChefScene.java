@@ -14,8 +14,6 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 /** A chef: "Taste this!" A spoonful of his secret recipe, the player turns green, seasoned with spider eye. */
 public class ChefScene extends NpcScene {
@@ -50,26 +48,39 @@ public class ChefScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		return new ItemStack(Items.SUSPICIOUS_STEW);
+		// His soup ladle with the green soup, the mod's own prop.
+		return Looks.prop(Items.SUSPICIOUS_STEW, "soup_ladle");
 	}
 
 	@Override
 	protected void act(Minecraft minecraft, ClientLevel level, LocalPlayer player, int t) {
 		if (t == 0) {
-			spoon = itemDisplay(level, new ItemStack(Items.WOODEN_SHOVEL), npc.getEyePosition());
+			// He holds his ladle of soup right up to the player's mouth, it leaves his hand for that.
+			spoon = itemDisplay(level, held(), npc.getEyePosition());
+			((de.derpvpclient.fakedeath.mixin.DisplayAccessor) spoon).fakedeath$setBillboard(Display.BillboardConstraints.CENTER);
+			npc.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, ItemStack.EMPTY);
 		}
-		if (spoon != null && t <= SPOON + 6) {
-			Vec3 mouth = player.getEyePosition().add(0.0, -0.25, 0.0).subtract(towardPlayer(player).scale(0.4));
-			Vec3 at = npc.getEyePosition().add(0.0, -0.4, 0.0).lerp(mouth, Math.min(1.0, t / (double) SPOON));
-			place(spoon, at, new Vector3f(0.3F), new Quaternionf().rotateY((float) Math.atan2(towardPlayer(player).x, towardPlayer(player).z)).rotateX(1.2F));
+		if (spoon != null) {
+			Vec3 hand = npc.getEyePosition().add(0.0, -0.7, 0.0).add(towardPlayer(player).scale(0.4));
+			Vec3 mouth = player.getEyePosition().add(0.0, -0.3, 0.0).subtract(towardPlayer(player).scale(0.5));
+			double p = t <= SPOON ? Math.min(1.0, t / (double) SPOON) : Math.max(0.0, 1.0 - (t - SPOON - 4) / 6.0);
+			p = p * p * (3.0 - 2.0 * p);
+			Vec3 at = hand.lerp(mouth, p);
+			place(spoon, at, 0.4F);
+			if (t % 3 == 0) {
+				// Steaming, and something green bubbling in it.
+				level.addParticle(ParticleTypes.POOF, at.x, at.y + 0.2, at.z, 0.0, 0.03, 0.0);
+				particles(level, ParticleTypes.ITEM_SLIME, at.add(0.0, 0.15, 0.0), 1, 0.08, 0.02);
+			}
 		}
 		if (t == SPOON) {
 			sound(level, player.position(), Looks.EAT, SoundSource.PLAYERS, 1.0F, 1.0F);
 			sound(level, player.position(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 1.0F, 0.8F);
 		}
-		if (t == SPOON + 6) {
+		if (t == SPOON + 10) {
 			despawn(level, spoon);
 			spoon = null;
+			npc.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, held());
 			speak(minecraft, level, "fakedeath.koch.good");
 		}
 		if (t == 36) {
