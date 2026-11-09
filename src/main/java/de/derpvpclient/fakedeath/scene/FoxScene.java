@@ -93,9 +93,7 @@ public class FoxScene extends Scene {
 			sound(level, behind, SoundEvents.FOX_SCREECH, SoundSource.NEUTRAL, 1.5F, 1.0F);
 		}
 		if (biter != null) {
-			int t = tick - POUNCE;
-			Vec3 at = t < 0 ? behind : behind.lerp(player.position(), Math.min(1.0, t / 10.0)).add(0.0, t >= 0 && t < 10 ? Mth.sin(t / 10.0F * Mth.PI) * 1.2 : 0.0, 0.0);
-			walk(biter, at);
+			walk(biter, biterAt(level, player, tick));
 			face(biter, player.getEyePosition());
 			turnTowards(player, biter.getEyePosition(), 0.3F);
 		}
@@ -105,6 +103,34 @@ public class FoxScene extends Scene {
 				hit(level, player, SoundEvents.PLAYER_HURT, 0.35F, i == BITES.length - 1);
 			}
 		}
+	}
+
+	/**
+	 * The second fox leaps right at the player's face for the first bite, drops down in front of them and jumps up again
+	 * for every further bite. It never lands on the player's own spot, the view would look straight down into the feet.
+	 */
+	private Vec3 biterAt(ClientLevel level, LocalPlayer player, int tick) {
+		int t = tick - POUNCE;
+		if (t < 0) {
+			return behind;
+		}
+		Vec3 toFox = behind.subtract(player.position());
+		toFox = new Vec3(toFox.x, 0.0, toFox.z).normalize();
+		Vec3 landing = ground(level, player, player.position().add(toFox.scale(1.1)));
+		Vec3 face = player.position().add(toFox.scale(0.55)).add(0.0, 1.0, 0.0);
+		if (t <= 10) {
+			float f = t / 10.0F;
+			return behind.lerp(face, f).add(0.0, Mth.sin(f * Mth.PI) * 0.8, 0.0);
+		}
+		// Falling back after the first bite, then up at the face again for each of the others.
+		double lunge = t < 16 ? 1.0 - (t - 10) / 6.0 : 0.0;
+		for (int i = 1; i < BITES.length; i++) {
+			int s = tick - BITES[i];
+			if (s >= -4 && s < 4) {
+				lunge = Math.max(lunge, 1.0 - Math.abs(s) / 4.0);
+			}
+		}
+		return landing.lerp(face, lunge);
 	}
 
 	private static Vec3 ground(ClientLevel level, LocalPlayer player, Vec3 pos) {

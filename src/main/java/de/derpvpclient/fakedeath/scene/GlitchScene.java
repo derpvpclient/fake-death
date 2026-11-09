@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * The game seems to break: the screen flickers in wrong colors, sounds stutter, error messages show up in
  * chat, the world around falls apart block by block, and in the end the player falls out of the world.
- * Flashes fast, so it only plays with flashing effects switched on in the settings.
+ * With flashing effects switched off in the settings it plays without the colored flicker, the rest stays the same.
  */
 public class GlitchScene extends Scene {
 	private static final int[] COLORS = {0xFF00FF, 0x00FFFF, 0xFF2020, 0x20FF20, 0xFFFFFF, 0x000000};
@@ -60,7 +60,8 @@ public class GlitchScene extends Scene {
 			moveCamera(new Vec3(0.0, -8.0 * t * t, 0.0));
 			tint = Math.min(255, (int) (t * 255)) << 24;
 		} else {
-			tint = flicker ? (60 + random.nextInt(120)) << 24 | COLORS[random.nextInt(COLORS.length)] : 0;
+			// Flashing colors only when the player allows them. Otherwise no flicker at all, safe for everyone.
+			tint = flicker && de.derpvpclient.fakedeath.FakeDeathConfig.flashing ? (60 + random.nextInt(120)) << 24 | COLORS[random.nextInt(COLORS.length)] : 0;
 		}
 
 		if (flicker) {
