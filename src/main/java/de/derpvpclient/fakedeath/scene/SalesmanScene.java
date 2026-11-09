@@ -55,7 +55,7 @@ public class SalesmanScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		return new ItemStack(Items.BOOK);
+		return Looks.prop(Items.BOOK, "briefcase");
 	}
 
 	@Override

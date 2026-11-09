@@ -50,7 +50,7 @@ public class ChimneySweepScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		return new ItemStack(Items.COAL);
+		return Looks.prop(Items.COAL, "chimney_brush");
 	}
 
 	@Override
