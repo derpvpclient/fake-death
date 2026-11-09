@@ -48,6 +48,9 @@ public class CaveInScene extends Scene {
 
 		if (tick == 0) {
 			findCeiling(level, player);
+			if (ceiling.isEmpty()) {
+				makeCeiling(level, player);
+			}
 			sound(level, head.add(0, 2, 0), SoundEvents.WARDEN_DIG, SoundSource.BLOCKS, 1.5F, 0.7F);
 			sound(level, head, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 1.0F, 0.8F);
 		}
@@ -61,10 +64,7 @@ public class CaveInScene extends Scene {
 			sound(level, head.add(0, 2, 0), SoundEvents.GRAVEL_FALL, SoundSource.BLOCKS, 1.0F, 0.7F);
 		}
 
-		// The shaking gets stronger the closer the collapse is.
-		if (tick < COLLAPSE && tick % Math.max(4, 14 - tick / 8) == 0) {
-			player.animateHurt(random.nextFloat() * 360.0F);
-		}
+		camera(player, tick);
 
 		if (tick >= CRACKS && tick < COLLAPSE) {
 			crack(level, player, tick);
@@ -88,13 +88,66 @@ public class CaveInScene extends Scene {
 		}
 	}
 
+	/**
+	 * The view: a nervous look around when it starts to rumble, then up at the ceiling while it cracks, following the
+	 * blocks as they come down, and finally pressed down under the rubble. It shakes harder and harder.
+	 */
+	private void camera(LocalPlayer player, int tick) {
+		Vec3 eyes = player.getEyePosition();
+		Vec3 look = horizontalLook(player);
+		Vec3 up = ceiling.isEmpty() ? eyes.add(0.0, 4.0, 0.0) : Vec3.atBottomCenterOf(ceiling.getFirst());
+		Vec3 target;
+		float speed;
+		if (tick < 18) {
+			target = eyes.add(look.yRot((tick / 9) % 2 == 0 ? 0.8F : -0.8F).scale(4.0)).add(0.0, 0.6, 0.0);
+			speed = 0.15F;
+		} else if (tick < BURIED) {
+			// Straight up, a little ahead so the cracks and the falling blocks are right in the middle of the view.
+			target = up.add(look.scale(0.6));
+			if (thirdPerson()) {
+				// In F5 from above instead: looking up would put the camera into the floor, from above the blocks come
+				// down onto the player right in the picture.
+				target = eyes.add(look.scale(4.0)).add(0.0, -2.3, 0.0);
+			}
+			speed = tick < COLLAPSE ? 0.12F : 0.3F;
+		} else {
+			target = eyes.add(look.scale(2.0)).add(0.0, -2.0, 0.0);
+			speed = 0.4F;
+		}
+		turnTowards(player, target, speed);
+
+		float shake = tick < COLLAPSE ? 0.02F + 0.1F * tick / COLLAPSE : tick < BURIED ? 0.25F : 0.0F;
+		Vec3 offset = new Vec3((random.nextFloat() - 0.5F) * shake, (random.nextFloat() - 0.5F) * shake, (random.nextFloat() - 0.5F) * shake);
+		if (tick >= BURIED - 4) {
+			// Knocked down under the rubble.
+			offset = offset.add(0.0, -0.9 * Math.min(1.0, (tick - (BURIED - 4)) / 4.0), 0.0);
+		}
+		moveCamera(offset);
+	}
+
+	/** Under an open sky or a very high cave there is no ceiling close enough, so one is put above the player. */
+	private void makeCeiling(ClientLevel level, LocalPlayer player) {
+		BlockPos top = player.blockPosition().above(4);
+		rock = player.getY() < 0 ? Blocks.DEEPSLATE.defaultBlockState() : Blocks.STONE.defaultBlockState();
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				BlockPos pos = top.offset(dx, 0, dz);
+				if (level.getBlockState(pos).isAir()) {
+					replaceBlock(level, pos, rock);
+					ceiling.add(pos);
+				}
+			}
+		}
+		ceiling.sort(Comparator.comparingDouble(pos -> pos.distToCenterSqr(player.getX(), pos.getY() + 0.5, player.getZ())));
+	}
+
 	/** The blocks right above the player that will come down, the middle one first. */
 	private void findCeiling(ClientLevel level, LocalPlayer player) {
 		BlockPos feet = player.blockPosition();
 
 		for (int dx = -1; dx <= 1; dx++) {
 			for (int dz = -1; dz <= 1; dz++) {
-				for (int dy = 2; dy <= 6; dy++) {
+				for (int dy = 2; dy <= 10; dy++) {
 					BlockPos pos = feet.offset(dx, dy, dz);
 					BlockState state = level.getBlockState(pos);
 
@@ -142,9 +195,6 @@ public class CaveInScene extends Scene {
 			sound(level, Vec3.atCenterOf(ceiling.get(random.nextInt(ceiling.size()))), SoundEvents.STONE_HIT, SoundSource.BLOCKS, 1.2F, 0.5F + random.nextFloat() * 0.3F);
 		}
 
-		if (!ceiling.isEmpty()) {
-			turnTowards(player, Vec3.atCenterOf(ceiling.getFirst()), 0.06F);
-		}
 	}
 
 	private void collapse(ClientLevel level, LocalPlayer player) {

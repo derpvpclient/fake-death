@@ -16,16 +16,19 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Something dangerous right next to the player: lava, fire, a cactus, powder snow, water or hunger.
+ * Something dangerous right next to the player: lava, powder snow, water or hunger.
  * It takes a few seconds, the hearts go down hit by hit, fire spreads around the player.
  */
 public class HazardScene extends Scene {
 	private static final int HIT_EVERY = 20;
 	private static final int LENGTH = 140;
 
-	private static final int FOOD_GONE = 60;
+	// Starving is quicker and hits harder: the bar empties fast, then three heavy hits and the last one.
+	private static final int FOOD_GONE = 36;
+	private static final int HUNGER_LENGTH = 84;
+	private static final int HUNGER_HIT_EVERY = 12;
 
-	private enum Extra { NONE, FIRE, FREEZE, LAVA, HUNGER }
+	private enum Extra { NONE, FREEZE, LAVA, HUNGER }
 
 	private int startFood;
 	private int now;
@@ -48,14 +51,6 @@ public class HazardScene extends Scene {
 		return new HazardScene("death.attack.lava", SoundEvents.PLAYER_HURT_ON_FIRE, ParticleTypes.LAVA, Extra.LAVA, lava);
 	}
 
-	public static HazardScene fire() {
-		return new HazardScene("death.attack.onFire", SoundEvents.PLAYER_HURT_ON_FIRE, ParticleTypes.FLAME, Extra.FIRE, null);
-	}
-
-	public static HazardScene cactus(BlockPos cactus) {
-		return new HazardScene("death.attack.cactus", SoundEvents.PLAYER_HURT, ParticleTypes.CRIT, Extra.NONE, cactus);
-	}
-
 	public static HazardScene freeze(BlockPos snow) {
 		return new HazardScene("death.attack.freeze", SoundEvents.PLAYER_HURT_FREEZE, ParticleTypes.SNOWFLAKE, Extra.FREEZE, snow);
 	}
@@ -66,7 +61,7 @@ public class HazardScene extends Scene {
 
 	@Override
 	public int length() {
-		return LENGTH;
+		return extra == Extra.HUNGER ? HUNGER_LENGTH : LENGTH;
 	}
 
 	@Override
@@ -80,18 +75,17 @@ public class HazardScene extends Scene {
 		if (extra != Extra.HUNGER || now < FOOD_GONE) {
 			return 0;
 		}
-		return Math.min(170, 30 + (now - FOOD_GONE) * 140 / (LENGTH - FOOD_GONE)) << 24;
+		return Math.min(170, 30 + (now - FOOD_GONE) * 140 / (length() - FOOD_GONE)) << 24;
 	}
 
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
 		now = tick;
 		Vec3 body = player.position().add(0, 0.9, 0);
-		boolean burning = extra == Extra.FIRE || extra == Extra.LAVA;
+		boolean burning = extra == Extra.LAVA;
 
 		if (tick == 0) {
 			switch (extra) {
-				case FIRE -> sound(level, body, SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS, 1.0F, 0.8F);
 				case LAVA -> sound(level, Vec3.atCenterOf(source), SoundEvents.LAVA_POP, SoundSource.BLOCKS, 1.5F, 0.8F);
 				case FREEZE -> freeze(player);
 				case HUNGER -> {
@@ -106,7 +100,7 @@ public class HazardScene extends Scene {
 
 		if (extra == Extra.HUNGER) {
 			// Weaker with every second: the view sways, sinks lower and the stomach growls.
-			float weak = tick / (float) LENGTH;
+			float weak = tick / (float) length();
 			moveCamera(new Vec3(Math.sin(tick * 0.09) * 0.25 * weak, -weak * weak * 0.9 + Math.sin(tick * 0.05) * 0.08, 0.0));
 			if (tick % 35 == 10) {
 				sound(level, body, SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.7F, 0.4F);
@@ -123,7 +117,7 @@ public class HazardScene extends Scene {
 
 			if (tick == FOOD_GONE) {
 				// Weak with hunger: the view narrows and sways a little.
-				addEffect(player, MobEffects.CONFUSION, LENGTH);
+				addEffect(player, MobEffects.CONFUSION, length());
 			}
 		}
 
@@ -156,13 +150,14 @@ public class HazardScene extends Scene {
 			particles(level, particle, body, burning ? 5 : 3, 0.5, 0.05);
 		}
 
-		if (tick > 0 && tick % HIT_EVERY == 0) {
+		int every = extra == Extra.HUNGER ? HUNGER_HIT_EVERY : HIT_EVERY;
+		if (tick > 0 && tick % every == 0) {
 			if (extra == Extra.FREEZE) {
 				particles(level, ParticleTypes.SNOWFLAKE, player.getEyePosition(), 25, 0.5, 0.15);
 				sound(level, player.position(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 0.8F, 1.6F);
 			}
 			// Every hit takes a fifth of the hearts, the last one kills.
-			hit(level, player, hurtSound, 0.19F, tick + HIT_EVERY >= LENGTH);
+			hit(level, player, hurtSound, extra == Extra.HUNGER ? 0.3F : 0.19F, tick + every >= length());
 		}
 	}
 
