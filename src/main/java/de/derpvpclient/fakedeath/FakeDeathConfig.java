@@ -19,6 +19,8 @@ public final class FakeDeathConfig {
 	public static int randomMaxMinutes = 30;
 	/** Scenes with fast flashing lights. On by default, people sensitive to them can switch them off. */
 	public static boolean flashing = true;
+	/** Developer switch, only in the file: true gives /fakedeath test and the test screen in game. Off for players. */
+	public static boolean developer = false;
 	/** Scene ids the random event and a plain /fakedeath leave out. Testing a scene by name still works. */
 	public static final Set<String> disabledScenes = new TreeSet<>();
 
@@ -56,6 +58,7 @@ public final class FakeDeathConfig {
 		randomMinMinutes = Math.max(1, parseInt(properties, "randomMinMinutes", randomMinMinutes));
 		randomMaxMinutes = Math.max(randomMinMinutes, parseInt(properties, "randomMaxMinutes", randomMaxMinutes));
 		flashing = version < 3 || Boolean.parseBoolean(properties.getProperty("flashing", String.valueOf(flashing)));
+		developer = Boolean.parseBoolean(properties.getProperty("developer", "false"));
 
 		disabledScenes.clear();
 		for (String scene : properties.getProperty("disabledScenes", "").split(",")) {
@@ -75,10 +78,11 @@ public final class FakeDeathConfig {
 		properties.setProperty("randomMinMinutes", String.valueOf(randomMinMinutes));
 		properties.setProperty("randomMaxMinutes", String.valueOf(randomMaxMinutes));
 		properties.setProperty("flashing", String.valueOf(flashing));
+		properties.setProperty("developer", String.valueOf(developer));
 		properties.setProperty("disabledScenes", String.join(",", disabledScenes));
 
 		try (Writer writer = Files.newBufferedWriter(file)) {
-			properties.store(writer, "Fake Death. randomEvent = Fake-Tod zufällig zwischen randomMinMinutes und randomMaxMinutes. flashing = Szenen mit schnell blinkenden Lichtern erlauben. disabledScenes = abgeschaltete Szenen, mit Komma getrennt");
+			properties.store(writer, "Fake Death. randomEvent = Fake-Tod zufällig zwischen randomMinMinutes und randomMaxMinutes. flashing = Szenen mit schnell blinkenden Lichtern erlauben. disabledScenes = abgeschaltete Szenen, mit Komma getrennt. developer = true nur für den Entwickler: /fakedeath test im Spiel");
 		} catch (IOException e) {
 			FakeDeathClient.LOGGER.warn("Could not write {}", file, e);
 		}

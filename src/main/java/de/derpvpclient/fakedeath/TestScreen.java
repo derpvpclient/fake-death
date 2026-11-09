@@ -34,7 +34,7 @@ public class TestScreen extends Screen {
 			"doppelgaenger", "ertrunkener", "magier", "ueberfall", "ghast", "enderman"),
 		"characters", List.of("finanzamt", "paketbote", "mama", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker",
 			"zauberer", "klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch", "fahrlehrer",
-			"wahrsagerin", "weihnachtsmann", "werbung", "oma", "kellner"));
+			"wahrsagerin", "weihnachtsmann", "werbung", "oma", "kellner", "navi", "bombenprank"));
 	private static boolean openNextTick;
 	// Remembered while the game runs, so the screen opens again on the same tab.
 	private static String category = "all";
@@ -112,8 +112,22 @@ public class TestScreen extends Screen {
 		int columns = Math.max(2, Math.min(4, (width - 20) / (BUTTON_WIDTH + 4)));
 		GridLayout grid = new GridLayout().columnSpacing(4).rowSpacing(4);
 		GridLayout.RowHelper rows = grid.createRowHelper(columns);
-		for (String id : shown) {
-			rows.addChild(sceneButton(id));
+		// Under "all" the scenes come in groups, each with its heading: nature and world, animals, monsters, characters.
+		boolean grouped = category.equals("all");
+		boolean first = true;
+		for (String group : grouped ? CATEGORIES.subList(1, CATEGORIES.size()) : List.of(category)) {
+			List<String> ids = shown.stream().filter(id -> grouped ? categoryOf(id).equals(group) : true).toList();
+			if (ids.isEmpty()) {
+				continue;
+			}
+			if (grouped) {
+				Component heading = Component.translatable("fakedeath.test.tab." + group).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD);
+				rows.addChild(new StringWidget(heading, font), columns, rows.newCellSettings().paddingTop(first ? 0 : 6));
+			}
+			first = false;
+			for (String id : ids) {
+				rows.addChild(sceneButton(id));
+			}
 		}
 		if (shown.isEmpty()) {
 			rows.addChild(new StringWidget(Component.translatable("fakedeath.test.none").withStyle(ChatFormatting.GRAY), font));

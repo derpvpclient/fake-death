@@ -40,7 +40,8 @@ public class PoliceScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		return new ItemStack(Items.SPYGLASS);
+		// His baton while he talks, the mod's own prop. For the photo he takes out his camera.
+		return Looks.prop(Items.STICK, "police_baton");
 	}
 
 	@Override
@@ -50,6 +51,11 @@ public class PoliceScene extends NpcScene {
 
 	@Override
 	protected void act(Minecraft minecraft, ClientLevel level, LocalPlayer player, int t) {
+		if (t == 0) {
+			npc.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, Looks.prop(Items.SPYGLASS, "police_camera"));
+			Looks.swing(npc);
+			sound(level, npc.position(), SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.NEUTRAL, 1.0F, 1.4F);
+		}
 		if (flash > 0) {
 			flash--;
 		}

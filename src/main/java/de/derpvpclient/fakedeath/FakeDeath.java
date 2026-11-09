@@ -43,6 +43,8 @@ public final class FakeDeath {
 	private static int pendingWaited;
 	private static boolean monsterNearby = true;
 	private static int pendingTicks = -1;
+	// The screen color as it is really shown, eased when flashing effects are off.
+	private static int shownTint;
 	private static String pendingScene;
 	private static int randomTicks = -1;
 	private static int armedTicks = -1;
@@ -100,7 +102,34 @@ public final class FakeDeath {
 
 	/** The color the running scene lays over the world, 0 for none. Gone with the reveal. */
 	public static int screenTint() {
-		return scene != null && outroTick < 0 ? scene.screenTint() : 0;
+		int wanted = scene != null && outroTick < 0 ? scene.screenTint() : 0;
+		return FakeDeathConfig.flashing ? wanted : shownTint;
+	}
+
+	/**
+	 * With flashing effects switched off no scene may flash: every color over the screen fades in and out slowly instead
+	 * of jumping (a lightning flash, a camera flash, an explosion), and the sky does not light up for lightning either.
+	 * One place for all scenes, so a new scene can never forget it.
+	 */
+	private static void calmFlashes(ClientLevel level) {
+		int wanted = scene != null && outroTick < 0 ? scene.screenTint() : 0;
+		if (FakeDeathConfig.flashing) {
+			shownTint = wanted;
+			return;
+		}
+		int result = 0;
+		for (int shift = 0; shift < 32; shift += 8) {
+			int from = shownTint >>> shift & 0xFF;
+			int to = wanted >>> shift & 0xFF;
+			// Alpha at most 6 a tick, a full fade takes two seconds. The color follows a little faster.
+			int step = shift == 24 ? 6 : 14;
+			int next = from + Math.max(-step, Math.min(step, to - from));
+			result |= next << shift;
+		}
+		shownTint = result;
+		if (scene != null) {
+			level.setSkyFlashTime(0);
+		}
 	}
 
 	/** Lets the hunger bar show a different level until the fake is over. */
@@ -180,6 +209,7 @@ public final class FakeDeath {
 		CameraDirector.startTick();
 		tickInner(minecraft, level, player);
 		CameraDirector.endTick(scene != null && outroTick < 0);
+		calmFlashes(level);
 		Demo.tick(minecraft, level, player);
 	}
 
@@ -230,8 +260,9 @@ public final class FakeDeath {
 			armedTicks = 0;
 		}
 
-		// Once armed, the event waits up to a minute for a moment that fits, like cutting a tree.
-		if (armedTicks >= 0 && !minecraft.isPaused()) {
+		// Once armed, the event waits up to a minute for a moment that fits, like cutting a tree. Never while a scene
+		// asked for by a command waits or has just started, that one comes first.
+		if (armedTicks >= 0 && !minecraft.isPaused() && scene == null && pendingTicks < 0) {
 			armedTicks++;
 
 			if (safe) {

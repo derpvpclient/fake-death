@@ -32,6 +32,8 @@ final class Looks {
 	/** The glowing tiles of the disco floor. */
 	static final BlockState[] DISCO_FLOOR = {Blocks.CONCRETE.magenta().defaultBlockState(), Blocks.CONCRETE.lightBlue().defaultBlockState(),
 		Blocks.CONCRETE.yellow().defaultBlockState(), Blocks.CONCRETE.lime().defaultBlockState(), Blocks.CONCRETE.purple().defaultBlockState()};
+	/** Yellow like a wet floor warning sign, the same yellow as on the disco floor. */
+	static final BlockState YELLOW_CONCRETE = DISCO_FLOOR[2];
 	static final SoundEvent CAT_PURR = SoundEvent.createVariableRangeEvent(net.minecraft.resources.Identifier.withDefaultNamespace("entity.cat.purr"));
 	static final SoundEvent CAT_PURREOW = SoundEvent.createVariableRangeEvent(net.minecraft.resources.Identifier.withDefaultNamespace("entity.cat.purreow"));
 	static final SoundEvent PLING = SoundEvents.NOTE_BLOCK_PLING.value();
@@ -83,6 +85,21 @@ final class Looks {
 	/** Draws a display at full brightness, so it never shows up dark against the sky. */
 	static void glow(net.minecraft.world.entity.Display display) {
 		((de.derpvpclient.fakedeath.mixin.DisplayAccessor) display).fakedeath$setBrightnessOverride(net.minecraft.util.Brightness.FULL_BRIGHT);
+	}
+
+	/**
+	 * One of the mod's own props, drawn with its own model and texture from the mod's assets. It is only a look: the
+	 * item underneath stays a normal one, so the mod still needs nothing on the server.
+	 */
+	static net.minecraft.world.item.ItemStack prop(net.minecraft.world.item.Item base, String model) {
+		net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(base);
+		stack.set(net.minecraft.core.component.DataComponents.ITEM_MODEL, net.minecraft.resources.Identifier.fromNamespaceAndPath("fakedeath", model));
+		return stack;
+	}
+
+	/** Feathers flying off, for the chickens. */
+	static net.minecraft.core.particles.ParticleOptions feathers() {
+		return new net.minecraft.core.particles.ItemParticleOption(net.minecraft.core.particles.ParticleTypes.ITEM, net.minecraft.world.item.Items.FEATHER);
 	}
 
 	/** Bits of a sweet berry, for munching. */
