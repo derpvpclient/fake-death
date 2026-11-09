@@ -44,7 +44,8 @@ public class DentistScene extends NpcScene {
 
 	@Override
 	protected ItemStack held() {
-		return new ItemStack(Items.IRON_PICKAXE);
+		// His dental drill, the mod's own prop.
+		return Looks.prop(Items.IRON_PICKAXE, "dental_drill");
 	}
 
 	@Override
