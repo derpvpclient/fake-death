@@ -39,6 +39,8 @@
 	"fakedeath.wait.monster": "a monster is nearby",
 	"fakedeath.wait.menu": "a menu is open",
 	"fakedeath.wait.tree": "you are standing on a tree",
+	"fakedeath.wait.portal": "you are standing in a portal",
+	"fakedeath.wait.fight": "you are in a fight",
 	"fakedeath.scene.baum": "Tree",
 	"fakedeath.scene.hoehle": "Cave-In",
 	"fakedeath.scene.blitz": "Lightning",

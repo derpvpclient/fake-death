@@ -15,6 +15,8 @@ public final class FakeDeathConfig {
 	private static final int VERSION = 3;
 
 	public static boolean randomEvent = true;
+	/** A day. More than that only comes from a file edited by hand. */
+	public static final int MAX_MINUTES = 1440;
 	public static int randomMinMinutes = 10;
 	public static int randomMaxMinutes = 30;
 	/** Scenes with fast flashing lights. On by default, people sensitive to them can switch them off. */
@@ -55,8 +57,8 @@ public final class FakeDeathConfig {
 		// because that was the default, not a choice.
 		int version = parseInt(properties, "version", 1);
 		randomEvent = version < 2 || Boolean.parseBoolean(properties.getProperty("randomEvent", String.valueOf(randomEvent)));
-		randomMinMinutes = Math.max(1, parseInt(properties, "randomMinMinutes", randomMinMinutes));
-		randomMaxMinutes = Math.max(randomMinMinutes, parseInt(properties, "randomMaxMinutes", randomMaxMinutes));
+		randomMinMinutes = Math.clamp(parseInt(properties, "randomMinMinutes", randomMinMinutes), 1, MAX_MINUTES);
+		randomMaxMinutes = Math.clamp(parseInt(properties, "randomMaxMinutes", randomMaxMinutes), randomMinMinutes, MAX_MINUTES);
 		flashing = version < 3 || Boolean.parseBoolean(properties.getProperty("flashing", String.valueOf(flashing)));
 		developer = Boolean.parseBoolean(properties.getProperty("developer", "false"));
 

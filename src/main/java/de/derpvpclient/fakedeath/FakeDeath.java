@@ -2,6 +2,7 @@ package de.derpvpclient.fakedeath;
 
 import de.derpvpclient.fakedeath.scene.Scene;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
@@ -15,6 +16,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * The whole fake death runs on the client only: a short scene, the vanilla death screen, a death
@@ -36,6 +38,15 @@ public final class FakeDeath {
 	private static boolean active;
 	private static int deathTicks;
 	private static float startHealth;
+	// The real health and absorption of the last tick: any drop is a real hit, even after regeneration.
+	private static float watchedHealth;
+	private static float watchedAbsorption;
+	// Where the scene started. A portal or a teleport takes the player away from everything it built.
+	private static ClientLevel sceneLevel;
+	private static Vec3 sceneStart;
+	private static final double LEASH = 12.0;
+	private static final int FIGHT_TICKS = 10 * 20;
+	private static int fightTicks;
 	private static float fakeHealth = -1.0F;
 	private static int fakeFood = -1;
 	private static int safeTicks;
@@ -175,6 +186,11 @@ public final class FakeDeath {
 		return had;
 	}
 
+	/** The player hit something real or was hit: the random event stays away from a running fight. */
+	public static void noteFight() {
+		fightTicks = FIGHT_TICKS;
+	}
+
 	public static void rollRandomTimer() {
 		armedTicks = -1;
 
@@ -183,8 +199,8 @@ public final class FakeDeath {
 			return;
 		}
 
-		int min = FakeDeathConfig.randomMinMinutes * 1200;
-		int max = Math.max(min, FakeDeathConfig.randomMaxMinutes * 1200);
+		int min = Math.clamp(FakeDeathConfig.randomMinMinutes, 1, FakeDeathConfig.MAX_MINUTES) * 1200;
+		int max = Math.max(min, Math.clamp(FakeDeathConfig.randomMaxMinutes, 1, FakeDeathConfig.MAX_MINUTES) * 1200);
 		randomTicks = ThreadLocalRandom.current().nextInt(min, max + 1);
 	}
 
@@ -195,15 +211,32 @@ public final class FakeDeath {
 		if (player == null || level == null) {
 			// The world is gone, and with it everything the scene put into it.
 			scene = null;
+			sceneLevel = null;
+			sceneStart = null;
 			active = false;
+			killed = false;
+			sceneTick = 0;
+			deathTicks = 0;
 			outroTick = -1;
 			fakeHealth = -1.0F;
 			fakeFood = -1;
 			pendingTicks = -1;
+			pendingScene = null;
+			pendingWaited = 0;
+			safeTicks = 0;
+			fightTicks = 0;
+			shownTint = 0;
+			monsterNearby = true;
 			Situations.reset();
 			CameraDirector.reset();
 			restoreCamera(minecraft);
 			return;
+		}
+
+		if (player.hurtTime > 0) {
+			noteFight();
+		} else if (fightTicks > 0) {
+			fightTicks--;
 		}
 
 		CameraDirector.startTick();
@@ -245,7 +278,7 @@ public final class FakeDeath {
 			String name = pendingScene;
 			pendingTicks = -1;
 			pendingScene = null;
-			Scene next = name != null ? Situations.create(name, level, player) : Situations.pick(level, player);
+			Scene next = name != null ? choose(() -> Situations.create(name, level, player)) : choose(() -> Situations.pick(level, player));
 
 			if (next != null) {
 				begin(minecraft, next);
@@ -266,12 +299,12 @@ public final class FakeDeath {
 			armedTicks++;
 
 			if (safe) {
-				Scene next = Situations.special(level, player);
+				Scene next = choose(() -> Situations.special(level, player));
 
 				boolean timeUp = armedTicks >= ARMED_TICKS;
 
 				if (next == null && timeUp) {
-					next = Situations.pick(level, player);
+					next = choose(() -> Situations.pick(level, player));
 				}
 
 				// Started, or nothing fits because every fitting scene is switched off: either way wait for the next round.
@@ -285,22 +318,57 @@ public final class FakeDeath {
 		}
 	}
 
+	/** Picking a scene looks at the world around the player. If that ever fails, there is just no scene this time. */
+	private static Scene choose(Supplier<Scene> choice) {
+		try {
+			return choice.get();
+		} catch (RuntimeException e) {
+			FakeDeathClient.LOGGER.error("Could not pick a fake death scene", e);
+			lastError = "pick: " + e;
+			return null;
+		}
+	}
+
+	/** True if the player lost real health or absorption hearts to a hit since the last tick. */
+	private static boolean reallyHurt(LocalPlayer player) {
+		float health = player.getHealth();
+		float absorption = player.getAbsorptionAmount();
+		// Absorption also runs out on its own, that is no hit.
+		boolean hurt = health < watchedHealth - 0.01F || absorption < watchedAbsorption - 0.01F && player.hurtTime > 0;
+		watchedHealth = health;
+		watchedAbsorption = absorption;
+		return hurt;
+	}
+
 	private static void tickScene(Minecraft minecraft, ClientLevel level, LocalPlayer player) {
+		// Through a portal or teleported away: the scene stayed behind, and nothing of it belongs into the new place.
+		if (level != sceneLevel || sceneStart != null && player.position().distanceToSqr(sceneStart) > LEASH * LEASH) {
+			FakeDeathClient.LOGGER.info("The player left the place of the fake death, the scene ends");
+			boolean onDeathScreen = active;
+			finish(level, player);
+			if (onDeathScreen && minecraft.screen instanceof DeathScreen) {
+				minecraft.setScreen(null);
+			}
+			return;
+		}
+
 		// A real death takes over, the fake is over then.
 		if (player.isDeadOrDying()) {
 			finish(level, player);
 			return;
 		}
 
+		boolean hurt = reallyHurt(player);
+
 		// Real damage while the player stands frozen in a scene: the fake ends at once, so they can defend themselves.
-		if (!active && outroTick < 0 && player.getHealth() < startHealth - 0.01F) {
+		if (!active && outroTick < 0 && hurt) {
 			FakeDeathClient.LOGGER.info("Real damage during a fake death, the scene ends");
 			finish(level, player);
 			return;
 		}
 
 		// The same on the fake death screen: a mob hitting the player while they sit there must not get a free kill.
-		if (active && player.getHealth() < startHealth - 0.01F) {
+		if (active && hurt) {
 			FakeDeathClient.LOGGER.info("Real damage on the fake death screen, back to the game");
 			reveal(minecraft);
 			return;
@@ -350,11 +418,16 @@ public final class FakeDeath {
 		outroTick = -1;
 		killed = false;
 		safeTicks = 0;
+		sceneLevel = minecraft.level;
+		sceneStart = null;
 		CameraDirector.release(false);
 
 		if (minecraft.player != null) {
 			startHealth = minecraft.player.getHealth();
 			fakeHealth = startHealth;
+			watchedHealth = startHealth;
+			watchedAbsorption = minecraft.player.getAbsorptionAmount();
+			sceneStart = minecraft.player.position();
 		}
 
 		// The scenes are filmed from the player's eyes.
@@ -373,7 +446,15 @@ public final class FakeDeath {
 
 	private static void die(Minecraft minecraft, ClientLevel level, LocalPlayer player) {
 		FakeDeathClient.LOGGER.info("Fake death scene {} reached the death screen after {} ticks", scene.getClass().getSimpleName(), sceneTick);
-		Component message = scene.deathMessage(player);
+		Component message;
+		try {
+			message = scene.deathMessage(player);
+		} catch (RuntimeException e) {
+			FakeDeathClient.LOGGER.error("Scene {} has no death message", scene.getClass().getSimpleName(), e);
+			lastError = scene.getClass().getSimpleName() + ": " + e;
+			finish(level, player);
+			return;
+		}
 
 		level.playLocalSound(player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_DEATH, SoundSource.PLAYERS, 1.0F, 1.0F, false);
 		minecraft.gui.getChat().addMessage(message);
@@ -388,10 +469,19 @@ public final class FakeDeath {
 
 	private static void finish(ClientLevel level, LocalPlayer player) {
 		if (scene != null) {
-			scene.end(level, player);
+			try {
+				// Always into the world the scene was built in. After a change of dimension that is no longer the shown one,
+				// and its blocks must not be put into the new world.
+				scene.end(sceneLevel != null ? sceneLevel : level, player);
+			} catch (RuntimeException e) {
+				FakeDeathClient.LOGGER.error("Scene {} could not clean up", scene.getClass().getSimpleName(), e);
+				lastError = scene.getClass().getSimpleName() + ": " + e;
+			}
 		}
 
 		scene = null;
+		sceneLevel = null;
+		sceneStart = null;
 		active = false;
 		outroTick = -1;
 		fakeHealth = -1.0F;
@@ -429,6 +519,10 @@ public final class FakeDeath {
 		if (player.hurtTime > 0) {
 			return "hurt";
 		}
+		// A portal may send the player away at any moment, and the scene would stay behind.
+		if (inPortal(level, player)) {
+			return "portal";
+		}
 		// Up in a tree no scene looks right: the bushes, people and animals of the scenes would end up in the leaves.
 		if (onTree(level, player)) {
 			return "tree";
@@ -438,6 +532,11 @@ public final class FakeDeath {
 			return null;
 		}
 
+		// In the middle of a fight nobody wants to stand frozen.
+		if (fightTicks > 0) {
+			return "fight";
+		}
+
 		// Searching for monsters is the expensive part, twice a second is enough for that.
 		if (level.getGameTime() % 10 == 0) {
 			AABB area = player.getBoundingBox().inflate(MONSTER_RADIUS);
@@ -445,6 +544,12 @@ public final class FakeDeath {
 		}
 
 		return monsterNearby ? "monster" : null;
+	}
+
+	private static boolean inPortal(ClientLevel level, LocalPlayer player) {
+		net.minecraft.world.level.block.state.BlockState feet = level.getBlockState(player.blockPosition());
+		return feet.is(net.minecraft.world.level.block.Blocks.NETHER_PORTAL) || feet.is(net.minecraft.world.level.block.Blocks.END_PORTAL)
+			|| feet.is(net.minecraft.world.level.block.Blocks.END_GATEWAY);
 	}
 
 	/** Standing on leaves, or on a log with leaves around it. A floor made of logs, like in a cabin, does not count. */
@@ -476,9 +581,16 @@ public final class FakeDeath {
 		CameraDirector.release(true);
 
 		if (scene != null && level != null && player != null) {
-			scene.onReveal(minecraft, level, player);
+			int outro = 0;
+			try {
+				scene.onReveal(minecraft, level, player);
+				outro = scene.outroLength();
+			} catch (RuntimeException e) {
+				FakeDeathClient.LOGGER.error("Scene {} failed at the reveal", scene.getClass().getSimpleName(), e);
+				lastError = scene.getClass().getSimpleName() + ": " + e;
+			}
 
-			if (scene.outroLength() > 0) {
+			if (outro > 0) {
 				outroTick = 0;
 			} else {
 				finish(level, player);
