@@ -193,6 +193,10 @@
 	"fakedeath.scene.allay": "Allay Delivery",
 	"fakedeath.scene.ziegenchor": "Goat Choir",
 	"fakedeath.scene.bombenprank": "Bomb Prank",
+	"fakedeath.scene.verzauberungstisch": "Enchanting Table",
+	"fakedeath.scene.glocke": "Village Bell",
+	"fakedeath.scene.lore": "Runaway Minecart",
+	"fakedeath.scene.ruestungsstaender": "Armor Stand",
 	"fakedeath.scene.netherportal": "Nether Portal",
 	"fakedeath.scene.endportal": "End Portal",
 
@@ -240,6 +244,10 @@
 	"fakedeath.death.allay": "%1$s got a present from an allay",
 	"fakedeath.death.ziegenchor": "%1$s did not survive the goat concert",
 	"fakedeath.death.bombenprank": "%1$s fell for a bomb prank",
+	"fakedeath.death.verzauberungstisch": "%1$s was enchanted with Curse of Vanishing and vanished",
+	"fakedeath.death.glocke": "%1$s rang the bell and was trampled by the whole village",
+	"fakedeath.death.lore": "%1$s was run over by a runaway minecart",
+	"fakedeath.death.ruestungsstaender": "%1$s had their own armor pulled over their ears by an armor stand",
 	"fakedeath.death.netherportal": "Only half of %1$s arrived on the other side of the portal",
 	"fakedeath.death.endportal": "%1$s looked too deep into the eyes of ender",
 
