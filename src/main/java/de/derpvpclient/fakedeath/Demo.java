@@ -107,6 +107,7 @@ final class Demo {
 
 		Scene next;
 		try {
+			stagePortal(name, level, player);
 			next = Situations.create(name, level, player);
 		} catch (RuntimeException e) {
 			FakeDeathClient.LOGGER.error("[Fake Death demo] {} could not start", name, e);
@@ -162,5 +163,31 @@ final class Demo {
 
 	private static Path marker() {
 		return FabricLoader.getInstance().getConfigDir().resolve(MARKER);
+	}
+
+	/** The test world has no portals. For the two portal scenes one is put up in front of the player, on this client only. */
+	private static void stagePortal(String name, net.minecraft.client.multiplayer.ClientLevel level, net.minecraft.client.player.LocalPlayer player) {
+		net.minecraft.core.BlockPos feet = player.blockPosition();
+		net.minecraft.core.Direction ahead = player.getDirection();
+
+		if (name.equals("netherportal")) {
+			for (int y = 0; y < 3; y++) {
+				level.setBlock(feet.relative(ahead, 3).above(y), net.minecraft.world.level.block.Blocks.NETHER_PORTAL.defaultBlockState(), 18);
+			}
+		} else if (name.equals("endportal")) {
+			net.minecraft.core.BlockPos middle = feet.relative(ahead, 4).below();
+
+			for (int x = -2; x <= 2; x++) {
+				for (int z = -2; z <= 2; z++) {
+					boolean edge = Math.abs(x) == 2 || Math.abs(z) == 2;
+					if (edge && Math.abs(x) == Math.abs(z)) {
+						continue;
+					}
+					level.setBlock(middle.offset(x, 0, z), edge
+						? net.minecraft.world.level.block.Blocks.END_PORTAL_FRAME.defaultBlockState().setValue(net.minecraft.world.level.block.EndPortalFrameBlock.HAS_EYE, true)
+						: net.minecraft.world.level.block.Blocks.END_PORTAL.defaultBlockState(), 18);
+				}
+			}
+		}
 	}
 }

@@ -193,6 +193,8 @@
 	"fakedeath.scene.allay": "Allay Delivery",
 	"fakedeath.scene.ziegenchor": "Goat Choir",
 	"fakedeath.scene.bombenprank": "Bomb Prank",
+	"fakedeath.scene.netherportal": "Nether Portal",
+	"fakedeath.scene.endportal": "End Portal",
 
 	"fakedeath.death.tornado": "%1$s was carried away by a tornado",
 	"fakedeath.death.mond": "%1$s was hit by the moon",
@@ -238,6 +240,8 @@
 	"fakedeath.death.allay": "%1$s got a present from an allay",
 	"fakedeath.death.ziegenchor": "%1$s did not survive the goat concert",
 	"fakedeath.death.bombenprank": "%1$s fell for a bomb prank",
+	"fakedeath.death.netherportal": "Only half of %1$s arrived on the other side of the portal",
+	"fakedeath.death.endportal": "%1$s looked too deep into the eyes of ender",
 
 	"fakedeath.influencer.name": "Influencer",
 	"fakedeath.influencer.1": "Hey guys, welcome back to my channel!",
