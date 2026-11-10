@@ -1,9 +1,11 @@
 package de.derpvpclient.fakedeath.mixin;
 
+import de.derpvpclient.fakedeath.FakeDeath;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +21,8 @@ public class MultiPlayerGameModeMixin {
 	private void fakedeath$ignoreActorAttack(Player player, Entity target, CallbackInfo ci) {
 		if (target.getId() < 0) {
 			ci.cancel();
+		} else if (target instanceof LivingEntity) {
+			FakeDeath.noteFight();
 		}
 	}
 
