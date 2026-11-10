@@ -16,6 +16,7 @@
 		"HudMixin",
 		"ItemDisplayAccessor",
 		"KeyboardInputMixin",
+		"LivingEntityMixin",
 		"LivingEntityRendererMixin",
 		"LocalPlayerMixin",
 		"MultiPlayerGameModeMixin",
