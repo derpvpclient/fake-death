@@ -65,6 +65,7 @@ final class Demo {
 				String error = FakeDeath.lastError;
 				results.add(name + ": " + (error != null ? "FEHLER " + error : deathPhoto ? "ok" : "ohne Todesbildschirm"));
 				FakeDeathClient.LOGGER.info("[Fake Death demo] {} done: {}", name, results.getLast());
+				unstage(level);
 				current = null;
 				index++;
 				wait = PAUSE;
@@ -172,7 +173,7 @@ final class Demo {
 
 		if (name.equals("netherportal")) {
 			for (int y = 0; y < 3; y++) {
-				level.setBlock(feet.relative(ahead, 3).above(y), net.minecraft.world.level.block.Blocks.NETHER_PORTAL.defaultBlockState(), 18);
+				stage(level, feet.relative(ahead, 3).above(y), net.minecraft.world.level.block.Blocks.NETHER_PORTAL.defaultBlockState());
 			}
 		} else if (name.equals("endportal")) {
 			net.minecraft.core.BlockPos middle = feet.relative(ahead, 4).below();
@@ -183,11 +184,39 @@ final class Demo {
 					if (edge && Math.abs(x) == Math.abs(z)) {
 						continue;
 					}
-					level.setBlock(middle.offset(x, 0, z), edge
+					stage(level, middle.offset(x, 0, z), edge
 						? net.minecraft.world.level.block.Blocks.END_PORTAL_FRAME.defaultBlockState().setValue(net.minecraft.world.level.block.EndPortalFrameBlock.HAS_EYE, true)
-						: net.minecraft.world.level.block.Blocks.END_PORTAL.defaultBlockState(), 18);
+						: net.minecraft.world.level.block.Blocks.END_PORTAL.defaultBlockState());
 				}
 			}
+		} else if (name.equals("verzauberungstisch")) {
+			stage(level, feet.relative(ahead, 2), net.minecraft.world.level.block.Blocks.ENCHANTING_TABLE.defaultBlockState());
+		} else if (name.equals("glocke")) {
+			stage(level, feet.relative(ahead, 2), net.minecraft.world.level.block.Blocks.BELL.defaultBlockState());
+		} else if (name.equals("lore")) {
+			for (int k = -2; k <= 6; k++) {
+				stage(level, feet.relative(ahead, k), net.minecraft.world.level.block.Blocks.RAIL.defaultBlockState().setValue(
+					net.minecraft.world.level.block.state.properties.BlockStateProperties.RAIL_SHAPE, ahead.getAxis() == net.minecraft.core.Direction.Axis.X
+						? net.minecraft.world.level.block.state.properties.RailShape.EAST_WEST : net.minecraft.world.level.block.state.properties.RailShape.NORTH_SOUTH));
+			}
 		}
+	}
+
+	private static final List<net.minecraft.core.BlockPos> STAGED = new java.util.ArrayList<>();
+
+	/** Puts a staged block into free air only and remembers it. */
+	private static void stage(net.minecraft.client.multiplayer.ClientLevel level, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
+		if (level.getBlockState(pos).isAir()) {
+			level.setBlock(pos, state, 18);
+			STAGED.add(pos.immutable());
+		}
+	}
+
+	/** Takes everything staged for the last scene away again, so nothing is left standing in the world. */
+	private static void unstage(net.minecraft.client.multiplayer.ClientLevel level) {
+		for (net.minecraft.core.BlockPos pos : STAGED) {
+			level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 18);
+		}
+		STAGED.clear();
 	}
 }

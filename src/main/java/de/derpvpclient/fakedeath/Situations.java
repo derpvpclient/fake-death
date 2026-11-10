@@ -84,6 +84,10 @@ import de.derpvpclient.fakedeath.scene.TrainerScene;
 import de.derpvpclient.fakedeath.scene.VolcanoScene;
 import de.derpvpclient.fakedeath.scene.NetherPortalScene;
 import de.derpvpclient.fakedeath.scene.EndPortalScene;
+import de.derpvpclient.fakedeath.scene.EnchantingTableScene;
+import de.derpvpclient.fakedeath.scene.BellScene;
+import de.derpvpclient.fakedeath.scene.MinecartScene;
+import de.derpvpclient.fakedeath.scene.ArmorStandScene;
 import net.minecraft.world.entity.animal.camel.Camel;
 import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.animal.Fox;
@@ -121,7 +125,8 @@ public final class Situations {
 		"dornen", "erdbeben", "vulkan", "bienennest", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer",
 		"klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch",
 		"fahrlehrer", "axolotl", "panda",
-		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor", "bombenprank", "netherportal", "endportal");
+		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor", "bombenprank", "netherportal", "endportal",
+		"verzauberungstisch", "glocke", "lore", "ruestungsstaender");
 
 	/** English scene names, both work in every language. Names that are the same in both are left out. */
 	private static final Map<String, String> ENGLISH = Map.ofEntries(
@@ -140,7 +145,8 @@ public final class Situations {
 		Map.entry("doctor", "arzt"), Map.entry("police", "polizist"), Map.entry("chimneysweep", "schornsteinfeger"), Map.entry("barber", "friseur"), Map.entry("chef", "koch"),
 		Map.entry("instructor", "fahrlehrer"),
 		Map.entry("fortuneteller", "wahrsagerin"), Map.entry("santa", "weihnachtsmann"), Map.entry("salesman", "werbung"), Map.entry("grandma", "oma"),
-		Map.entry("satnav", "navi"), Map.entry("waiter", "kellner"), Map.entry("cats", "katzen"), Map.entry("goatchoir", "ziegenchor"), Map.entry("bombprank", "bombenprank"));
+		Map.entry("satnav", "navi"), Map.entry("waiter", "kellner"), Map.entry("cats", "katzen"), Map.entry("goatchoir", "ziegenchor"), Map.entry("bombprank", "bombenprank"),
+		Map.entry("enchantingtable", "verzauberungstisch"), Map.entry("bell", "glocke"), Map.entry("minecart", "lore"), Map.entry("armorstand", "ruestungsstaender"));
 
 	public static final List<String> ENGLISH_NAMES = NAMES.stream()
 		.map(name -> ENGLISH.entrySet().stream().filter(entry -> entry.getValue().equals(name)).map(Map.Entry::getKey).findFirst().orElse(name))
@@ -511,6 +517,32 @@ public final class Situations {
 			}
 		}
 
+		// 1.0.52: four more places, each only for someone who stands right there.
+		if (options.wants("verzauberungstisch")) {
+			BlockPos table = find(level, feet, 2, 1, state -> state.is(Blocks.ENCHANTING_TABLE));
+			if (table != null) {
+				options.add("verzauberungstisch", 6, () -> new EnchantingTableScene(table));
+			}
+		}
+		if (options.wants("glocke")) {
+			BlockPos bell = find(level, feet, 2, 2, state -> state.is(Blocks.BELL));
+			if (bell != null) {
+				options.add("glocke", 6, () -> new BellScene(bell));
+			}
+		}
+		if (options.wants("lore")) {
+			BlockPos rail = find(level, feet, 2, 1, state -> state.is(BlockTags.RAILS));
+			if (rail != null) {
+				options.add("lore", 6, () -> new MinecartScene(rail));
+			}
+		}
+		if (options.wants("ruestungsstaender")) {
+			net.minecraft.world.entity.Entity stand = ArmorStandScene.near(level, player, 3.0);
+			if (stand != null) {
+				options.add("ruestungsstaender", 6, () -> new ArmorStandScene(stand));
+			}
+		}
+
 		// The characters, each one rare. The chimney sweep needs a sky for his roof.
 		if (sky) {
 			for (String npc : List.of("influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer", "klempner",
@@ -687,6 +719,11 @@ public final class Situations {
 				BlockPos portal = find(level, feet, 6, 3, Situations::isEndPortal);
 				yield portal != null ? new EndPortalScene(portal) : null;
 			}
+			// By name these four always play: without the thing nearby the scene puts one up, only on this client.
+			case "verzauberungstisch" -> new EnchantingTableScene(find(level, feet, 4, 2, state -> state.is(Blocks.ENCHANTING_TABLE)));
+			case "glocke" -> new BellScene(find(level, feet, 4, 2, state -> state.is(Blocks.BELL)));
+			case "lore" -> new MinecartScene(find(level, feet, 3, 1, state -> state.is(BlockTags.RAILS)));
+			case "ruestungsstaender" -> new ArmorStandScene(ArmorStandScene.near(level, player, 5.0));
 			default -> npcScene(id);
 		};
 	}

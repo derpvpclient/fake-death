@@ -193,6 +193,10 @@
 	"fakedeath.scene.allay": "Allay-Lieferservice",
 	"fakedeath.scene.ziegenchor": "Ziegen-Chor",
 	"fakedeath.scene.bombenprank": "Bomben-Prank",
+	"fakedeath.scene.verzauberungstisch": "Verzauberungstisch",
+	"fakedeath.scene.glocke": "Dorfglocke",
+	"fakedeath.scene.lore": "Führerlose Lore",
+	"fakedeath.scene.ruestungsstaender": "Rüstungsständer",
 	"fakedeath.scene.netherportal": "Netherportal",
 	"fakedeath.scene.endportal": "Endportal",
 
@@ -240,6 +244,10 @@
 	"fakedeath.death.allay": "%1$s hat ein Geschenk vom Allay bekommen",
 	"fakedeath.death.ziegenchor": "%1$s hat das Ziegenkonzert nicht überlebt",
 	"fakedeath.death.bombenprank": "%1$s ist auf einen Bomben-Prank reingefallen",
+	"fakedeath.death.verzauberungstisch": "%1$s wurde mit „Fluch des Verschwindens“ verzaubert und verschwand",
+	"fakedeath.death.glocke": "%1$s läutete die Glocke und wurde vom ganzen Dorf überrannt",
+	"fakedeath.death.lore": "%1$s wurde von einer führerlosen Lore überrollt",
+	"fakedeath.death.ruestungsstaender": "%1$s bekam von einem Rüstungsständer die eigene Rüstung über die Ohren gezogen",
 	"fakedeath.death.netherportal": "%1$s kam nur zur Hälfte auf der anderen Seite des Portals an",
 	"fakedeath.death.endportal": "%1$s hat den Enderaugen zu tief in die Augen geschaut",
 
