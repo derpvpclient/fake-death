@@ -193,6 +193,8 @@
 	"fakedeath.scene.allay": "Allay-Lieferservice",
 	"fakedeath.scene.ziegenchor": "Ziegen-Chor",
 	"fakedeath.scene.bombenprank": "Bomben-Prank",
+	"fakedeath.scene.netherportal": "Netherportal",
+	"fakedeath.scene.endportal": "Endportal",
 
 	"fakedeath.death.tornado": "%1$s wurde von einem Tornado davongetragen",
 	"fakedeath.death.mond": "%1$s wurde vom Mond getroffen",
@@ -238,6 +240,8 @@
 	"fakedeath.death.allay": "%1$s hat ein Geschenk vom Allay bekommen",
 	"fakedeath.death.ziegenchor": "%1$s hat das Ziegenkonzert nicht überlebt",
 	"fakedeath.death.bombenprank": "%1$s ist auf einen Bomben-Prank reingefallen",
+	"fakedeath.death.netherportal": "%1$s kam nur zur Hälfte auf der anderen Seite des Portals an",
+	"fakedeath.death.endportal": "%1$s hat den Enderaugen zu tief in die Augen geschaut",
 
 	"fakedeath.influencer.name": "Influencer",
 	"fakedeath.influencer.1": "Hey Leute, willkommen zurück auf meinem Kanal!",
