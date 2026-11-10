@@ -82,6 +82,8 @@ import de.derpvpclient.fakedeath.scene.ThornScene;
 import de.derpvpclient.fakedeath.scene.TornadoScene;
 import de.derpvpclient.fakedeath.scene.TrainerScene;
 import de.derpvpclient.fakedeath.scene.VolcanoScene;
+import de.derpvpclient.fakedeath.scene.NetherPortalScene;
+import de.derpvpclient.fakedeath.scene.EndPortalScene;
 import net.minecraft.world.entity.animal.camel.Camel;
 import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.entity.animal.fox.Fox;
@@ -119,7 +121,7 @@ public final class Situations {
 		"dornen", "erdbeben", "vulkan", "bienennest", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer",
 		"klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch",
 		"fahrlehrer", "axolotl", "panda",
-		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor", "bombenprank");
+		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor", "bombenprank", "netherportal", "endportal");
 
 	/** English scene names, both work in every language. Names that are the same in both are left out. */
 	private static final Map<String, String> ENGLISH = Map.ofEntries(
@@ -495,6 +497,20 @@ public final class Situations {
 			options.add("navi", 1, NavScene::new);
 		}
 
+		// 1.0.51: the portals, only for someone who stands right at one.
+		if (options.wants("netherportal")) {
+			BlockPos portal = find(level, feet, 3, 2, state -> state.is(Blocks.NETHER_PORTAL));
+			if (portal != null) {
+				options.add("netherportal", 7, () -> new NetherPortalScene(portal));
+			}
+		}
+		if (options.wants("endportal")) {
+			BlockPos portal = find(level, feet, 4, 2, Situations::isEndPortal);
+			if (portal != null) {
+				options.add("endportal", 7, () -> new EndPortalScene(portal));
+			}
+		}
+
 		// The characters, each one rare. The chimney sweep needs a sky for his roof.
 		if (sky) {
 			for (String npc : List.of("influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer", "klempner",
@@ -529,6 +545,10 @@ public final class Situations {
 			case "bombenprank" -> new BombPrankScene();
 			default -> null;
 		};
+	}
+
+	private static boolean isEndPortal(BlockState state) {
+		return state.is(Blocks.END_PORTAL) || state.is(Blocks.END_PORTAL_FRAME);
 	}
 
 	private static boolean isFurnace(BlockState state) {
@@ -658,6 +678,15 @@ public final class Situations {
 			case "katzen" -> new CatScene();
 			case "allay" -> new AllayScene();
 			case "ziegenchor" -> new GoatChoirScene();
+			case "netherportal" -> {
+				// Always a real portal, none is put up. Without one nearby the scene can not play.
+				BlockPos portal = find(level, feet, 6, 3, state -> state.is(Blocks.NETHER_PORTAL));
+				yield portal != null ? new NetherPortalScene(portal) : null;
+			}
+			case "endportal" -> {
+				BlockPos portal = find(level, feet, 6, 3, Situations::isEndPortal);
+				yield portal != null ? new EndPortalScene(portal) : null;
+			}
 			default -> npcScene(id);
 		};
 	}
