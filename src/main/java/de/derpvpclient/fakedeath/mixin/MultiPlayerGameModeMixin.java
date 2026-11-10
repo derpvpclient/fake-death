@@ -1,9 +1,11 @@
 package de.derpvpclient.fakedeath.mixin;
 
+import de.derpvpclient.fakedeath.FakeDeath;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +21,8 @@ public class MultiPlayerGameModeMixin {
 	private void fakedeath$ignoreActorAttack(Player player, Entity target, CallbackInfo ci) {
 		if (target.getId() < 0) {
 			ci.cancel();
+		} else if (target instanceof LivingEntity) {
+			FakeDeath.noteFight();
 		}
 	}
 
@@ -26,6 +30,14 @@ public class MultiPlayerGameModeMixin {
 	private void fakedeath$ignoreActorInteract(Player player, Entity target, EntityHitResult hitResult, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
 		if (target.getId() < 0) {
 			cir.setReturnValue(InteractionResult.PASS);
+		}
+	}
+
+	// The middle mouse button asks the server for the item of an entity, by its id.
+	@Inject(method = "handlePickItemFromEntity", at = @At("HEAD"), cancellable = true)
+	private void fakedeath$ignoreActorPick(Entity target, boolean includeData, CallbackInfo ci) {
+		if (target.getId() < 0) {
+			ci.cancel();
 		}
 	}
 }
