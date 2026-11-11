@@ -24,6 +24,7 @@ public class DrownedScene extends Scene {
 
 	private final BlockPos water;
 	private Drowned drowned;
+	private net.minecraft.world.entity.Entity trident;
 	private Vec3 surface;
 
 	public DrownedScene(BlockPos water) {
@@ -81,15 +82,31 @@ public class DrownedScene extends Scene {
 			Vec3 to = player.getEyePosition().add(0, -0.3, 0);
 
 			if (tick == shot) {
+				Looks.swing(drowned);
 				sound(level, from, SoundEvents.TRIDENT_THROW.value(), SoundSource.HOSTILE, 1.5F, 1.0F);
 			}
 
 			if (tick >= shot && tick < shot + FLIGHT) {
 				Vec3 delta = to.subtract(from);
 				line(level, ParticleTypes.CRIT, from.add(delta.scale((tick - shot) / (double) FLIGHT)), from.add(delta.scale((tick - shot + 1) / (double) FLIGHT)), 0.25);
+				// A real trident in the air, not only a trail.
+				if (tick == shot) {
+					trident = spawn(level, EntityType.TRIDENT, from);
+					trident.setNoGravity(true);
+				}
+				Vec3 at = from.add(delta.scale((tick - shot + 1) / (double) FLIGHT));
+				trident.setPos(at.x, at.y, at.z);
+				trident.setYRot((float) (Math.atan2(delta.x, delta.z) * 180.0 / Math.PI));
+				trident.setXRot((float) (Math.atan2(delta.y, delta.horizontalDistance()) * 180.0 / Math.PI));
+				trident.yRotO = trident.getYRot();
+				trident.xRotO = trident.getXRot();
 			}
 
 			if (tick == shot + FLIGHT) {
+				if (trident != null) {
+					despawn(level, trident);
+					trident = null;
+				}
 				sound(level, to, SoundEvents.TRIDENT_HIT, SoundSource.HOSTILE, 1.5F, 1.0F);
 				hit(level, player, SoundEvents.PLAYER_HURT, 0.35F, i == THROWS.length - 1);
 			}
