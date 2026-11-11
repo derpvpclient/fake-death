@@ -191,6 +191,17 @@ public final class FakeDeath {
 		fightTicks = FIGHT_TICKS;
 	}
 
+	/** For the game test: the random event is due in this many ticks. */
+	public static void randomDueIn(int ticks) {
+		armedTicks = -1;
+		randomTicks = ticks;
+	}
+
+	/** Ticks until the random event is due, -1 while it is off or already waiting for its moment. */
+	public static int randomTicksLeft() {
+		return randomTicks;
+	}
+
 	public static void rollRandomTimer() {
 		armedTicks = -1;
 
