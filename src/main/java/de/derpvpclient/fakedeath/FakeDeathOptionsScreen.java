@@ -38,6 +38,8 @@ public class FakeDeathOptionsScreen extends OptionsSubScreen {
 			minutes("fakedeath.options.max", FakeDeathConfig.randomMaxMinutes, value -> FakeDeathConfig.randomMaxMinutes = value));
 		list.addBig(OptionInstance.createBoolean("fakedeath.options.flashing", tooltip("fakedeath.options.flashing.tooltip"),
 			FakeDeathConfig.flashing, value -> FakeDeathConfig.flashing = value));
+		list.addBig(OptionInstance.createBoolean("fakedeath.options.update_check", tooltip("fakedeath.options.update_check.tooltip"),
+			FakeDeathConfig.updateCheck, value -> FakeDeathConfig.updateCheck = value));
 
 		// The scenes in the same groups as in the test screen, each sorted by name, with a switch for all of them at once.
 		header(Component.translatable("fakedeath.options.scenes"));

@@ -1,6 +1,6 @@
 {
 	"modmenu.summaryTranslation.fakedeath": "Täuschend echter Fake-Tod mit passender Szene. Nur du siehst ihn.",
-	"modmenu.descriptionTranslation.fakedeath": "Fake-Tod als Event: kurze Szene, echter Todesbildschirm, echte Todesmeldung im Chat. Nur du siehst es, an den Server geht nichts.",
+	"modmenu.descriptionTranslation.fakedeath": "Du stirbst. Glaubst du zumindest.\n\n\u00a7c\u2620 \u00a7f98 Szenen\u00a77, vom Creeper bis zum Finanzamt\n\u00a76\u2726 \u00a7fKommt von allein\u00a77, wenn du nicht damit rechnest\n\u00a7a\u2714 \u00a7fNur du siehst es\u00a77, an den Server geht nichts\n\u00a7b\u2699 \u00a7fAlles einstellbar\u00a77: Abstand, Szenen, Blitzeffekte\n\n\u00a78Echter Todesbildschirm, echte Todesmeldung. Ein Klick auf \u201eRespawn\u201c, und du stehst wieder da.",
 	"fakedeath.death.tree": "%1$s wurde von einem umstürzenden Baum erschlagen",
 	"fakedeath.death.tax": "%1$s wurde bei einer Steuerprüfung vom Finanzamt gelasert",
 	"fakedeath.death.herobrine": "%1$s hat Herobrine gesehen",
@@ -25,6 +25,9 @@
 	"fakedeath.options.general": "Allgemein",
 	"fakedeath.options.all_on": "Alle Szenen an",
 	"fakedeath.options.all_off": "Alle Szenen aus",
+	"fakedeath.options.update_check": "Update-Hinweis",
+	"fakedeath.options.update_check.tooltip": "Zeigt im Mod-Menü an, wenn es eine neuere Version auf Modrinth und CurseForge gibt. Es wird nichts automatisch heruntergeladen.",
+	"fakedeath.update.message": "v%s auf Modrinth und CurseForge",
 	"fakedeath.message.all_off": "Alle Szenen, die hier passen würden, sind in den Einstellungen ausgeschaltet.",
 	"fakedeath.message.waiting": "Der Fake-Tod wartet noch: %s.",
 	"fakedeath.command.test": "Szene „%s“ startet, sobald du sicher stehst.",
