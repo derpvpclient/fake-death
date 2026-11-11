@@ -10,6 +10,8 @@ dependencies {
 
 	// Only for the settings button in Mod Menu, the mod runs without it.
 	compileOnly files("libs/modmenu-21.0.0.jar")
+	// In the game test Mod Menu is really there, to look at the update notice.
+	localRuntime files("libs/modmenu-21.0.0.jar")
 }
 
 processResources {
@@ -51,6 +53,7 @@ loom {
 			vmArg "-Dfakedeath.demoUi=" + (project.findProperty("demoUi") ?: "false")
 			vmArg "-Dfakedeath.demoTree=" + (project.findProperty("demoTree") ?: "false")
 			vmArg "-Dfakedeath.demoRandom=" + (project.findProperty("demoRandom") ?: "false")
+			vmArg "-Dfakedeath.updateTest=" + (project.findProperty("demoUpdate") ?: "")
 		}
 	}
 }

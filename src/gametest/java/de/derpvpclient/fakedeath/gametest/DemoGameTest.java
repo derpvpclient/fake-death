@@ -41,6 +41,25 @@ public class DemoGameTest implements FabricClientGameTest {
 			}
 			return;
 		}
+		if (!System.getProperty("fakedeath.updateTest", "").isEmpty()) {
+			// The update notice: with a pretended newer version Mod Menu marks the mod in its list.
+			try (TestSingleplayerContext singleplayer = context.worldBuilder().create()) {
+				context.waitTicks(60);
+				context.runOnClient(client -> {
+					try {
+						client.gui.setScreen((net.minecraft.client.gui.screens.Screen) Class.forName("com.terraformersmc.modmenu.api.ModMenuApi")
+							.getMethod("createModsScreen", net.minecraft.client.gui.screens.Screen.class).invoke(null, (Object) null));
+					} catch (ReflectiveOperationException e) {
+						throw new IllegalStateException(e);
+					}
+				});
+				context.waitTicks(200);
+				context.getInput().typeChars("Fake");
+				context.waitTicks(10);
+				context.takeScreenshot("update-1-modmenu");
+			}
+			return;
+		}
 		if (Boolean.getBoolean("fakedeath.demoRandom")) {
 			// The random event: comes by itself when due, sets its next time, stays away from monsters and when switched off.
 			StringBuilder result = new StringBuilder();
