@@ -217,10 +217,17 @@ final class Demo {
 					net.minecraft.world.level.block.state.properties.BlockStateProperties.RAIL_SHAPE, ahead.getAxis() == net.minecraft.core.Direction.Axis.X
 						? net.minecraft.world.level.block.state.properties.RailShape.EAST_WEST : net.minecraft.world.level.block.state.properties.RailShape.NORTH_SOUTH));
 			}
+		} else if (name.equals("amethyst")) {
+			stage(level, feet.relative(ahead, 3), net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST.defaultBlockState());
+		} else if (name.equals("spawner")) {
+			stage(level, feet.relative(ahead, 2), net.minecraft.world.level.block.Blocks.SPAWNER.defaultBlockState());
+		} else if (name.equals("reparatur")) {
+			stage(level, feet.relative(ahead, 2), net.minecraft.world.level.block.Blocks.ANVIL.defaultBlockState());
 		}
 	}
 
-	private static final List<net.minecraft.core.BlockPos> STAGED = new java.util.ArrayList<>();
+	private static final List<net.minecraft.core.BlockPos> STAGED
+ = new java.util.ArrayList<>();
 
 	/** Puts a staged block into free air only and remembers it. */
 	private static void stage(net.minecraft.client.multiplayer.ClientLevel level, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {

@@ -88,6 +88,16 @@ import de.derpvpclient.fakedeath.scene.EnchantingTableScene;
 import de.derpvpclient.fakedeath.scene.BellScene;
 import de.derpvpclient.fakedeath.scene.MinecartScene;
 import de.derpvpclient.fakedeath.scene.ArmorStandScene;
+import de.derpvpclient.fakedeath.scene.PaintingScene;
+import de.derpvpclient.fakedeath.scene.AmethystScene;
+import de.derpvpclient.fakedeath.scene.SnowmanScene;
+import de.derpvpclient.fakedeath.scene.ArmadilloScene;
+import de.derpvpclient.fakedeath.scene.GoatChargeScene;
+import de.derpvpclient.fakedeath.scene.SwordFoxScene;
+import de.derpvpclient.fakedeath.scene.SpawnerScene;
+import de.derpvpclient.fakedeath.scene.LightningRodScene;
+import de.derpvpclient.fakedeath.scene.RepairScene;
+import de.derpvpclient.fakedeath.scene.Nearby;
 import net.minecraft.world.entity.animal.camel.Camel;
 import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.entity.animal.fox.Fox;
@@ -126,7 +136,8 @@ public final class Situations {
 		"klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch",
 		"fahrlehrer", "axolotl", "panda",
 		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor", "bombenprank", "netherportal", "endportal",
-		"verzauberungstisch", "glocke", "lore", "ruestungsstaender");
+		"verzauberungstisch", "glocke", "lore", "ruestungsstaender",
+		"gemaelde", "amethyst", "schneemann", "guerteltier", "anlauf", "schwertfuchs", "spawner", "blitzableiter", "reparatur");
 
 	/** English scene names, both work in every language. Names that are the same in both are left out. */
 	private static final Map<String, String> ENGLISH = Map.ofEntries(
@@ -146,7 +157,9 @@ public final class Situations {
 		Map.entry("instructor", "fahrlehrer"),
 		Map.entry("fortuneteller", "wahrsagerin"), Map.entry("santa", "weihnachtsmann"), Map.entry("salesman", "werbung"), Map.entry("grandma", "oma"),
 		Map.entry("satnav", "navi"), Map.entry("waiter", "kellner"), Map.entry("cats", "katzen"), Map.entry("goatchoir", "ziegenchor"), Map.entry("bombprank", "bombenprank"),
-		Map.entry("enchantingtable", "verzauberungstisch"), Map.entry("bell", "glocke"), Map.entry("minecart", "lore"), Map.entry("armorstand", "ruestungsstaender"));
+		Map.entry("enchantingtable", "verzauberungstisch"), Map.entry("bell", "glocke"), Map.entry("minecart", "lore"), Map.entry("armorstand", "ruestungsstaender"),
+		Map.entry("painting", "gemaelde"), Map.entry("snowman", "schneemann"), Map.entry("armadillo", "guerteltier"), Map.entry("goatcharge", "anlauf"),
+		Map.entry("swordfox", "schwertfuchs"), Map.entry("lightningrod", "blitzableiter"), Map.entry("repair", "reparatur"));
 
 	public static final List<String> ENGLISH_NAMES = NAMES.stream()
 		.map(name -> ENGLISH.entrySet().stream().filter(entry -> entry.getValue().equals(name)).map(Map.Entry::getKey).findFirst().orElse(name))
@@ -154,7 +167,7 @@ public final class Situations {
 
 	/** The ids stay plain for config files, what players type and see is spelled right. */
 	private static final Map<String, String> UMLAUTS = Map.of(
-		"hoehle", "höhle", "doppelgaenger", "doppelgänger", "fledermaeuse", "fledermäuse", "froesche", "frösche", "ueberfall", "überfall", "huehner", "hühner");
+		"hoehle", "höhle", "doppelgaenger", "doppelgänger", "fledermaeuse", "fledermäuse", "froesche", "frösche", "ueberfall", "überfall", "huehner", "hühner", "gemaelde", "gemälde", "guerteltier", "gürteltier");
 
 	/** Scenes with fast flashing lights, they only play with that setting switched on. */
 	public static final java.util.Set<String> FLASHING = java.util.Set.of();
@@ -543,6 +556,62 @@ public final class Situations {
 			}
 		}
 
+		// 1.0.53: nine more, each only for someone who stands right at the thing.
+		if (options.wants("gemaelde")) {
+			net.minecraft.world.entity.Entity painting = Nearby.entity(level, player, net.minecraft.world.entity.EntityTypes.PAINTING, 4.0);
+			if (painting != null) {
+				options.add("gemaelde", 6, () -> new PaintingScene(painting));
+			}
+		}
+		if (options.wants("amethyst")) {
+			BlockPos amethyst = find(level, feet, 3, 2, state -> state.getBlock().getDescriptionId().contains("amethyst"));
+			if (amethyst != null) {
+				options.add("amethyst", 6, () -> new AmethystScene(amethyst));
+			}
+		}
+		if (options.wants("schneemann")) {
+			BlockPos snow = find(level, feet, 1, 1, state -> state.is(Blocks.POWDER_SNOW));
+			if (snow != null) {
+				options.add("schneemann", 6, () -> new SnowmanScene(snow));
+			}
+		}
+		if (options.wants("guerteltier")) {
+			net.minecraft.world.entity.Entity armadillo = Nearby.entity(level, player, net.minecraft.world.entity.EntityTypes.ARMADILLO, 4.0);
+			if (armadillo != null) {
+				options.add("guerteltier", 6, () -> new ArmadilloScene(armadillo));
+			}
+		}
+		if (options.wants("anlauf")) {
+			net.minecraft.world.entity.Entity goat = Nearby.entity(level, player, net.minecraft.world.entity.EntityTypes.GOAT, 4.0);
+			if (goat != null) {
+				options.add("anlauf", 6, () -> new GoatChargeScene(goat));
+			}
+		}
+		if (options.wants("schwertfuchs")) {
+			net.minecraft.world.entity.Entity fox = Nearby.entity(level, player, net.minecraft.world.entity.EntityTypes.FOX, 4.0);
+			if (fox != null) {
+				options.add("schwertfuchs", 6, () -> new SwordFoxScene(fox));
+			}
+		}
+		if (options.wants("spawner")) {
+			BlockPos spawner = find(level, feet, 3, 2, state -> state.is(Blocks.SPAWNER));
+			if (spawner != null) {
+				options.add("spawner", 6, () -> new SpawnerScene(spawner));
+			}
+		}
+		if (options.wants("blitzableiter")) {
+			BlockPos rod = find(level, feet, 3, 3, state -> state.getBlock().getDescriptionId().contains("lightning_rod"));
+			if (rod != null) {
+				options.add("blitzableiter", 6, () -> new LightningRodScene(rod));
+			}
+		}
+		if (options.wants("reparatur")) {
+			BlockPos anvil = find(level, feet, 2, 1, state -> state.is(BlockTags.ANVIL));
+			if (anvil != null) {
+				options.add("reparatur", 6, () -> new RepairScene(anvil));
+			}
+		}
+
 		// The characters, each one rare. The chimney sweep needs a sky for his roof.
 		if (sky) {
 			for (String npc : List.of("influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker", "zauberer", "klempner",
@@ -724,6 +793,16 @@ public final class Situations {
 			case "glocke" -> new BellScene(find(level, feet, 4, 2, state -> state.is(Blocks.BELL)));
 			case "lore" -> new MinecartScene(find(level, feet, 3, 1, state -> state.is(BlockTags.RAILS)));
 			case "ruestungsstaender" -> new ArmorStandScene(ArmorStandScene.near(level, player, 5.0));
+			// By name these nine always play too: without the thing nearby the scene brings its own, only on this client.
+			case "gemaelde" -> new PaintingScene(Nearby.entity(level, player, net.minecraft.world.entity.EntityTypes.PAINTING, 6.0));
+			case "amethyst" -> new AmethystScene(find(level, feet, 4, 2, state -> state.getBlock().getDescriptionId().contains("amethyst")));
+			case "schneemann" -> new SnowmanScene(find(level, feet, 1, 1, state -> state.is(Blocks.POWDER_SNOW)));
+			case "guerteltier" -> new ArmadilloScene(Nearby.entity(level, player, net.minecraft.world.entity.EntityTypes.ARMADILLO, 6.0));
+			case "anlauf" -> new GoatChargeScene(Nearby.entity(level, player, net.minecraft.world.entity.EntityTypes.GOAT, 6.0));
+			case "schwertfuchs" -> new SwordFoxScene(Nearby.entity(level, player, net.minecraft.world.entity.EntityTypes.FOX, 6.0));
+			case "spawner" -> new SpawnerScene(find(level, feet, 4, 2, state -> state.is(Blocks.SPAWNER)));
+			case "blitzableiter" -> new LightningRodScene(find(level, feet, 4, 3, state -> state.getBlock().getDescriptionId().contains("lightning_rod")));
+			case "reparatur" -> new RepairScene(find(level, feet, 3, 1, state -> state.is(BlockTags.ANVIL)));
 			default -> npcScene(id);
 		};
 	}

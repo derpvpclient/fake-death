@@ -92,8 +92,13 @@ public class DoppelgangerScene extends Scene {
 	}
 
 	/** A copy of the player: their skin, their armor and what they hold. With its own id, so it never gets mixed up with them. */
-	private static RemotePlayer mirror(ClientLevel level, LocalPlayer player) {
-		GameProfile profile = new GameProfile(UUID.randomUUID(), player.getGameProfile().name());
+	static RemotePlayer mirror(ClientLevel level, LocalPlayer player) {
+		return mirror(level, player, player.getGameProfile().name());
+	}
+
+	/** The same copy with another name over its head. An empty one shows no name at all. */
+	static RemotePlayer mirror(ClientLevel level, LocalPlayer player, String name) {
+		GameProfile profile = new GameProfile(UUID.randomUUID(), name);
 		RemotePlayer copy = new RemotePlayer(level, profile) {
 			{
 				// The second skin layer (hat, jacket, sleeves) and the main hand, exactly as the player has them set.
