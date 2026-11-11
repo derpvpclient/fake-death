@@ -1,6 +1,6 @@
 {
 	"modmenu.summaryTranslation.fakedeath": "A convincing fake death with a scene that fits the moment. Only you see it.",
-	"modmenu.descriptionTranslation.fakedeath": "Fake death as an event: a short scene, the real death screen and a real death message in chat. Only you see it, nothing is sent to the server.",
+	"modmenu.descriptionTranslation.fakedeath": "You die. Or so you think.\n\n\u00a7c\u2620 \u00a7f98 scenes\u00a77, from the creeper to the tax office\n\u00a76\u2726 \u00a7fComes by itself\u00a77, when you least expect it\n\u00a7a\u2714 \u00a7fOnly you see it\u00a77, nothing is sent to the server\n\u00a7b\u2699 \u00a7fEverything adjustable\u00a77: timing, scenes, flashing effects\n\n\u00a78The real death screen, a real death message. One click on \"Respawn\" and you are back.",
 	"fakedeath.death.tree": "%1$s was crushed by a falling tree",
 	"fakedeath.death.tax": "%1$s was lasered by the tax office during an audit",
 	"fakedeath.death.herobrine": "%1$s saw Herobrine",
@@ -25,6 +25,9 @@
 	"fakedeath.options.general": "General",
 	"fakedeath.options.all_on": "All scenes on",
 	"fakedeath.options.all_off": "All scenes off",
+	"fakedeath.options.update_check": "Update Notice",
+	"fakedeath.options.update_check.tooltip": "Shows in Mod Menu when a newer version is out on Modrinth and CurseForge. Nothing is downloaded automatically.",
+	"fakedeath.update.message": "v%s on Modrinth and CurseForge",
 	"fakedeath.message.all_off": "Every scene that would fit here is switched off in the settings.",
 	"fakedeath.message.waiting": "The fake death is still waiting: %s.",
 	"fakedeath.command.test": "Scene \"%s\" starts as soon as you stand safely.",

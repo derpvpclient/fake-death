@@ -7,6 +7,11 @@
 	"authors": [
 		"derpvpclient"
 	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/fake-death",
+		"issues": "https://github.com/derpvpclient/fake-death/issues",
+		"sources": "https://github.com/derpvpclient/fake-death"
+	},
 	"license": "MIT",
 	"icon": "assets/fakedeath/icon.png",
 	"environment": "client",
@@ -32,5 +37,13 @@
 	},
 	"suggests": {
 		"modmenu": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.modrinth": "https://modrinth.com/mod/fake-death",
+				"modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/fake-death"
+			}
+		}
 	}
 }
