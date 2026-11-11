@@ -194,7 +194,7 @@ final class Demo {
 				stage(level, feet.relative(ahead, 3).above(y), net.minecraft.world.level.block.Blocks.NETHER_PORTAL.defaultBlockState());
 			}
 		} else if (name.equals("endportal")) {
-			net.minecraft.core.BlockPos middle = feet.relative(ahead, 4).below();
+			net.minecraft.core.BlockPos middle = feet.relative(ahead, 4);
 
 			for (int x = -2; x <= 2; x++) {
 				for (int z = -2; z <= 2; z++) {
@@ -207,6 +207,8 @@ final class Demo {
 						: net.minecraft.world.level.block.Blocks.END_PORTAL.defaultBlockState());
 				}
 			}
+		} else if (name.equals("ofen")) {
+			stage(level, feet.relative(ahead, 3), net.minecraft.world.level.block.Blocks.FURNACE.defaultBlockState());
 		} else if (name.equals("verzauberungstisch")) {
 			stage(level, feet.relative(ahead, 2), net.minecraft.world.level.block.Blocks.ENCHANTING_TABLE.defaultBlockState());
 		} else if (name.equals("glocke")) {
