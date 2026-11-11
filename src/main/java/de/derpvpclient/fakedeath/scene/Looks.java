@@ -90,7 +90,7 @@ final class Looks {
 	/** 1.21.1 has no item_model component: the props are custom_model_data overrides on the base item, ids 4711000 + index. */
 	private static final java.util.List<String> PROPS = java.util.List.of("barber_scissors", "briefcase", "chimney_brush", "clipboard",
 		"dental_drill", "dumbbell", "invoice", "magic_saw", "mop", "phone", "pipe_wrench", "police_baton", "police_camera", "present",
-		"screwdriver", "selfie_stick", "soup_ladle", "syringe", "tarot_card");
+		"screwdriver", "selfie_stick", "soup_ladle", "syringe", "tarot_card", "roast_chicken", "rubber_stamp");
 
 	static net.minecraft.world.item.ItemStack prop(net.minecraft.world.item.Item base, String model) {
 		net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(base);

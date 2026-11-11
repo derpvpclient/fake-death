@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:item/cooked_chicken"
+  },
+  "overrides": [
+    { "predicate": { "custom_model_data": 4711019 }, "model": "fakedeath:item/roast_chicken" }
+  ]
+}

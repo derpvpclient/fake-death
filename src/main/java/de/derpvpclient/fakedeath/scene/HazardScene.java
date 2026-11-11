@@ -27,10 +27,14 @@ public class HazardScene extends Scene {
 	private static final int FOOD_GONE = 36;
 	private static final int HUNGER_LENGTH = 84;
 	private static final int HUNGER_HIT_EVERY = 12;
+	// The roast chicken the starving player sees: it comes close until the bar is empty, then backs away and is gone.
+	private static final int MIRAGE = 4;
+	private static final int MIRAGE_GONE = 70;
 
 	private enum Extra { NONE, FREEZE, LAVA, HUNGER }
 
 	private int startFood;
+	private net.minecraft.world.entity.Display.ItemDisplay dish;
 	private int now;
 
 	private final String messageKey;
@@ -105,6 +109,7 @@ public class HazardScene extends Scene {
 			if (tick % 35 == 10) {
 				sound(level, body, SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.7F, 0.4F);
 			}
+			mirage(level, player, tick);
 		}
 
 		if (extra == Extra.HUNGER) {
@@ -158,6 +163,52 @@ public class HazardScene extends Scene {
 			}
 			// Every hit takes a fifth of the hearts, the last one kills.
 			hit(level, player, hurtSound, extra == Extra.HUNGER ? 0.3F : 0.19F, tick + every >= length());
+		}
+	}
+
+	/**
+	 * Starving, the player sees things: a steaming roast chicken hangs in the air, almost close enough to grab. Once the
+	 * hunger bar is empty it backs away, gets smaller and goes up in smoke.
+	 */
+	private void mirage(ClientLevel level, LocalPlayer player, int tick) {
+		if (tick == MIRAGE) {
+			dish = itemDisplay(level, Looks.prop(net.minecraft.world.item.Items.COOKED_CHICKEN, "roast_chicken"), player.getEyePosition());
+			((de.derpvpclient.fakedeath.mixin.DisplayAccessor) dish).fakedeath$setBillboard(net.minecraft.world.entity.Display.BillboardConstraints.CENTER);
+			Looks.glow(dish);
+			sound(level, player.position(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.8F, 1.4F);
+		}
+
+		if (dish == null) {
+			return;
+		}
+
+		if (tick >= MIRAGE_GONE) {
+			particles(level, ParticleTypes.POOF, dish.position(), 14, 0.2, 0.04);
+			sound(level, dish.position(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.4F, 1.5F);
+			despawn(level, dish);
+			dish = null;
+			return;
+		}
+
+		double distance;
+		float size;
+		if (tick < FOOD_GONE) {
+			float p = (tick - MIRAGE) / (float) (FOOD_GONE - MIRAGE);
+			distance = 3.0 - 1.7 * p;
+			size = 0.5F + 0.5F * p;
+		} else {
+			float p = (tick - FOOD_GONE) / (float) (MIRAGE_GONE - FOOD_GONE);
+			distance = 1.3 + 3.5 * p;
+			size = 1.0F - 0.7F * p;
+		}
+
+		Vec3 at = player.getEyePosition().add(horizontalLook(player).scale(distance)).add(0.0, -0.15 + Math.sin(tick * 0.25) * 0.06, 0.0);
+		place(dish, at, size);
+		turnTowards(player, at, 0.1F);
+
+		if (tick % 4 == 0) {
+			// Still steaming.
+			particles(level, ParticleTypes.WHITE_SMOKE, at.add(0.0, 0.25 * size, 0.0), 1, 0.08, 0.01);
 		}
 	}
 
