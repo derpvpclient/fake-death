@@ -60,6 +60,10 @@ public class CreeperScene extends Scene {
 			walk(creeper, step);
 		}
 
+		if (invisible) {
+			hint(level, tick);
+		}
+
 		if (tick == SNEAK) {
 			// Swells on the client by itself, the explosion only ever happens on a server.
 			creeper.setSwellDir(1);
@@ -76,6 +80,26 @@ public class CreeperScene extends Scene {
 
 		if (tick == EXPLODE) {
 			explode(level, player);
+		}
+	}
+
+	/** Nobody sees the invisible one, but it still treads the grass down, and its fuse still smokes. */
+	private void hint(ClientLevel level, int tick) {
+		Vec3 at = creeper.position();
+
+		if (tick <= SNEAK && tick % 5 == 0) {
+			particles(level, ParticleTypes.POOF, at.add(0.0, 0.05, 0.0), 2, 0.12, 0.01);
+			sound(level, at, SoundEvents.GRASS_STEP, SoundSource.HOSTILE, 0.5F, 0.8F);
+		}
+
+		if (tick > SNEAK && tick < EXPLODE) {
+			// The swelling body shows as a shape of white smoke, bigger with every tick, sparks where the head is.
+			float swell = (tick - SNEAK) / (float) (EXPLODE - SNEAK);
+			particles(level, ParticleTypes.CLOUD, at.add(0.0, 0.85, 0.0), 1 + (int) (swell * 3.0F), 0.2 + swell * 0.2, 0.0);
+			particles(level, ParticleTypes.SMOKE, at.add(0.0, 1.7, 0.0), 2, 0.06, 0.02);
+			if (tick % 3 == 0) {
+				particles(level, ParticleTypes.ELECTRIC_SPARK, at.add(0.0, 1.75, 0.0), 2, 0.1, 0.3);
+			}
 		}
 	}
 
