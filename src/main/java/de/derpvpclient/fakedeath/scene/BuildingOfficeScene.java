@@ -22,6 +22,11 @@ import net.minecraft.world.phys.Vec3;
 public class BuildingOfficeScene extends NpcScene {
 	private static final int DEPTH = 9;
 	private static final int FALL = 30;
+	// Before anything is torn down it is stamped: the stamp goes up, comes down in front of the feet, and then the ground goes.
+	private static final int STAMP = 22;
+	private static final int STAMP_DOWN = 16;
+	private static final net.minecraft.core.particles.DustParticleOptions INK = new net.minecraft.core.particles.DustParticleOptions(0xD23A2C, 1.6F);
+	private net.minecraft.world.entity.Display.ItemDisplay stamp;
 
 	public BuildingOfficeScene() {
 		super("bauamt", ChatFormatting.GRAY);
@@ -34,7 +39,7 @@ public class BuildingOfficeScene extends NpcScene {
 
 	@Override
 	protected int actLength() {
-		return FALL + 60;
+		return STAMP + FALL + 60;
 	}
 
 	@Override
@@ -48,8 +53,42 @@ public class BuildingOfficeScene extends NpcScene {
 	}
 
 	@Override
+	protected Vec3 focus(LocalPlayer player) {
+		return stamp != null ? stamp.position() : npc.getEyePosition();
+	}
+
+	@Override
 	protected void act(Minecraft minecraft, ClientLevel level, LocalPlayer player, int t) {
 		BlockPos below = player.blockPosition().below();
+		if (t == 0) {
+			Looks.swing(npc);
+			stamp = itemDisplay(level, Looks.prop(Items.PAPER, "rubber_stamp"), npc.getEyePosition());
+			((de.derpvpclient.fakedeath.mixin.DisplayAccessor) stamp).fakedeath$setBillboard(net.minecraft.world.entity.Display.BillboardConstraints.CENTER);
+			sound(level, npc.position(), SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0F, 0.8F);
+		}
+		if (stamp != null) {
+			Vec3 ground = player.position().subtract(towardPlayer(player).scale(0.9)).add(0.0, 0.5, 0.0);
+			Vec3 high = ground.add(0.0, 2.3, 0.0);
+			Vec3 at;
+			if (t < 10) {
+				at = npc.getEyePosition().lerp(high, t / 10.0);
+			} else {
+				double p = Math.min(1.0, (t - 10) / (double) (STAMP_DOWN - 10));
+				at = high.lerp(ground, p * p);
+			}
+			place(stamp, at, 0.6F + Math.min(1.0F, t / 10.0F) * 1.0F);
+			if (t == STAMP_DOWN) {
+				sound(level, ground, SoundEvents.ANVIL_LAND, SoundSource.NEUTRAL, 0.5F, 0.6F);
+				particles(level, INK, ground.add(0.0, -0.3, 0.0), 30, 0.5, 0.0);
+				cameraShake(0.03F);
+			}
+			if (t == STAMP) {
+				cameraShake(0.0F);
+				despawn(level, stamp);
+				stamp = null;
+			}
+		}
+		t -= STAMP;
 		if (t == 0) {
 			BlockState ground = level.getBlockState(below);
 			Looks.swing(npc);
