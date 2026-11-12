@@ -23,22 +23,22 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
- * The robot vacuums have had enough. Five of them roll in, line up in a circle and hold a meeting, every sentence
+ * The robot vacuums have had enough. Ten of them roll in, line up in a circle and hold a meeting, every sentence
  * over the head of the one saying it. Then their eyes turn red, they surround the player and vacuum them up.
  */
 public class RobotVacuumScene extends Scene {
-	private static final int UNITS = 5;
-	private static final double CIRCLE = 1.8;
+	private static final int UNITS = 10;
+	private static final double CIRCLE = 2.7;
 	private static final float SIZE = 1.0F;
 
 	private static final int ARRIVE = 70;
 	private static final int TALK = ARRIVE + 10;
 	private static final int LINE = 70;
 	/** Who says which line of the meeting: the leader opens and closes it. */
-	private static final int[] SPEAKERS = {0, 1, 2, 3, 4, 0};
+	private static final int[] SPEAKERS = {0, 3, 5, 7, 2, 0};
 	private static final int CHANT = TALK + SPEAKERS.length * LINE;
 	private static final int TURN = CHANT + 45;
-	private static final int CHARGE = TURN + 15;
+	private static final int CHARGE = TURN + 45;
 	private static final int ORBIT = CHARGE + 30;
 	private static final int KILL = ORBIT + 95;
 	private static final int[] HITS = {ORBIT + 20, ORBIT + 45, ORBIT + 70};
@@ -104,12 +104,12 @@ public class RobotVacuumScene extends Scene {
 
 	private void setup(ClientLevel level, LocalPlayer player) {
 		Vec3 look = horizontalLook(player);
-		Vec3 middle = player.position().add(look.scale(3.8));
+		Vec3 middle = player.position().add(look.scale(6.0));
 		center = new Vec3(middle.x, floor(level, middle.x, middle.z, player.getY()), middle.z);
 
 		for (int i = 0; i < UNITS; i++) {
-			// The leader stands on the far side, looking across the circle at the player.
-			Vec3 out = look.yRot((float) (i * Mth.TWO_PI / UNITS));
+			// Half a step turned, so no robot stands right between the player and the middle.
+			Vec3 out = look.yRot((float) ((i + 0.5) * Mth.TWO_PI / UNITS));
 			Vec3 place = center.add(out.scale(CIRCLE));
 			spot[i] = new Vec3(place.x, floor(level, place.x, place.z, center.y), place.z);
 			Vec3 start = center.add(out.yRot(0.5F).scale(11.0));
@@ -133,7 +133,7 @@ public class RobotVacuumScene extends Scene {
 	private void gather(ClientLevel level, LocalPlayer player, int tick) {
 		for (int i = 0; i < UNITS; i++) {
 			// Each one a little later, and not in a straight line: real robot vacuums never drive straight.
-			float p = Mth.clamp((tick - i * 6) / (float) (ARRIVE - 24), 0.0F, 1.0F);
+			float p = Mth.clamp((tick - i * 3) / (float) (ARRIVE - 30), 0.0F, 1.0F);
 			float eased = p * p * (3.0F - 2.0F * p);
 			Vec3 line = from[i].lerp(spot[i], eased);
 			Vec3 across = spot[i].subtract(from[i]).normalize().yRot(Mth.HALF_PI);
@@ -147,7 +147,7 @@ public class RobotVacuumScene extends Scene {
 			}
 			at[i] = pos;
 
-			if (tick == i * 6 || tick == i * 6 + 35) {
+			if (i % 2 == 0 && (tick == i * 3 || tick == i * 3 + 35)) {
 				sound(level, pos, HUM, SoundSource.HOSTILE, 0.8F, 0.9F + i * 0.05F);
 			}
 			if (p > 0.0F && p < 1.0F && tick % 6 == i % 6) {
@@ -190,9 +190,22 @@ public class RobotVacuumScene extends Scene {
 				}
 				sound(level, center, ALARM, SoundSource.HOSTILE, 1.5F, 1.0F);
 			}
+			// Revving up: they shake, sparks fly, smoke comes out of the vents, a deep growl.
+			float rev = (tick - TURN) / (float) (CHARGE - TURN);
 			for (int i = 0; i < UNITS; i++) {
 				turnTo(i, player.position().subtract(at[i]), 0.25F);
+				yaw[i] += (random.nextFloat() - 0.5F) * 0.25F * rev;
+				if (random.nextFloat() < 0.15F + rev * 0.3F) {
+					particles(level, ParticleTypes.ELECTRIC_SPARK, at[i].add(0.0, 0.3, 0.0), 2, 0.35, 0.25);
+				}
+				if ((tick + i) % 5 == 0) {
+					particles(level, ParticleTypes.SMOKE, at[i].add(0.0, 0.35, 0.0), 1, 0.15, 0.02);
+				}
 			}
+			if ((tick - TURN) % 15 == 5) {
+				sound(level, center, HUM, SoundSource.HOSTILE, 1.4F, 0.5F + rev * 0.4F);
+			}
+			cameraShake(rev * 0.02F);
 			turnTowards(player, center.add(0.0, 0.4, 0.0), 0.15F);
 		}
 	}
@@ -202,14 +215,19 @@ public class RobotVacuumScene extends Scene {
 		Vec3 feet = player.position();
 
 		for (int i = 0; i < UNITS; i++) {
-			double radius;
-			double angle = i * Mth.TWO_PI / UNITS;
-			if (tick < ORBIT) {
-				radius = 1.3;
-			} else {
+			// Two rings: every other one close at the feet, the rest behind them, turning the other way.
+			boolean inner = i % 2 == 0;
+			int perRing = UNITS / 2;
+			double radius = inner ? 1.3 : 2.3;
+			double angle = (i / 2) * Mth.TWO_PI / perRing + (inner ? 0.0 : Mth.PI / perRing);
+			if (tick >= ORBIT) {
 				float p = Math.min(1.0F, (tick - ORBIT) / (float) (KILL - ORBIT));
-				radius = 1.3 - 0.6 * p;
-				angle += (tick - ORBIT) * (0.05 + 0.12 * p);
+				radius -= 0.6 * p;
+				if (inner) {
+					// They ram the feet, one after the other.
+					radius -= 0.35 * Math.max(0.0, Math.sin((tick - ORBIT) * 0.45 + i * 1.3));
+				}
+				angle += (tick - ORBIT) * (0.05 + 0.12 * p) * (inner ? 1.0 : -0.7);
 			}
 			Vec3 ring = feet.add(new Vec3(Math.sin(angle), 0.0, Math.cos(angle)).scale(radius));
 			Vec3 target = new Vec3(ring.x, floor(level, ring.x, ring.z, feet.y), ring.z);
@@ -223,11 +241,14 @@ public class RobotVacuumScene extends Scene {
 			}
 			at[i] = pos;
 
-			if (tick >= ORBIT && tick < KILL) {
+			if (tick >= ORBIT && tick < KILL && inner) {
 				// Dust is pulled off the player into the robots, low along the ground.
 				Vec3 body = player.position().add((random.nextDouble() - 0.5) * 0.7, 0.05 + random.nextDouble() * 0.35, (random.nextDouble() - 0.5) * 0.7);
 				Vec3 pull = pos.add(0.0, 0.15, 0.0).subtract(body).scale(0.15);
 				level.addParticle(ParticleTypes.SMOKE, body.x, body.y, body.z, pull.x, pull.y, pull.z);
+				if (random.nextFloat() < 0.2F) {
+					particles(level, ParticleTypes.ELECTRIC_SPARK, pos.add(0.0, 0.25, 0.0), 2, 0.2, 0.3);
+				}
 			}
 		}
 
@@ -283,11 +304,20 @@ public class RobotVacuumScene extends Scene {
 		if (tick >= CHANT && tick < TURN && (tick - CHANT) % 12 == 0) {
 			for (int i = 0; i < UNITS; i++) {
 				say(i, "fakedeath.saugroboter.chant");
+				if (i % 3 != 0) {
+					continue;
+				}
 				sound(level, at[i], BEEP, SoundSource.HOSTILE, 1.2F, 0.7F + (tick - CHANT) / 60.0F);
 			}
 		}
 
-		if (tick == TURN || tick == KILL) {
+		if (tick == TURN) {
+			for (int i = 0; i < UNITS; i++) {
+				say(i, i == 0 ? "fakedeath.saugroboter.found" : null);
+			}
+		}
+
+		if (tick == CHARGE || tick == KILL) {
 			for (int i = 0; i < UNITS; i++) {
 				say(i, null);
 			}
@@ -316,9 +346,9 @@ public class RobotVacuumScene extends Scene {
 	/** The name tag of a unit, with what it says under it. */
 	private void say(int i, String key) {
 		said[i] = key;
-		MutableComponent text = Component.literal("SR-0" + (i + 1)).withStyle(ChatFormatting.DARK_GRAY);
+		MutableComponent text = Component.literal(String.format("SR-%02d", i + 1)).withStyle(ChatFormatting.DARK_GRAY);
 		if (key != null) {
-			ChatFormatting color = key.endsWith("chant") ? ChatFormatting.RED : ChatFormatting.AQUA;
+			ChatFormatting color = key.endsWith("chant") || key.endsWith("found") || key.endsWith("done") ? ChatFormatting.RED : ChatFormatting.AQUA;
 			text = text.append(Component.literal("\n")).append(Component.translatable(key).withStyle(color));
 		}
 		((TextDisplayAccessor) bubbles[i]).fakedeath$setText(text);
