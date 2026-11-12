@@ -278,12 +278,27 @@ public class RobotVacuumScene extends Scene {
 
 		if (tick == KILL) {
 			cameraShake(0.0F);
+			quiet();
+			// One short slurp, the long suction sound is already gone.
+			sound(level, feet, SoundEvents.ITEM_PICKUP, SoundSource.HOSTILE, 1.5F, 0.5F);
 			particles(level, ParticleTypes.POOF, feet.add(0.0, 0.2, 0.0), 12, 0.9, 0.04);
-			sound(level, feet, SUCK, SoundSource.HOSTILE, 2.0F, 1.8F);
 			kill(level, player, SoundEvents.PLAYER_HURT);
 		}
 
 		turnTowards(player, feet.add(horizontalLook(player).scale(1.6)), 0.12F);
+	}
+
+	/** The hum and the suction are long sounds, they stop with the killing blow and again when the scene is over. */
+	private static void quiet() {
+		Looks.stopOwn("robot.hum");
+		Looks.stopOwn("robot.suck");
+		Looks.stopOwn("robot.alarm");
+	}
+
+	@Override
+	public void end(ClientLevel level, LocalPlayer player) {
+		quiet();
+		super.end(level, player);
 	}
 
 	/** 1 at the moment of a hit, falling off over four ticks before and after it. */

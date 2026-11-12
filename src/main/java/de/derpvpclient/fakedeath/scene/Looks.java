@@ -46,6 +46,11 @@ final class Looks {
 		return SoundEvent.createVariableRangeEvent(net.minecraft.resources.Identifier.fromNamespaceAndPath("fakedeath", path));
 	}
 
+	/** Stops one of the mod's own sounds wherever it is still playing, long ones would run on past the scene. */
+	static void stopOwn(String path) {
+		net.minecraft.client.Minecraft.getInstance().getSoundManager().stop(net.minecraft.resources.Identifier.fromNamespaceAndPath("fakedeath", path), null);
+	}
+
 	/** A pointed dripstone hanging down, the tip or the thicker part above it. */
 	static BlockState dripstone(boolean tip) {
 		return Blocks.POINTED_DRIPSTONE.defaultBlockState()
