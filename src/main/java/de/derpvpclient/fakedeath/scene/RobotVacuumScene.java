@@ -41,7 +41,7 @@ public class RobotVacuumScene extends Scene {
 	private static final int CHARGE = TURN + 45;
 	private static final int ORBIT = CHARGE + 30;
 	private static final int KILL = ORBIT + 95;
-	private static final int[] HITS = {ORBIT + 20, ORBIT + 45, ORBIT + 70};
+	private static final int[] HITS = {ORBIT + 8, ORBIT + 30, ORBIT + 52, ORBIT + 74};
 	private static final int DONE = KILL + 25;
 
 	private static final SoundEvent HUM = Looks.own("robot.hum");
@@ -224,8 +224,8 @@ public class RobotVacuumScene extends Scene {
 				float p = Math.min(1.0F, (tick - ORBIT) / (float) (KILL - ORBIT));
 				radius -= 0.6 * p;
 				if (inner) {
-					// They ram the feet, one after the other.
-					radius -= 0.35 * Math.max(0.0, Math.sin((tick - ORBIT) * 0.45 + i * 1.3));
+					// All of them ram the feet together, and the damage comes right at the moment they hit.
+					radius -= 0.5 * ram(tick);
 				}
 				angle += (tick - ORBIT) * (0.05 + 0.12 * p) * (inner ? 1.0 : -0.7);
 			}
@@ -270,7 +270,9 @@ public class RobotVacuumScene extends Scene {
 
 		for (int hit : HITS) {
 			if (tick == hit) {
-				hurt(level, player, SoundEvents.PLAYER_HURT, 0.25F);
+				hurt(level, player, SoundEvents.PLAYER_HURT, 0.2F);
+				particles(level, ParticleTypes.ELECTRIC_SPARK, feet.add(0.0, 0.2, 0.0), 10, 0.6, 0.3);
+				cameraShake(0.08F);
 			}
 		}
 
@@ -282,6 +284,16 @@ public class RobotVacuumScene extends Scene {
 		}
 
 		turnTowards(player, feet.add(horizontalLook(player).scale(1.6)), 0.12F);
+	}
+
+	/** 1 at the moment of a hit, falling off over four ticks before and after it. */
+	private static double ram(int tick) {
+		double best = 0.0;
+		for (int hit : HITS) {
+			best = Math.max(best, 1.0 - Math.abs(tick - hit) / 4.0);
+		}
+		best = Math.max(best, 1.0 - Math.abs(tick - KILL) / 4.0);
+		return Math.max(0.0, best);
 	}
 
 	/** Every line over the head of the one saying it, beeping along. */
