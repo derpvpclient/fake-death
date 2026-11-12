@@ -1,0 +1,31 @@
+{
+	"robot.hum": {
+		"subtitle": "fakedeath.subtitles.robot.hum",
+		"sounds": [
+			{"name": "minecraft:block/beacon/ambient", "pitch": 1.9, "volume": 0.6},
+			{"name": "minecraft:block/conduit/ambient", "pitch": 1.8, "volume": 0.6}
+		]
+	},
+	"robot.beep": {
+		"subtitle": "fakedeath.subtitles.robot.beep",
+		"sounds": [
+			{"name": "minecraft:note/bit", "volume": 0.7},
+			{"name": "minecraft:note/bit", "pitch": 1.5, "volume": 0.7},
+			{"name": "minecraft:note/pling", "pitch": 1.8, "volume": 0.4}
+		]
+	},
+	"robot.alarm": {
+		"subtitle": "fakedeath.subtitles.robot.alarm",
+		"sounds": [
+			{"name": "minecraft:block/beacon/activate", "pitch": 2.0},
+			{"name": "minecraft:block/respawn_anchor/charge1", "pitch": 1.6}
+		]
+	},
+	"robot.suck": {
+		"subtitle": "fakedeath.subtitles.robot.suck",
+		"sounds": [
+			{"name": "minecraft:item/elytra/elytra_loop", "pitch": 1.6, "volume": 0.8},
+			{"name": "minecraft:block/conduit/attack1", "pitch": 0.7, "volume": 0.6}
+		]
+	}
+}

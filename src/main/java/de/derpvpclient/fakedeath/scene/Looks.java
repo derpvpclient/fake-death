@@ -38,6 +38,11 @@ final class Looks {
 	static final BlockState YELLOW_CONCRETE = DISCO_FLOOR[2];
 	static final SoundEvent PLING = SoundEvents.NOTE_BLOCK_PLING.value();
 
+	/** One of the mod's own sound events from its sounds.json. */
+	static SoundEvent own(String path) {
+		return SoundEvent.createVariableRangeEvent(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("fakedeath", path));
+	}
+
 	/** Puts a saddle on a horse. */
 	static void saddle(net.minecraft.world.entity.animal.horse.AbstractHorse horse) {
 		horse.equipSaddle(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SADDLE), null);
@@ -90,7 +95,7 @@ final class Looks {
 	/** 1.21.1 has no item_model component: the props are custom_model_data overrides on the base item, ids 4711000 + index. */
 	private static final java.util.List<String> PROPS = java.util.List.of("barber_scissors", "briefcase", "chimney_brush", "clipboard",
 		"dental_drill", "dumbbell", "invoice", "magic_saw", "mop", "phone", "pipe_wrench", "police_baton", "police_camera", "present",
-		"screwdriver", "selfie_stick", "soup_ladle", "syringe", "tarot_card", "roast_chicken", "rubber_stamp");
+		"screwdriver", "selfie_stick", "soup_ladle", "syringe", "tarot_card", "roast_chicken", "rubber_stamp", "robot_vacuum", "robot_vacuum_angry");
 
 	static net.minecraft.world.item.ItemStack prop(net.minecraft.world.item.Item base, String model) {
 		net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(base);

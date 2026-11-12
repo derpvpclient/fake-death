@@ -1,0 +1,10 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:item/iron_nugget"
+  },
+  "overrides": [
+    { "predicate": { "custom_model_data": 4711021 }, "model": "fakedeath:item/robot_vacuum" },
+    { "predicate": { "custom_model_data": 4711022 }, "model": "fakedeath:item/robot_vacuum_angry" }
+  ]
+}

@@ -23,7 +23,8 @@
 		"OptionsScreenMixin",
 		"PlayerModelMixin",
 		"PlayerRendererMixin",
-		"SpellcasterIllagerAccessor"
+		"SpellcasterIllagerAccessor",
+		"TextDisplayAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1
