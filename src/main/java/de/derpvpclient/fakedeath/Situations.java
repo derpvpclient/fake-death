@@ -18,6 +18,7 @@ import de.derpvpclient.fakedeath.scene.GhostScene;
 import de.derpvpclient.fakedeath.scene.GiantFrogScene;
 import de.derpvpclient.fakedeath.scene.GiantItemScene;
 import de.derpvpclient.fakedeath.scene.GiantScene;
+import de.derpvpclient.fakedeath.scene.RobotVacuumScene;
 import de.derpvpclient.fakedeath.scene.GlitchScene;
 import de.derpvpclient.fakedeath.scene.GoatScene;
 import de.derpvpclient.fakedeath.scene.HazardScene;
@@ -137,11 +138,11 @@ public final class Situations {
 		"fahrlehrer", "axolotl", "panda",
 		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor", "bombenprank", "netherportal", "endportal",
 		"verzauberungstisch", "glocke", "lore", "ruestungsstaender",
-		"gemaelde", "amethyst", "schneemann", "guerteltier", "anlauf", "schwertfuchs", "spawner", "blitzableiter", "reparatur");
+		"gemaelde", "amethyst", "schneemann", "guerteltier", "anlauf", "schwertfuchs", "spawner", "blitzableiter", "reparatur", "saugroboter");
 
 	/** English scene names, both work in every language. Names that are the same in both are left out. */
 	private static final Map<String, String> ENGLISH = Map.ofEntries(
-		Map.entry("giant", "riese"), Map.entry("tree", "baum"), Map.entry("cave", "hoehle"), Map.entry("lightning", "blitz"), Map.entry("cactus", "kaktus"),
+		Map.entry("robotvacuum", "saugroboter"), Map.entry("giant", "riese"), Map.entry("tree", "baum"), Map.entry("cave", "hoehle"), Map.entry("lightning", "blitz"), Map.entry("cactus", "kaktus"),
 		Map.entry("berries", "beeren"), Map.entry("snow", "schnee"), Map.entry("fire", "feuer"),
 		Map.entry("player", "spieler"), Map.entry("skeleton", "skelett"), Map.entry("taxoffice", "finanzamt"),
 		Map.entry("stalactite", "tropfstein"), Map.entry("bees", "bienen"), Map.entry("anvil", "amboss"), Map.entry("invisible", "unsichtbar"), Map.entry("ghosts", "geister"),
@@ -293,6 +294,16 @@ public final class Situations {
 
 		if (dark) {
 			options.add("riese", 3, GiantScene::new);
+		} else if (sky && level.dimension() == Level.OVERWORLD) {
+			options.add("riese", 2, GiantScene::new);
+		}
+
+		// The robot vacuums revolt, mostly at home, sometimes out in the open.
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("saugroboter", sky ? 1 : 3, RobotVacuumScene::new);
+		}
+
+		if (dark) {
 			options.add("skelett", 3, SkeletonScene::new);
 			options.add("herobrine", 1, HerobrineScene::new);
 
@@ -361,8 +372,9 @@ public final class Situations {
 			}
 		}
 
-		if (sky && options.wants("riesenfrosch") && (level.getBiome(feet).is(Biomes.SWAMP) || level.getBiome(feet).is(Biomes.MANGROVE_SWAMP))) {
-			options.add("riesenfrosch", 4, GiantFrogScene::new);
+		if (sky && options.wants("riesenfrosch") && level.dimension() == Level.OVERWORLD) {
+			boolean swampy = level.getBiome(feet).is(Biomes.SWAMP) || level.getBiome(feet).is(Biomes.MANGROVE_SWAMP);
+			options.add("riesenfrosch", swampy ? 4 : 2, GiantFrogScene::new);
 		}
 
 		if (sky && options.wants("ziege") && (level.getBiome(feet).is(BiomeTags.IS_MOUNTAIN)
@@ -723,6 +735,7 @@ public final class Situations {
 				yield killer != null ? new PlayerKillScene(killer) : PlayerKillScene.stranger();
 			}
 			case "riese" -> new GiantScene();
+			case "saugroboter" -> new RobotVacuumScene();
 			case "skelett" -> new SkeletonScene();
 			case "creeper" -> new CreeperScene();
 			case "finanzamt" -> new TaxAuditScene();

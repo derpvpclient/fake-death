@@ -38,6 +38,11 @@ final class Looks {
 	static final BlockState YELLOW_CONCRETE = DISCO_FLOOR[2];
 	static final SoundEvent PLING = SoundEvents.NOTE_BLOCK_PLING.value();
 
+	/** One of the mod's own sound events from its sounds.json. */
+	static SoundEvent own(String path) {
+		return SoundEvent.createVariableRangeEvent(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("fakedeath", path));
+	}
+
 	/** Puts a saddle on a horse. */
 	static void saddle(net.minecraft.world.entity.animal.horse.AbstractHorse horse) {
 		horse.equipSaddle(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SADDLE), null);
