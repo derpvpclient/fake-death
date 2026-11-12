@@ -43,6 +43,11 @@ final class Looks {
 		return SoundEvent.createVariableRangeEvent(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("fakedeath", path));
 	}
 
+	/** Stops one of the mod's own sounds wherever it is still playing, long ones would run on past the scene. */
+	static void stopOwn(String path) {
+		net.minecraft.client.Minecraft.getInstance().getSoundManager().stop(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("fakedeath", path), null);
+	}
+
 	/** Puts a saddle on a horse. */
 	static void saddle(net.minecraft.world.entity.animal.horse.AbstractHorse horse) {
 		horse.setItemSlot(net.minecraft.world.entity.EquipmentSlot.SADDLE, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SADDLE));
