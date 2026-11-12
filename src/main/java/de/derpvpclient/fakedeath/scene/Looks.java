@@ -41,6 +41,11 @@ final class Looks {
 	private Looks() {
 	}
 
+	/** One of the mod's own sound events from its sounds.json. */
+	static SoundEvent own(String path) {
+		return SoundEvent.createVariableRangeEvent(net.minecraft.resources.Identifier.fromNamespaceAndPath("fakedeath", path));
+	}
+
 	/** A pointed dripstone hanging down, the tip or the thicker part above it. */
 	static BlockState dripstone(boolean tip) {
 		return Blocks.POINTED_DRIPSTONE.defaultBlockState()

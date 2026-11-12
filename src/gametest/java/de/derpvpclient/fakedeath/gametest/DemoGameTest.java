@@ -74,6 +74,17 @@ public class DemoGameTest implements FabricClientGameTest {
 				int max = de.derpvpclient.fakedeath.FakeDeathConfig.randomMaxMinutes * 1200;
 				result.append("timer after switching on: ").append(rolled).append(rolled >= min - 200 && rolled <= max ? " ok" : " WRONG").append(System.lineSeparator());
 
+				// Which scenes the event picks here, by day on open ground: a hundred rolls.
+				java.util.Map<String, Integer> mix = context.computeOnClient(client -> {
+					java.util.Map<String, Integer> counts = new java.util.TreeMap<>();
+					for (int i = 0; i < 400; i++) {
+						de.derpvpclient.fakedeath.scene.Scene scene = de.derpvpclient.fakedeath.Situations.pick(client.level, client.player);
+						counts.merge(scene == null ? "none" : scene.getClass().getSimpleName(), 1, Integer::sum);
+					}
+					return counts;
+				});
+				result.append("400 picks: ").append(mix).append(System.lineSeparator());
+
 				// A monster close by holds it back.
 				singleplayer.getServer().runCommand("difficulty easy");
 				singleplayer.getServer().runCommand("execute as @a at @s run summon minecraft:husk ~4 ~ ~ {NoAI:1b,Silent:1b,PersistenceRequired:1b}");
