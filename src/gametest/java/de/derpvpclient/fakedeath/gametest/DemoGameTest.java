@@ -14,7 +14,11 @@ public class DemoGameTest implements FabricClientGameTest {
 	@Override
 	public void runTest(ClientGameTestContext context) {
 		// Tests run silently.
-		context.runOnClient(client -> client.options.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.MASTER).set(0.0));
+		if (!Boolean.getBoolean("fakedeath.demoSound")) {
+			context.runOnClient(client -> client.options.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.MASTER).set(0.0));
+		} else {
+			context.runOnClient(client -> client.options.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.MASTER).set(0.6));
+		}
 		if (Boolean.getBoolean("fakedeath.demoUi")) {
 			// Only the test screen: opened by the real command, a tab, a search, each one as a picture.
 			try (TestSingleplayerContext singleplayer = context.worldBuilder().create()) {
