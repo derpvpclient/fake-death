@@ -23,7 +23,8 @@
 		"MultiPlayerGameModeMixin",
 		"OptionsScreenMixin",
 		"PlayerModelMixin",
-		"SpellcasterIllagerAccessor"
+		"SpellcasterIllagerAccessor",
+		"TextDisplayAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

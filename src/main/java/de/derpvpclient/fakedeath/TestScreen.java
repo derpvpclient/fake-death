@@ -31,7 +31,7 @@ public class TestScreen extends Screen {
 		"animals", List.of("bienen", "woelfe", "froesche", "riesenfrosch", "silberfische", "ziege", "fledermaeuse", "papagei", "delfin",
 			"kamel", "fuchs", "huehner", "bienennest", "axolotl", "panda", "katzen", "allay", "ziegenchor"),
 		"monsters", List.of("spieler", "riese", "skelett", "creeper", "unsichtbar", "herobrine", "slenderman", "phantom", "geister",
-			"doppelgaenger", "ertrunkener", "magier", "ueberfall", "ghast", "enderman"),
+			"doppelgaenger", "ertrunkener", "magier", "ueberfall", "ghast", "enderman", "saugroboter"),
 		"characters", List.of("finanzamt", "paketbote", "mama", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker",
 			"zauberer", "klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch", "fahrlehrer",
 			"wahrsagerin", "weihnachtsmann", "werbung", "oma", "kellner", "navi", "bombenprank"));
