@@ -69,7 +69,7 @@ public final class FakeDeathSodiumPage implements ConfigEntryPoint {
 				.addOptionGroup(general));
 
 		// One page per scene group, the same groups as in the test screen, each sorted by name.
-		for (String group : List.of("world", "animals", "monsters", "characters")) {
+		for (String group : List.of("world", "animals", "monsters", "characters", "famous")) {
 			List<String> ids = Situations.NAMES.stream()
 				.filter(scene -> TestScreen.categoryOf(scene).equals(group))
 				.sorted(Comparator.comparing(scene -> Component.translatable("fakedeath.scene." + scene).getString()))

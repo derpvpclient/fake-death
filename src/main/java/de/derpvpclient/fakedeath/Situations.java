@@ -19,6 +19,11 @@ import de.derpvpclient.fakedeath.scene.GiantFrogScene;
 import de.derpvpclient.fakedeath.scene.GiantItemScene;
 import de.derpvpclient.fakedeath.scene.GiantScene;
 import de.derpvpclient.fakedeath.scene.RobotVacuumScene;
+import de.derpvpclient.fakedeath.scene.SkyscraperScene;
+import de.derpvpclient.fakedeath.scene.BlackRavenScene;
+import de.derpvpclient.fakedeath.scene.MonumentScene;
+import de.derpvpclient.fakedeath.scene.RevolutionScene;
+import de.derpvpclient.fakedeath.scene.MausoleumScene;
 import de.derpvpclient.fakedeath.scene.KittenScene;
 import de.derpvpclient.fakedeath.scene.StalinScene;
 import de.derpvpclient.fakedeath.scene.PutinScene;
@@ -145,7 +150,7 @@ public final class Situations {
 		"fahrlehrer", "axolotl", "panda",
 		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor", "bombenprank", "netherportal", "endportal",
 		"verzauberungstisch", "glocke", "lore", "ruestungsstaender",
-		"gemaelde", "amethyst", "schneemann", "guerteltier", "anlauf", "schwertfuchs", "spawner", "blitzableiter", "reparatur", "saugroboter", "trumpmauer", "trumprakete", "ulbricht", "merkel", "putin", "stalin", "kaetzchen");
+		"gemaelde", "amethyst", "schneemann", "guerteltier", "anlauf", "schwertfuchs", "spawner", "blitzableiter", "reparatur", "saugroboter", "trumpmauer", "trumprakete", "ulbricht", "merkel", "putin", "stalin", "kaetzchen", "mausoleum", "revolution", "denkmal", "schwarzerrabe", "hochhaus");
 
 	/** English scene names, both work in every language. Names that are the same in both are left out. */
 	private static final Map<String, String> ENGLISH = Map.ofEntries(
@@ -167,7 +172,7 @@ public final class Situations {
 		Map.entry("satnav", "navi"), Map.entry("waiter", "kellner"), Map.entry("cats", "katzen"), Map.entry("goatchoir", "ziegenchor"), Map.entry("bombprank", "bombenprank"),
 		Map.entry("enchantingtable", "verzauberungstisch"), Map.entry("bell", "glocke"), Map.entry("minecart", "lore"), Map.entry("armorstand", "ruestungsstaender"),
 		Map.entry("painting", "gemaelde"), Map.entry("snowman", "schneemann"), Map.entry("armadillo", "guerteltier"), Map.entry("goatcharge", "anlauf"),
-		Map.entry("swordfox", "schwertfuchs"), Map.entry("lightningrod", "blitzableiter"), Map.entry("repair", "reparatur"), Map.entry("trumpwall", "trumpmauer"), Map.entry("trumprocket", "trumprakete"), Map.entry("ulbricht", "ulbricht"), Map.entry("merkel", "merkel"), Map.entry("putin", "putin"), Map.entry("stalin", "stalin"), Map.entry("kittens", "kaetzchen"));
+		Map.entry("swordfox", "schwertfuchs"), Map.entry("lightningrod", "blitzableiter"), Map.entry("repair", "reparatur"), Map.entry("trumpwall", "trumpmauer"), Map.entry("trumprocket", "trumprakete"), Map.entry("ulbricht", "ulbricht"), Map.entry("merkel", "merkel"), Map.entry("putin", "putin"), Map.entry("stalin", "stalin"), Map.entry("kittens", "kaetzchen"), Map.entry("mausoleum", "mausoleum"), Map.entry("revolution", "revolution"), Map.entry("monument", "denkmal"), Map.entry("blackraven", "schwarzerrabe"), Map.entry("skyscraper", "hochhaus"));
 
 	public static final List<String> ENGLISH_NAMES = NAMES.stream()
 		.map(name -> ENGLISH.entrySet().stream().filter(entry -> entry.getValue().equals(name)).map(Map.Entry::getKey).findFirst().orElse(name))
@@ -329,6 +334,21 @@ public final class Situations {
 		}
 		if (level.dimension() == Level.OVERWORLD) {
 			options.add("kaetzchen", 2, KittenScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("mausoleum", dark ? 2 : 1, MausoleumScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("revolution", sky ? 2 : 1, RevolutionScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("denkmal", sky ? 2 : 0, MonumentScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("schwarzerrabe", dark ? 3 : 0, BlackRavenScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("hochhaus", sky ? 2 : 0, SkyscraperScene::new);
 		}
 		// The robot vacuums revolt, mostly at home, sometimes out in the open.
 		if (level.dimension() == Level.OVERWORLD) {
@@ -769,6 +789,11 @@ public final class Situations {
 			}
 			case "riese" -> new GiantScene();
 			case "saugroboter" -> new RobotVacuumScene();
+			case "hochhaus" -> new SkyscraperScene();
+			case "schwarzerrabe" -> new BlackRavenScene();
+			case "denkmal" -> new MonumentScene();
+			case "revolution" -> new RevolutionScene();
+			case "mausoleum" -> new MausoleumScene();
 			case "kaetzchen" -> new KittenScene();
 			case "stalin" -> new StalinScene();
 			case "putin" -> new PutinScene();

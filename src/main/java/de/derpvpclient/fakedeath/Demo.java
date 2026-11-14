@@ -189,6 +189,15 @@ final class Demo {
 
 	/** With -Dfakedeath.demoView=all every scene plays three times: from the eyes, from behind (F5) and from the front (F5 twice). */
 	private static List<String> withViews(List<String> scenes) {
+		if (VIEW.equals("f5")) {
+			// Only from outside: behind and in front.
+			List<String> outside = new ArrayList<>();
+			for (String scene : scenes) {
+				outside.add(scene + "-v2back");
+				outside.add(scene + "-v3front");
+			}
+			return outside;
+		}
 		if (!VIEW.equals("all")) {
 			return scenes;
 		}
