@@ -38,6 +38,9 @@ public class CaretakerScene extends NpcScene {
 	private static final int DROP = PEEKED + 40;
 	private static final int HIT = DROP + 12;
 	private static final int MOP_EVERY = 16;
+	/** Before the slide he mops right under the feet, and the last swipe of the mop takes them away. */
+	private static final int SWEEP = 18;
+	private static final int SWIPE = 13;
 
 	private final List<Display.BlockDisplay> puddles = new ArrayList<>();
 	private Vec3 slideDir;
@@ -47,6 +50,7 @@ public class CaretakerScene extends NpcScene {
 	private boolean landed;
 	private Display.ItemDisplay bucket;
 	private Vec3 dropFrom;
+	private Vec3 sweepFrom;
 
 	public CaretakerScene() {
 		super("hausmeister", ChatFormatting.DARK_GREEN);
@@ -59,7 +63,7 @@ public class CaretakerScene extends NpcScene {
 
 	@Override
 	protected int actLength() {
-		return HIT + 40;
+		return SWEEP + HIT + 40;
 	}
 
 	@Override
@@ -74,6 +78,10 @@ public class CaretakerScene extends NpcScene {
 
 	@Override
 	protected Vec3 focus(LocalPlayer player) {
+		if (sweepFrom != null && slideDir == null) {
+			// Looking down at the mop sweeping around the own feet.
+			return player.position().add(0.0, 0.1, 0.0);
+		}
 		if (slideDir == null) {
 			return npc.getEyePosition();
 		}
@@ -143,6 +151,45 @@ public class CaretakerScene extends NpcScene {
 
 	@Override
 	protected void act(Minecraft minecraft, ClientLevel level, LocalPlayer player, int t) {
+		if (t < SWEEP) {
+			sweep(minecraft, level, player, t);
+			return;
+		}
+		slide(minecraft, level, player, t - SWEEP);
+	}
+
+	/** He steps up to the player and mops the floor right around their feet, soap and water everywhere; the last swipe sweeps the feet away. */
+	private void sweep(Minecraft minecraft, ClientLevel level, LocalPlayer player, int t) {
+		Vec3 dir = towardPlayer(player);
+		if (t == 0) {
+			sweepFrom = npc.position();
+			speak(minecraft, level, "fakedeath.hausmeister.feet");
+		}
+		Vec3 feet = player.position();
+		Vec3 beside = feet.subtract(dir.scale(1.2));
+		float p = Math.min(1.0F, t / 8.0F);
+		Vec3 at = sweepFrom.lerp(beside, p);
+		walk(npc, new Vec3(at.x, floor(level, at.x, at.z, player.getY()), at.z));
+		face(npc, feet);
+		if (t % 4 == 1) {
+			Looks.swing(npc);
+			particles(level, ParticleTypes.SPLASH, feet.add(0.0, 0.1, 0.0), 12, 0.35, 0.15);
+			particles(level, ParticleTypes.BUBBLE_POP, feet.add(0.0, 0.15, 0.0), 6, 0.3, 0.02);
+			sound(level, feet, SoundEvents.BUCKET_EMPTY, SoundSource.NEUTRAL, 0.4F, 1.7F);
+		}
+		if (t == SWIPE) {
+			// The big swipe: the mop goes right through the feet.
+			Looks.swing(npc);
+			sound(level, feet, SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.NEUTRAL, 1.0F, 1.2F);
+			particles(level, ParticleTypes.SPLASH, feet.add(0.0, 0.1, 0.0), 30, 0.5, 0.3);
+		}
+		if (t > SWIPE) {
+			// The feet go, the body tips back for a moment.
+			moveCamera(new Vec3(0.0, -0.08 * (t - SWIPE), 0.0));
+		}
+	}
+
+	private void slide(Minecraft minecraft, ClientLevel level, LocalPlayer player, int t) {
 		if (t == 0) {
 			// Away from the caretaker, over the wet floor, to the hatch he left open.
 			slideDir = towardPlayer(player);

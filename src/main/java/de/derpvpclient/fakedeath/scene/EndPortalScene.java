@@ -21,19 +21,32 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
- * The eyes of ender leave the frame of the End portal one by one, hover, and stare at the player. Then they circle
- * closer and closer, peck, and at the end all of them strike at once.
+ * The eyes of ender leave the frame of the End portal one by one, hover, and stare at the player. With its eyes gone the
+ * portal goes out. The frame trembles, the dragon roars far away, the eyes circle closer and closer and peck. Then black
+ * nothing rises out of the dead portal, up over the feet, the chest, the eyes, while all the eyes strike at once.
  */
 public class EndPortalScene extends Scene {
 	private static final int MAX_EYES = 12;
 	private static final int CIRCLE = 60;
 	private static final int STRIKE = 150;
+	/** All eyes are out: the portal goes dark. */
+	private static final int OUT = 48;
+	/** The black nothing starts to rise. */
+	private static final int RISE = STRIKE - 45;
 	private static final int[] PECKS = {CIRCLE + 35, CIRCLE + 58, CIRCLE + 76};
 	private final BlockPos found;
 	private final List<Vec3> homes = new ArrayList<>();
 	private final List<BlockPos> frames = new ArrayList<>();
 	private final List<Display.ItemDisplay> eyes = new ArrayList<>();
 	private Vec3 center;
+	private final List<BlockPos> portal = new ArrayList<>();
+	private Display.BlockDisplay voidSheet;
+	private float dark;
+
+	@Override
+	public int screenTint() {
+		return dark > 0.0F ? ((int) (Math.min(dark, 1.0F) * 240.0F) << 24) : 0;
+	}
 
 	public EndPortalScene(BlockPos portal) {
 		this.found = portal;
@@ -77,6 +90,29 @@ public class EndPortalScene extends Scene {
 			sound(level, home, SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.BLOCKS, 1.0F, 0.7F + i * 0.06F);
 			particles(level, ParticleTypes.PORTAL, home, 12, 0.2, 0.6);
 		}
+
+		if (tick == OUT) {
+			// No eyes, no portal: it goes out with a dying hum.
+			for (BlockPos pos : portal) {
+				replaceBlock(level, pos, Blocks.AIR.defaultBlockState());
+				particles(level, ParticleTypes.REVERSE_PORTAL, Vec3.atCenterOf(pos), 6, 0.4, 0.2);
+			}
+			sound(level, center, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 2.0F, 0.5F);
+			sound(level, center, SoundEvents.RESPAWN_ANCHOR_DEPLETE.value(), SoundSource.BLOCKS, 1.5F, 0.6F);
+		}
+		if (tick >= OUT && tick < STRIKE) {
+			// The frame trembles, the dust of the End is drawn into the dead portal.
+			cameraShake(0.03F + (tick - OUT) * 0.0006F);
+			for (int i = 0; i < 3; i++) {
+				Vec3 from = center.add((random.nextDouble() - 0.5) * 8.0, random.nextDouble() * 3.0, (random.nextDouble() - 0.5) * 8.0);
+				Vec3 speed = center.subtract(from).scale(0.06);
+				level.addParticle(ParticleTypes.PORTAL, from.x, from.y, from.z, speed.x, speed.y, speed.z);
+			}
+		}
+		if (tick == CIRCLE + 10) {
+			sound(level, center.add(0.0, 20.0, 0.0), SoundEvents.ENDER_DRAGON_GROWL, SoundSource.HOSTILE, 4.0F, 0.8F);
+		}
+		rise(level, player, tick);
 
 		Vec3 head = player.getEyePosition();
 		turnTowards(player, center.add(0.0, 1.6, 0.0), 0.12F);
@@ -125,12 +161,35 @@ public class EndPortalScene extends Scene {
 		}
 	}
 
+	/** Black nothing rising out of the dead portal: a sheet of pure black around the player, from below up over the eyes. */
+	private void rise(ClientLevel level, LocalPlayer player, int tick) {
+		if (tick == RISE) {
+			voidSheet = blockDisplay(level, Looks.BLACK_CONCRETE, player.position(), 16.0F);
+			((de.derpvpclient.fakedeath.mixin.DisplayAccessor) voidSheet).fakedeath$setBrightnessOverride(new net.minecraft.util.Brightness(0, 0));
+			sound(level, player.position(), SoundEvents.WARDEN_SONIC_CHARGE, SoundSource.HOSTILE, 1.0F, 0.5F);
+		}
+		if (voidSheet == null) {
+			return;
+		}
+		float p = Math.min(1.0F, (tick - RISE) / (float) (STRIKE - RISE));
+		double top = player.getY() - 2.0 + p * (player.getEyeHeight() + 2.3);
+		Vec3 at = new Vec3(player.getX(), top - 1.5, player.getZ());
+		place(voidSheet, at, new Vector3f(9.0F, 3.0F, 9.0F), new Quaternionf());
+		dark = p * p * 0.9F;
+		if (tick % 10 == 0) {
+			sound(level, player.position(), SoundEvents.SCULK_BLOCK_SPREAD, SoundSource.HOSTILE, 1.5F, 0.5F);
+		}
+	}
+
 	/** Every frame around gives one eye. Where there are too few, as at the portal in the End, the rest comes out of the portal itself. */
 	private void prepare(ClientLevel level) {
 		for (BlockPos pos : BlockPos.betweenClosed(found.offset(-5, -2, -5), found.offset(5, 2, 5))) {
 			if (homes.size() < MAX_EYES && level.getBlockState(pos).is(Blocks.END_PORTAL_FRAME)) {
 				frames.add(pos.immutable());
 				homes.add(Vec3.atBottomCenterOf(pos).add(0.0, 0.95, 0.0));
+			}
+			if (level.getBlockState(pos).is(Blocks.END_PORTAL)) {
+				portal.add(pos.immutable());
 			}
 		}
 

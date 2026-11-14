@@ -52,7 +52,8 @@ public class TreeScene extends Scene {
 
 	@Override
 	public int screenTint() {
-		if (now < IMPACT) {
+		if (now < IMPACT || thirdPerson()) {
+			// Only from the eyes: buried under the leaves. From outside (F5) the body is seen lying under the tree.
 			return 0;
 		}
 		return (Math.min(150, (now - IMPACT + 1) * 40) << 24) | 0x1C3410;
@@ -230,7 +231,7 @@ public class TreeScene extends Scene {
 			sink = drop;
 		} else {
 			// A small bounce on the ground, then it lies still.
-			angle = tick == IMPACT + 1 ? LYING_ANGLE - 3.0F : LYING_ANGLE;
+			angle = tick == IMPACT + 1 ? LYING_ANGLE - 5.0F : tick == IMPACT + 2 ? LYING_ANGLE - 2.0F : tick == IMPACT + 3 ? LYING_ANGLE - 0.6F : LYING_ANGLE;
 			sink = drop;
 		}
 
@@ -243,6 +244,20 @@ public class TreeScene extends Scene {
 
 		if (tick == 5 || tick == 14 || tick == 22 || tick == 29) {
 			sound(level, pivot.add(0, 2, 0), SoundEvents.WOOD_BREAK, SoundSource.BLOCKS, 2.0F, 0.45F + random.nextFloat() * 0.1F);
+		}
+
+		if (tick < WOBBLE && tick % 5 == 2) {
+			// Chips fly out of the cut while the trunk gives way.
+			particles(level, new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK, logState), pivot.add(0.0, 0.4, 0.0), 5, 0.25, 0.15);
+		}
+		if (tick == WOBBLE) {
+			// The last fibres snap, then it goes.
+			sound(level, pivot.add(0, 1, 0), SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, SoundSource.BLOCKS, 1.4F, 0.5F);
+			particles(level, new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK, logState), pivot.add(0.0, 0.5, 0.0), 20, 0.35, 0.25);
+		}
+		if (tick > WOBBLE && tick < IMPACT && tick % 4 == 0) {
+			// The crown rushes through the air.
+			sound(level, worldCenter(parts.get(logs.size() - 1), rotation, sink), SoundEvents.AZALEA_LEAVES_STEP, SoundSource.BLOCKS, 1.5F, 0.6F + (tick - WOBBLE) * 0.03F);
 		}
 
 		if (tick == 8) {
@@ -278,6 +293,12 @@ public class TreeScene extends Scene {
 		if (tick == IMPACT) {
 			impact(level, player, rotation, sink);
 		}
+	}
+
+	@Override
+	public float lying() {
+		// In F5 the body lies flat under the fallen tree.
+		return now >= IMPACT ? 1.0F : 0.0F;
 	}
 
 	private void setUp(ClientLevel level, LocalPlayer player) {
