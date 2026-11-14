@@ -52,12 +52,6 @@ public final class FakeDeathSodiumPage implements ConfigEntryPoint {
 				.setTooltip(Component.translatable("fakedeath.options.flashing.tooltip"))
 				.setDefaultValue(true)
 				.setBinding(value -> FakeDeathConfig.flashing = value, () -> FakeDeathConfig.flashing)
-				.setStorageHandler(FakeDeathConfig::save))
-			.addOption(builder.createBooleanOption(id("update_check"))
-				.setName(Component.translatable("fakedeath.options.update_check"))
-				.setTooltip(Component.translatable("fakedeath.options.update_check.tooltip"))
-				.setDefaultValue(true)
-				.setBinding(value -> FakeDeathConfig.updateCheck = value, () -> FakeDeathConfig.updateCheck)
 				.setStorageHandler(FakeDeathConfig::save));
 		// The test screen is only for the developer.
 		if (FakeDeathClient.isDeveloper()) {

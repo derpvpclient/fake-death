@@ -27,8 +27,6 @@
 	"fakedeath.options.general": "General",
 	"fakedeath.options.all_on": "All scenes on",
 	"fakedeath.options.all_off": "All scenes off",
-	"fakedeath.options.update_check": "Update Notice",
-	"fakedeath.options.update_check.tooltip": "Shows in Mod Menu when a newer version is out on Modrinth and CurseForge. Nothing is downloaded automatically.",
 	"fakedeath.update.message": "v%s on Modrinth and CurseForge",
 	"fakedeath.update.message.curseforge": "v%s on CurseForge and Modrinth",
 	"fakedeath.message.all_off": "Every scene that would fit here is switched off in the settings.",
