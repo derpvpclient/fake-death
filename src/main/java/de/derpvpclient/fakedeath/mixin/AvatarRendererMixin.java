@@ -17,9 +17,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class AvatarRendererMixin {
 	@Inject(method = "extractRenderState(Lnet/minecraft/world/entity/Avatar;Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;F)V", at = @At("TAIL"))
 	private void fakedeath$lying(Avatar entity, AvatarRenderState state, float partialTicks, CallbackInfo ci) {
+		// The people in the scenes wear the mod's own skins, some without a name over the head.
+		net.minecraft.world.entity.player.PlayerSkin skin = de.derpvpclient.fakedeath.scene.Skins.of(entity.getId());
+		if (skin != null) {
+			state.skin = skin;
+			if (de.derpvpclient.fakedeath.scene.Skins.hidesName(entity.getId())) {
+				state.nameTag = null;
+			}
+		}
+		de.derpvpclient.fakedeath.scene.Skins.posed(state, de.derpvpclient.fakedeath.scene.Skins.poseOf(entity.getId()));
 		Scene scene = FakeDeath.currentScene();
 		if (entity == Minecraft.getInstance().player) {
 			CameraDirector.pushUpState = scene != null && scene.pushUp() ? state : null;
+		}
+		if (entity == Minecraft.getInstance().player && scene != null && scene.hidesBody()) {
+			state.isInvisible = true;
+			state.isInvisibleToPlayer = true;
 		}
 		if (entity != Minecraft.getInstance().player || scene == null || scene.lying() <= 0.0F) {
 			return;

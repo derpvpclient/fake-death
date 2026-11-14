@@ -1,138 +1,153 @@
 package de.derpvpclient.fakedeath.scene;
 
+import com.mojang.math.Transformation;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Display;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 /**
- * Cactus pinball: the player steps back right into a cactus, jumps away from the sting, straight into the next one,
- * bounces off that one into the next, faster and faster, until there are no hearts left.
+ * The desert comes alive. The sand trembles, and all around the player cacti shoot up out of the ground, a whole ring
+ * of them, three blocks tall. Then the ring starts to move: the cacti slide closer, scraping through the sand, tighter
+ * and tighter, every touch a sting, until they press together right on the player.
  */
 public class CactusScene extends Scene {
-	private static final int STEP_BACK = 18;
-	/** The moments the player hits a cactus, each flight shorter than the one before. */
-	private static final int[] HITS = {30, 46, 59, 69, 77};
-	/** Where the cacti stand, as angles from the view and distances: behind, front right, left, back right, front right again. */
-	private static final double[][] SPOTS = {{180.0, 1.3}, {40.0, 2.3}, {-80.0, 2.4}, {140.0, 2.3}};
-	private static final int[] ORDER = {0, 1, 2, 3, 1};
+	private static final int COUNT = 12;
+	private static final double START = 4.5;
+	private static final double END = 0.55;
+	private static final int TREMBLE = 25;
+	private static final int GROW_EVERY = 3;
+	private static final int GROW = 10;
+	private static final int CLOSE = TREMBLE + COUNT * GROW_EVERY + GROW + 15;
+	private static final int CLOSE_TICKS = 80;
+	private static final double[] STINGS = {1.6, 1.15, 0.85};
 
-	private final BlockPos found;
-	private final List<Vec3> cacti = new ArrayList<>();
-	private Vec3 look;
-	private Vec3 offset = Vec3.ZERO;
-
-	/** @param found a real cactus right next to the player, used as the first one, or null */
-	public CactusScene(BlockPos found) {
-		this.found = found;
-	}
+	private final List<Column> columns = new ArrayList<>();
+	private Vec3 center;
+	private BlockState ground;
+	private int stung;
 
 	@Override
 	public int length() {
-		return HITS[HITS.length - 1] + 25;
+		return CLOSE + CLOSE_TICKS + 2;
 	}
 
 	@Override
 	public int photoTick() {
-		return HITS[2] - 4;
+		return CLOSE + CLOSE_TICKS / 2;
 	}
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
-		return Component.translatable("death.attack.cactus", player.getDisplayName());
+		return Component.translatable("fakedeath.death.kaktus", player.getDisplayName());
 	}
 
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
-		Vec3 eyes = player.getEyePosition();
 		if (tick == 0) {
-			look = horizontalLook(player);
-			for (int i = 0; i < SPOTS.length; i++) {
-				Vec3 at = player.position().add(look.yRot((float) Math.toRadians(SPOTS[i][0])).scale(SPOTS[i][1]));
-				BlockPos pos = i == 0 && found != null ? found : grow(level, BlockPos.containing(at));
-				cacti.add(pos != null ? Vec3.atBottomCenterOf(pos) : new Vec3(at.x, player.getY(), at.z));
+			center = player.position();
+			ground = level.getBlockState(player.blockPosition().below());
+			if (ground.isAir()) {
+				ground = Blocks.SAND.defaultBlockState();
 			}
 		}
 
-		// Where the camera is: still, a step back, then flying from cactus to cactus.
-		Vec3 target;
-		if (tick < STEP_BACK) {
-			target = Vec3.ZERO;
-			look(player, eyes.add(look.scale(5.0)).add(0.0, -0.5, 0.0), 0.1F);
-		} else if (tick <= HITS[0]) {
-			float p = (tick - STEP_BACK) / (float) (HITS[0] - STEP_BACK);
-			target = before(eyes, 0).scale(p * p);
-			look(player, eyes.add(look.scale(5.0)).add(0.0, -0.5, 0.0), 0.1F);
-		} else {
-			int leg = 1;
-			while (leg < HITS.length && tick > HITS[leg]) {
-				leg++;
-			}
-			if (leg >= HITS.length) {
-				target = offset;
-			} else {
-				float p = (tick - HITS[leg - 1]) / (float) (HITS[leg] - HITS[leg - 1]);
-				Vec3 from = before(eyes, ORDER[leg - 1]);
-				Vec3 to = before(eyes, ORDER[leg]);
-				// A flat arc through the air, flailing.
-				target = from.lerp(to, p).add(0.0, Math.sin(p * Math.PI) * 0.5, 0.0);
-				look(player, cacti.get(ORDER[leg]).add(0.0, 1.0, 0.0), 0.45F);
+		if (tick < TREMBLE) {
+			// The sand trembles all around.
+			cameraShake(0.04F);
+			if (tick % 5 == 0) {
+				sound(level, center, SoundEvents.SAND_STEP, SoundSource.BLOCKS, 1.0F, 0.6F);
+				particles(level, new BlockParticleOption(ParticleTypes.BLOCK, ground), center.add(0.0, 0.05, 0.0), 10, START, 0.05);
 			}
 		}
-		offset = target;
-		moveCamera(offset);
 
-		for (int i = 0; i < HITS.length; i++) {
-			if (tick == HITS[i]) {
-				Vec3 at = cacti.get(ORDER[i]).add(0.0, 1.0, 0.0);
-				particles(level, new BlockParticleOption(ParticleTypes.BLOCK, Blocks.CACTUS.defaultBlockState()), at, 15, 0.4, 0.15);
-				particles(level, ParticleTypes.CRIT, at, 10, 0.3, 0.2);
-				// A cartoon boing with every bounce.
-				sound(level, at, SoundEvents.SLIME_JUMP, SoundSource.PLAYERS, 1.2F, 1.4F + i * 0.1F);
-				hit(level, player, SoundEvents.PLAYER_HURT, 0.15F + i * 0.02F, i == HITS.length - 1);
-				Looks.swing(player);
+		int growing = tick - TREMBLE;
+		if (growing >= 0 && growing % GROW_EVERY == 0 && growing / GROW_EVERY < COUNT) {
+			sprout(level, player, growing / GROW_EVERY, tick);
+		}
+
+		double radius = START;
+		if (tick >= CLOSE) {
+			float p = Math.min(1.0F, (tick - CLOSE) / (float) CLOSE_TICKS);
+			// Slow at first, then faster and faster.
+			radius = START + (END - START) * p * p;
+			if (tick % 6 == 0) {
+				sound(level, center, SoundEvents.SAND_BREAK, SoundSource.BLOCKS, 1.2F, 0.5F + p * 0.4F);
 			}
+			while (stung < STINGS.length && radius <= STINGS[stung]) {
+				stung++;
+				sound(level, center, SoundEvents.SWEET_BERRY_BUSH_BREAK, SoundSource.BLOCKS, 1.5F, 0.8F);
+				hurt(level, player, SoundEvents.PLAYER_HURT, 0.25F);
+				cameraShake(0.2F);
+			}
+		}
+
+		for (Column column : columns) {
+			move(level, column, tick, radius);
+		}
+
+		// Looking around at the ring, then at the cacti right in front.
+		if (tick < CLOSE + CLOSE_TICKS - 10) {
+			float angle = (float) (Math.sin(tick * 0.035) * 1.9);
+			Vec3 at = center.add(horizontalLook(player).yRot(angle).scale(radius)).add(0.0, 1.2, 0.0);
+			turnTowards(player, at, 0.08F);
+		}
+
+		if (tick == CLOSE + CLOSE_TICKS) {
+			sound(level, center, SoundEvents.SWEET_BERRY_BUSH_BREAK, SoundSource.BLOCKS, 2.0F, 0.6F);
+			sound(level, center, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 0.8F, 1.6F);
+			particles(level, ParticleTypes.CRIT, player.getEyePosition(), 20, 0.4, 0.3);
+			kill(level, player, SoundEvents.PLAYER_HURT);
 		}
 	}
 
-	private void look(LocalPlayer player, Vec3 target, float speed) {
-		turnTowards(player, target, speed);
-	}
-
-	/** The camera offset right in front of a cactus, on the side the player comes from. */
-	private Vec3 before(Vec3 eyes, int index) {
-		Vec3 cactus = cacti.get(index).add(0.0, 1.0, 0.0);
-		Vec3 out = eyes.subtract(cactus);
-		out = new Vec3(out.x, 0.0, out.z);
-		out = out.lengthSqr() < 1.0E-4 ? look : out.normalize();
-		Vec3 spot = cactus.add(out.scale(0.75));
-		return new Vec3(spot.x - eyes.x, 0.0, spot.z - eyes.z);
-	}
-
-	/** A two block cactus on free ground at or a step up or down from a spot, or null if there is no room. */
-	private BlockPos grow(ClientLevel level, BlockPos around) {
-		for (int dy : new int[] {0, 1, -1}) {
-			BlockPos pos = around.above(dy);
-			BlockState below = level.getBlockState(pos.below());
-			if (level.getBlockState(pos).isAir() && level.getBlockState(pos.above()).isAir()
-				&& below.isFaceSturdy(level, pos.below(), Direction.UP) && !onTree(level, pos)) {
-				replaceBlock(level, pos, Blocks.CACTUS.defaultBlockState());
-				replaceBlock(level, pos.above(), Blocks.CACTUS.defaultBlockState());
-				particles(level, ParticleTypes.HAPPY_VILLAGER, Vec3.atCenterOf(pos.above()), 3, 0.3, 0.0);
-				return pos;
-			}
+	/** One cactus column, three blocks, pushed up out of the sand. */
+	private void sprout(ClientLevel level, LocalPlayer player, int index, int tick) {
+		float angle = index * Mth.TWO_PI / COUNT + (random.nextFloat() - 0.5F) * 0.2F;
+		int height = 2 + random.nextInt(2);
+		List<Display.BlockDisplay> blocks = new ArrayList<>();
+		for (int i = 0; i < height; i++) {
+			blocks.add(blockDisplay(level, Blocks.CACTUS.defaultBlockState(), center, 6.0F));
 		}
-		return null;
+		columns.add(new Column(blocks, angle, tick));
+		Vec3 at = center.add(Mth.cos(angle) * START, 0.0, Mth.sin(angle) * START);
+		particles(level, new BlockParticleOption(ParticleTypes.BLOCK, ground), at.add(0.0, 0.1, 0.0), 16, 0.4, 0.2);
+		sound(level, at, SoundEvents.SAND_BREAK, SoundSource.BLOCKS, 1.2F, 0.7F + random.nextFloat() * 0.3F);
+	}
+
+	private void move(ClientLevel level, Column column, int tick, double radius) {
+		float rise = Math.min(1.0F, (tick - column.start()) / (float) GROW);
+		// Overshooting a little, then settling, like it bursts out of the sand.
+		double up = rise < 1.0F ? Mth.sin(rise * Mth.HALF_PI) * 1.08 : 1.0;
+		double x = center.x + Mth.cos(column.angle()) * radius;
+		double z = center.z + Mth.sin(column.angle()) * radius;
+		double floor = floor(level, x, z, center.y);
+		int height = column.blocks().size();
+		for (int i = 0; i < height; i++) {
+			// The column comes out of the ground block by block; below the floor it is hidden.
+			double y = floor - height + up * height + i;
+			Display.BlockDisplay block = column.blocks().get(i);
+			float shown = (float) Mth.clamp(y + 1.0 - floor, 0.0, 1.0);
+			block.setPos(x, floor, z);
+			transform(block, new Transformation(new Vector3f(-0.5F, (float) (y - floor + 1.0 - shown), -0.5F), new Quaternionf(),
+				new Vector3f(1.0F, shown, 1.0F), new Quaternionf()));
+		}
+	}
+
+	private record Column(List<Display.BlockDisplay> blocks, float angle, int start) {
 	}
 }
