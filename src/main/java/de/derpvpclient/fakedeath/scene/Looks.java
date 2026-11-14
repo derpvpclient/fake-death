@@ -18,6 +18,7 @@ final class Looks {
 	static final BlockState RED_WOOL = Blocks.RED_WOOL.defaultBlockState();
 	static final BlockState WHITE_WOOL = Blocks.WHITE_WOOL.defaultBlockState();
 	static final BlockState GRAY_CONCRETE = Blocks.GRAY_CONCRETE.defaultBlockState();
+	static final BlockState YELLOW_GLOW = Blocks.YELLOW_CONCRETE.defaultBlockState();
 
 	static final SoundEvent EXPLODE = SoundEvents.GENERIC_EXPLODE.value();
 	static final SoundEvent EAT = SoundEvents.GENERIC_EAT.value();
