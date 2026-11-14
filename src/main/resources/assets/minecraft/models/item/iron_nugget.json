@@ -5,6 +5,15 @@
   },
   "overrides": [
     { "predicate": { "custom_model_data": 4711021 }, "model": "fakedeath:item/robot_vacuum" },
-    { "predicate": { "custom_model_data": 4711022 }, "model": "fakedeath:item/robot_vacuum_angry" }
+    { "predicate": { "custom_model_data": 4711022 }, "model": "fakedeath:item/robot_vacuum_angry" },
+    { "predicate": { "custom_model_data": 4711023 }, "model": "fakedeath:item/missing_block" },
+    { "predicate": { "custom_model_data": 4711024 }, "model": "fakedeath:item/flag_soviet" },
+    { "predicate": { "custom_model_data": 4711025 }, "model": "fakedeath:item/flag_gdr" },
+    { "predicate": { "custom_model_data": 4711026 }, "model": "fakedeath:item/flag_usa" },
+    { "predicate": { "custom_model_data": 4711027 }, "model": "fakedeath:item/flag_mexico" },
+    { "predicate": { "custom_model_data": 4711028 }, "model": "fakedeath:item/flag_germany" },
+    { "predicate": { "custom_model_data": 4711029 }, "model": "fakedeath:item/flag_red" },
+    { "predicate": { "custom_model_data": 4711032 }, "model": "fakedeath:item/ring_light" },
+    { "predicate": { "custom_model_data": 4711035 }, "model": "fakedeath:item/red_star" }
   ]
 }

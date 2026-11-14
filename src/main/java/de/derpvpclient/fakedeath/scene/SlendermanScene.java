@@ -65,8 +65,7 @@ public class SlendermanScene extends Scene {
 		if (tick == SCARE) {
 			// Open mouth and shaking, like an angry enderman.
 			figure.setTarget(player);
-			sound(level, figure.position(), SoundEvents.ENDERMAN_SCREAM, SoundSource.HOSTILE, 1.5F, 0.6F);
-			sound(level, figure.position(), SoundEvents.ENDERMAN_STARE, SoundSource.HOSTILE, 1.5F, 0.8F);
+			sound(level, figure.position(), SoundEvents.ENDERMAN_SCREAM, SoundSource.HOSTILE, 1.5F, 1.0F);
 			kill(level, player, SoundEvents.PLAYER_HURT);
 		}
 

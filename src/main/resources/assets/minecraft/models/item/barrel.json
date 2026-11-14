@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/barrel",
+  "overrides": [
+    { "predicate": { "custom_model_data": 4711034 }, "model": "fakedeath:item/amazom_box" }
+  ]
+}

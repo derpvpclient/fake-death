@@ -58,6 +58,10 @@ public class SwordFoxScene extends Scene {
 
 	@Override
 	public Component deathMessage(LocalPlayer player) {
+		// The message names what the fox really took: a totem is no sword.
+		if (loot != null && !loot.is(net.minecraft.tags.ItemTags.SWORDS)) {
+			return Component.translatable("fakedeath.death.schwertfuchs.item", player.getDisplayName(), loot.getDisplayName());
+		}
 		return Component.translatable("fakedeath.death.schwertfuchs", player.getDisplayName());
 	}
 

@@ -20,7 +20,8 @@ import org.joml.Vector3f;
 
 /** A plumber fixes a leaking pipe next to the player. It bursts, and lava comes out instead of water. */
 public class PlumberScene extends NpcScene {
-	private static final int[] BURNS = {20, 40, 60};
+	// The first burn comes as soon as the jet reaches the player, a few ticks after the pipe bursts.
+	private static final int[] BURNS = {6, 26, 46};
 	private Display.BlockDisplay pipe;
 	private Vec3 pipeAt;
 

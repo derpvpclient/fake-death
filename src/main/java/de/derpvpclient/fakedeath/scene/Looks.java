@@ -18,6 +18,7 @@ final class Looks {
 	static final BlockState RED_WOOL = Blocks.RED_WOOL.defaultBlockState();
 	static final BlockState WHITE_WOOL = Blocks.WHITE_WOOL.defaultBlockState();
 	static final BlockState GRAY_CONCRETE = Blocks.GRAY_CONCRETE.defaultBlockState();
+	static final BlockState YELLOW_GLOW = Blocks.YELLOW_CONCRETE.defaultBlockState();
 
 	static final SoundEvent EXPLODE = SoundEvents.GENERIC_EXPLODE.value();
 	static final SoundEvent EAT = SoundEvents.GENERIC_EAT;
@@ -100,7 +101,9 @@ final class Looks {
 	/** 1.21.1 has no item_model component: the props are custom_model_data overrides on the base item, ids 4711000 + index. */
 	private static final java.util.List<String> PROPS = java.util.List.of("barber_scissors", "briefcase", "chimney_brush", "clipboard",
 		"dental_drill", "dumbbell", "invoice", "magic_saw", "mop", "phone", "pipe_wrench", "police_baton", "police_camera", "present",
-		"screwdriver", "selfie_stick", "soup_ladle", "syringe", "tarot_card", "roast_chicken", "rubber_stamp", "robot_vacuum", "robot_vacuum_angry");
+		"screwdriver", "selfie_stick", "soup_ladle", "syringe", "tarot_card", "roast_chicken", "rubber_stamp", "robot_vacuum", "robot_vacuum_angry",
+		"missing_block", "flag_soviet", "flag_gdr", "flag_usa", "flag_mexico", "flag_germany", "flag_red", "grandma_selfie_stick", "knitting", "ring_light",
+		"cookie_tin", "amazom_box", "red_star");
 
 	static net.minecraft.world.item.ItemStack prop(net.minecraft.world.item.Item base, String model) {
 		net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(base);

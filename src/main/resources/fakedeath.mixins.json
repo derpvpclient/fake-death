@@ -21,6 +21,8 @@
 		"LocalPlayerMixin",
 		"MultiPlayerGameModeMixin",
 		"OptionsScreenMixin",
+		"AbstractClientPlayerMixin",
+		"EntityRendererMixin",
 		"PlayerModelMixin",
 		"PlayerRendererMixin",
 		"SpellcasterIllagerAccessor",

@@ -21,8 +21,6 @@ public final class FakeDeathConfig {
 	public static int randomMaxMinutes = 30;
 	/** Scenes with fast flashing lights. On by default, people sensitive to them can switch them off. */
 	public static boolean flashing = true;
-	/** Lets Mod Menu show when a newer version is out. Asks Modrinth, nothing is downloaded. */
-	public static boolean updateCheck = true;
 	/** Developer switch, only in the file: true gives /fakedeath test and the test screen in game. Off for players. */
 	public static boolean developer = false;
 	/** Scene ids the random event and a plain /fakedeath leave out. Testing a scene by name still works. */
@@ -62,7 +60,6 @@ public final class FakeDeathConfig {
 		randomMinMinutes = Math.clamp(parseInt(properties, "randomMinMinutes", randomMinMinutes), 1, MAX_MINUTES);
 		randomMaxMinutes = Math.clamp(parseInt(properties, "randomMaxMinutes", randomMaxMinutes), randomMinMinutes, MAX_MINUTES);
 		flashing = version < 3 || Boolean.parseBoolean(properties.getProperty("flashing", String.valueOf(flashing)));
-		updateCheck = Boolean.parseBoolean(properties.getProperty("updateCheck", String.valueOf(updateCheck)));
 		developer = Boolean.parseBoolean(properties.getProperty("developer", "false"));
 
 		disabledScenes.clear();
@@ -83,12 +80,11 @@ public final class FakeDeathConfig {
 		properties.setProperty("randomMinMinutes", String.valueOf(randomMinMinutes));
 		properties.setProperty("randomMaxMinutes", String.valueOf(randomMaxMinutes));
 		properties.setProperty("flashing", String.valueOf(flashing));
-		properties.setProperty("updateCheck", String.valueOf(updateCheck));
 		properties.setProperty("developer", String.valueOf(developer));
 		properties.setProperty("disabledScenes", String.join(",", disabledScenes));
 
 		try (Writer writer = Files.newBufferedWriter(file)) {
-			properties.store(writer, "Fake Death. randomEvent = Fake-Tod zufällig zwischen randomMinMinutes und randomMaxMinutes. flashing = Szenen mit schnell blinkenden Lichtern erlauben. updateCheck = im Mod-Menü anzeigen, wenn es eine neue Version gibt. disabledScenes = abgeschaltete Szenen, mit Komma getrennt. developer = true nur für den Entwickler: /fakedeath test im Spiel");
+			properties.store(writer, "Fake Death. randomEvent = Fake-Tod zufällig zwischen randomMinMinutes und randomMaxMinutes. flashing = Szenen mit schnell blinkenden Lichtern erlauben. disabledScenes = abgeschaltete Szenen, mit Komma getrennt. developer = true nur für den Entwickler: /fakedeath test im Spiel");
 		} catch (IOException e) {
 			FakeDeathClient.LOGGER.warn("Could not write {}", file, e);
 		}

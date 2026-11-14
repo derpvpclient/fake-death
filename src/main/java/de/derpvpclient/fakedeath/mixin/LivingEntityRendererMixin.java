@@ -15,16 +15,34 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntityRenderer.class)
 public class LivingEntityRendererMixin {
 	// In third person the body goes where the scene took the camera: it rides the horse, hangs in the panda's paws,
 	// walks into the wall. Only on this client.
-	@Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At("HEAD"))
+	@Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At("HEAD"), cancellable = true)
 	private void fakedeath$bodyFollows(LivingEntity entity, float yaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffers, int light, CallbackInfo ci) {
 		if (entity == Minecraft.getInstance().player) {
+			Scene scene = FakeDeath.currentScene();
+			if (scene != null && scene.hidesBody()) {
+				// Swallowed, erased: the body is gone in third person.
+				ci.cancel();
+				return;
+			}
 			Vec3 shift = CameraDirector.bodyOffset(entity);
 			poseStack.translate(shift.x, shift.y, shift.z);
+			if (scene != null && scene.bodyScale() != 1.0F) {
+				poseStack.scale(scene.bodyScale(), scene.bodyScale(), scene.bodyScale());
+			}
+		}
+	}
+
+	// Some people in the scenes carry no name over the head, like the extras, or a sign of their own instead.
+	@Inject(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
+	private void fakedeath$noName(LivingEntity entity, CallbackInfoReturnable<Boolean> cir) {
+		if (de.derpvpclient.fakedeath.scene.Skins.hidesName(entity.getId())) {
+			cir.setReturnValue(false);
 		}
 	}
 
