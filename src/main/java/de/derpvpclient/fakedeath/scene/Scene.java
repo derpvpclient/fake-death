@@ -462,10 +462,14 @@ public abstract class Scene {
 			Vec3 eyes = player.getEyePosition();
 			Vec3 delta = target.subtract(eyes);
 			Vec3 aside = new Vec3(delta.x, 0.0, delta.z).yRot(SIDE_ANGLE);
+			if (aside.lengthSqr() < 1.0) {
+				// Right overhead: keep looking the way the player faces, only a little upwards.
+				aside = horizontalLook(player).yRot(SIDE_ANGLE);
+			}
 			// Never steeply up or down: from outside the camera would dive under the body or over it, and the body
 			// would fill the whole picture. Something high up is still in the shot above the head.
 			double flat = Math.max(1.0, aside.length());
-			double up = Mth.clamp(delta.y, -0.7 * flat, 0.35 * flat);
+			double up = Mth.clamp(delta.y, -0.7 * flat, 0.3 * flat);
 			CameraDirector.turnTowards(player, eyes.add(aside.x, up, aside.z), speed);
 			return;
 		}

@@ -108,7 +108,8 @@ public class SkyscraperScene extends CastScene {
 				particles(level, new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SMOOTH_SANDSTONE.defaultBlockState()), at.add(0.0, height, 0.0), 8, size[0] / 2, 0.1);
 				sound(level, at.add(0.0, height, 0.0), SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 2.0F, 0.6F + random.nextFloat() * 0.3F);
 			}
-			y += size[1];
+			// Each tier stands on the one below as it is right now, so nothing floats while the lower ones still grow.
+			y += height;
 		}
 		placeWindows();
 		topY = y;
@@ -136,7 +137,7 @@ public class SkyscraperScene extends CastScene {
 		}
 
 		// The star on top: glowing, wobbling, then falling.
-		Vec3 top = base.add(0.0, topY + 1.6, 0.0);
+		Vec3 top = base.add(0.0, topY + 2.6, 0.0);
 		Vec3 starAt = top;
 		float spin = 0.0F;
 		if (tick >= FIRST + (TIERS.length - 1) * TIER && tick < BREAK) {
@@ -166,7 +167,7 @@ public class SkyscraperScene extends CastScene {
 		if (tick >= FIRST + (TIERS.length - 1) * TIER) {
 			Vec3 toPlayer = player.position().subtract(base);
 			float face = (float) Math.atan2(toPlayer.x, toPlayer.z);
-			place(star, starAt, new Vector3f(3.0F), new Quaternionf().rotateY(face).rotateZ(spin));
+			place(star, starAt, new Vector3f(5.0F), new Quaternionf().rotateY(face).rotateZ(spin));
 		}
 		turnTowards(player, tick < FIRST ? stalin.getEyePosition() : tick < BREAK ? base.add(0.0, Math.min(topY, 8.0 + (tick - FIRST) * 0.15), 0.0) : starAt, tick < BREAK ? 0.06F : 0.3F);
 		if (tick == HIT) {
@@ -221,7 +222,7 @@ public class SkyscraperScene extends CastScene {
 				transform(window, new Transformation(new Vector3f(-size[0] * 0.4F, 0.0F, -0.02F).rotate(turn), new Quaternionf(turn),
 					new Vector3f(size[0] * 0.8F, built ? 0.5F : 0.0F, 0.04F), new Quaternionf()));
 			}
-			y += size[1];
+			y += heights[i];
 		}
 	}
 
