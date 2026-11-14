@@ -22,6 +22,8 @@
 	"fakedeath.options.max.tooltip": "Spätestens nach so vielen Minuten kommt das nächste Zufalls-Event.",
 	"fakedeath.options.minutes": "%s Min.",
 	"fakedeath.options.scenes": "Szenen",
+	"fakedeath.options.scene.tooltip": "Diese Szene kann beim zufälligen Fake-Tod drankommen.",
+	"fakedeath.options.test.tooltip": "Spielt eine Szene sofort ab, zum Testen.",
 	"fakedeath.options.general": "Allgemein",
 	"fakedeath.options.all_on": "Alle Szenen an",
 	"fakedeath.options.all_off": "Alle Szenen aus",

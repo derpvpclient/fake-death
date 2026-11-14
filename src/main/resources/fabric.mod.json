@@ -21,6 +21,9 @@
 		],
 		"modmenu": [
 			"de.derpvpclient.fakedeath.FakeDeathModMenu"
+		],
+		"sodium:config_api_user": [
+			"de.derpvpclient.fakedeath.FakeDeathSodiumPage"
 		]
 	},
 	"mixins": [

@@ -9,7 +9,7 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// Only for the settings button in Mod Menu, the mod runs without it.
-	compileOnly files("libs/modmenu-21.0.0.jar")
+	compileOnly files("libs/modmenu-21.0.0.jar", "libs/sodium-fabric-0.9.3-beta.1+mc26.3.jar")
 	// In the game test Mod Menu is really there, to look at the update notice.
 	localRuntime files("libs/modmenu-21.0.0.jar")
 }

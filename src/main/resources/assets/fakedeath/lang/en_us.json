@@ -22,6 +22,8 @@
 	"fakedeath.options.max.tooltip": "The next random event comes after this many minutes at the latest.",
 	"fakedeath.options.minutes": "%s min",
 	"fakedeath.options.scenes": "Scenes",
+	"fakedeath.options.scene.tooltip": "This scene can come up in the random fake death.",
+	"fakedeath.options.test.tooltip": "Plays a scene right away, for testing.",
 	"fakedeath.options.general": "General",
 	"fakedeath.options.all_on": "All scenes on",
 	"fakedeath.options.all_off": "All scenes off",
