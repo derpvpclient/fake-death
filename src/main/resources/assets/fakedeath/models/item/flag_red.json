@@ -1,0 +1,59 @@
+{
+	"textures": {
+		"flag": "fakedeath:item/flag_red",
+		"pole": "fakedeath:item/flag_pole",
+		"particle": "fakedeath:item/flag_pole"
+	},
+	"elements": [
+		{
+			"from": [-0.6, -16, 7.4],
+			"to": [0.6, 30, 8.6],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 16], "texture": "#pole"},
+				"south": {"uv": [1, 0, 2, 16], "texture": "#pole"},
+				"east": {"uv": [2, 0, 3, 16], "texture": "#pole"},
+				"west": {"uv": [3, 0, 4, 16], "texture": "#pole"},
+				"down": {"uv": [0, 0, 1, 1], "texture": "#pole"}
+			}
+		},
+		{
+			"from": [-1.2, 29, 6.8],
+			"to": [1.2, 30.4, 9.2],
+			"faces": {
+				"north": {"uv": [8, 8, 11, 10], "texture": "#pole"},
+				"south": {"uv": [8, 8, 11, 10], "texture": "#pole"},
+				"east": {"uv": [8, 8, 11, 10], "texture": "#pole"},
+				"west": {"uv": [8, 8, 11, 10], "texture": "#pole"},
+				"down": {"uv": [8, 8, 11, 11], "texture": "#pole"}
+			}
+		},
+		{
+			"from": [-0.5, 30.4, 7.5],
+			"to": [0.5, 32, 8.5],
+			"faces": {
+				"north": {"uv": [9, 0, 11, 4], "texture": "#pole"},
+				"south": {"uv": [9, 0, 11, 4], "texture": "#pole"},
+				"east": {"uv": [9, 0, 11, 4], "texture": "#pole"},
+				"west": {"uv": [9, 0, 11, 4], "texture": "#pole"},
+				"up": {"uv": [9, 0, 11, 2], "texture": "#pole"}
+			}
+		},
+		{
+			"from": [0.6, 13.6, 7.95],
+			"to": [30.6, 28.6, 8.05],
+			"faces": {
+				"north": {"uv": [16, 0, 0, 16], "texture": "#flag"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#flag"},
+				"up": {"uv": [0, 0, 16, 0.25], "texture": "#flag"},
+				"down": {"uv": [0, 15.75, 16, 16], "texture": "#flag"},
+				"east": {"uv": [15.75, 0, 16, 16], "texture": "#flag"}
+			}
+		}
+	],
+	"display": {
+		"fixed": {"rotation": [0, 0, 0], "translation": [0, 0, 0], "scale": [1, 1, 1]},
+		"thirdperson_righthand": {"rotation": [0, 90, 0], "translation": [0, 8, 1], "scale": [0.8, 0.8, 0.8]},
+		"firstperson_righthand": {"rotation": [0, 90, 0], "translation": [0, 4, 0], "scale": [0.6, 0.6, 0.6]},
+		"gui": {"rotation": [0, 0, 0], "translation": [-4, -4, 0], "scale": [0.4, 0.4, 0.4]}
+	}
+}

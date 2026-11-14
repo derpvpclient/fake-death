@@ -42,6 +42,13 @@ public class DiscoScene extends Scene {
 	private final List<Display.BlockDisplay> tiles = new ArrayList<>();
 	private final List<int[]> tileSpots = new ArrayList<>();
 	private Creeper creeper;
+	private int now;
+
+	@Override
+	public boolean dancing() {
+		// And dances along, stepping to the beat, until the music stops.
+		return thirdPerson() && creeper != null && now < PRIME;
+	}
 	private Vec3 floor;
 	private Display.BlockDisplay ball;
 	private Display.BlockDisplay chain;
@@ -63,6 +70,7 @@ public class DiscoScene extends Scene {
 
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
+		now = tick;
 		if (tick == 0) {
 			sound(level, player.position(), SoundEvents.MUSIC_DISC_PIGSTEP.value(), SoundSource.RECORDS, 2.0F, 1.0F);
 			floor = groundSpot(level, player, 3.0, 0.0);

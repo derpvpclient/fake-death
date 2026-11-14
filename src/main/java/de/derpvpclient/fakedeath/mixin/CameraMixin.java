@@ -29,7 +29,15 @@ public abstract class CameraMixin {
 		Vec3 offset = CameraDirector.positionOffset();
 
 		if (offset.lengthSqr() > 1.0E-6) {
-			setPosition(position().add(offset));
+			Vec3 moved = position().add(offset);
+			net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+			net.minecraft.world.entity.Entity body = minecraft.getCameraEntity();
+			if (body != null && !minecraft.options.getCameraType().isFirstPerson()) {
+				// From outside the camera stays above the body, it never sinks into the ground with a lying body.
+				double feet = body.getPosition(partialTicks).y + CameraDirector.bodyOffset(body).y;
+				moved = new Vec3(moved.x, Math.max(moved.y, feet + 0.9), moved.z);
+			}
+			setPosition(moved);
 		}
 	}
 

@@ -26,6 +26,7 @@ import org.joml.Vector3f;
  */
 public class DeliveryScene extends Scene {
 	private static final Component NAME = Component.translatable("fakedeath.delivery.name").withStyle(ChatFormatting.YELLOW);
+	// Bits of cardboard when it bursts open on the head.
 	private static final BlockState PACKAGE = Blocks.BARREL.defaultBlockState();
 	private static final float BOX = 0.55F;
 	private static final int ARRIVE = 40;
@@ -41,7 +42,7 @@ public class DeliveryScene extends Scene {
 	private static final double ARC = 9.0;
 
 	private Villager courier;
-	private Display.BlockDisplay box;
+	private Display.ItemDisplay box;
 	private Vec3 start;
 	private Vec3 stand;
 	private Vec3 throwFrom;
@@ -73,7 +74,8 @@ public class DeliveryScene extends Scene {
 			courier.setCustomName(NAME);
 			courier.setCustomNameVisible(true);
 			courier.noPhysics = true;
-			box = blockDisplay(level, PACKAGE, start, 2.0F);
+			// A proper parcel: brown cardboard, tape, the smile of "amazom" on its side.
+			box = itemDisplay(level, Looks.prop(net.minecraft.world.item.Items.BARREL, "amazom_box"), start);
 		}
 
 		if (courier == null) {
@@ -160,6 +162,6 @@ public class DeliveryScene extends Scene {
 
 		box.setPos(boxPos.x, boxPos.y, boxPos.z);
 		Quaternionf rotation = new Quaternionf().rotateXYZ(spin, spin * 0.6F, 0.0F);
-		transform(box, new Transformation(new Vector3f(-BOX / 2.0F).rotate(rotation), rotation, new Vector3f(BOX), new Quaternionf()));
+		transform(box, new Transformation(new Vector3f(), rotation, new Vector3f(BOX * 1.4F), new Quaternionf()));
 	}
 }

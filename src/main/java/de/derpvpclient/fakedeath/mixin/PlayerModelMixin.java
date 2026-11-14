@@ -14,6 +14,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class PlayerModelMixin {
 	@Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"))
 	private void fakedeath$pushUp(AvatarRenderState state, CallbackInfo ci) {
+		de.derpvpclient.fakedeath.scene.Skins.Pose pose = de.derpvpclient.fakedeath.scene.Skins.posedState(state);
+		if (pose != null) {
+			arms((PlayerModel) (Object) this, pose);
+			return;
+		}
 		if (state != CameraDirector.pushUpState) {
 			return;
 		}
@@ -30,5 +35,40 @@ public class PlayerModelMixin {
 		model.leftLeg.xRot = 0.0F;
 		model.leftLeg.yRot = 0.0F;
 		model.leftLeg.zRot = 0.0F;
+	}
+
+	/** The arms of a person in a scene, posed after the game set them, so the pose wins. */
+	private static void arms(PlayerModel model, de.derpvpclient.fakedeath.scene.Skins.Pose pose) {
+		switch (pose) {
+			case RAUTE -> {
+				model.rightArm.xRot = -0.8F;
+				model.rightArm.yRot = -0.55F;
+				model.rightArm.zRot = 0.0F;
+				model.leftArm.xRot = -0.8F;
+				model.leftArm.yRot = 0.55F;
+				model.leftArm.zRot = 0.0F;
+			}
+			case POINT -> {
+				model.rightArm.xRot = -Mth.HALF_PI;
+				model.rightArm.yRot = -0.1F;
+				model.rightArm.zRot = 0.0F;
+			}
+			case CHEER -> {
+				model.rightArm.xRot = -2.9F;
+				model.rightArm.zRot = 0.25F;
+				model.leftArm.xRot = -2.9F;
+				model.leftArm.zRot = -0.25F;
+			}
+			case RAISE -> {
+				model.rightArm.xRot = -2.4F;
+				model.rightArm.yRot = 0.0F;
+				model.rightArm.zRot = 0.1F;
+			}
+			case SALUTE -> {
+				model.rightArm.xRot = -2.2F;
+				model.rightArm.yRot = -0.6F;
+				model.rightArm.zRot = 0.6F;
+			}
+		}
 	}
 }

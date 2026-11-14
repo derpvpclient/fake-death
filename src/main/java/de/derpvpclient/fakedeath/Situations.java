@@ -19,6 +19,18 @@ import de.derpvpclient.fakedeath.scene.GiantFrogScene;
 import de.derpvpclient.fakedeath.scene.GiantItemScene;
 import de.derpvpclient.fakedeath.scene.GiantScene;
 import de.derpvpclient.fakedeath.scene.RobotVacuumScene;
+import de.derpvpclient.fakedeath.scene.SkyscraperScene;
+import de.derpvpclient.fakedeath.scene.BlackRavenScene;
+import de.derpvpclient.fakedeath.scene.MonumentScene;
+import de.derpvpclient.fakedeath.scene.RevolutionScene;
+import de.derpvpclient.fakedeath.scene.MausoleumScene;
+import de.derpvpclient.fakedeath.scene.KittenScene;
+import de.derpvpclient.fakedeath.scene.StalinScene;
+import de.derpvpclient.fakedeath.scene.PutinScene;
+import de.derpvpclient.fakedeath.scene.MerkelScene;
+import de.derpvpclient.fakedeath.scene.UlbrichtScene;
+import de.derpvpclient.fakedeath.scene.TrumpRocketScene;
+import de.derpvpclient.fakedeath.scene.TrumpWallScene;
 import de.derpvpclient.fakedeath.scene.GlitchScene;
 import de.derpvpclient.fakedeath.scene.GoatScene;
 import de.derpvpclient.fakedeath.scene.HazardScene;
@@ -138,7 +150,7 @@ public final class Situations {
 		"fahrlehrer", "axolotl", "panda",
 		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor", "bombenprank", "netherportal", "endportal",
 		"verzauberungstisch", "glocke", "lore", "ruestungsstaender",
-		"gemaelde", "amethyst", "schneemann", "guerteltier", "anlauf", "schwertfuchs", "spawner", "blitzableiter", "reparatur", "saugroboter");
+		"gemaelde", "amethyst", "schneemann", "guerteltier", "anlauf", "schwertfuchs", "spawner", "blitzableiter", "reparatur", "saugroboter", "trumpmauer", "trumprakete", "ulbricht", "merkel", "putin", "stalin", "kaetzchen", "mausoleum", "revolution", "denkmal", "schwarzerrabe", "hochhaus");
 
 	/** English scene names, both work in every language. Names that are the same in both are left out. */
 	private static final Map<String, String> ENGLISH = Map.ofEntries(
@@ -160,7 +172,7 @@ public final class Situations {
 		Map.entry("satnav", "navi"), Map.entry("waiter", "kellner"), Map.entry("cats", "katzen"), Map.entry("goatchoir", "ziegenchor"), Map.entry("bombprank", "bombenprank"),
 		Map.entry("enchantingtable", "verzauberungstisch"), Map.entry("bell", "glocke"), Map.entry("minecart", "lore"), Map.entry("armorstand", "ruestungsstaender"),
 		Map.entry("painting", "gemaelde"), Map.entry("snowman", "schneemann"), Map.entry("armadillo", "guerteltier"), Map.entry("goatcharge", "anlauf"),
-		Map.entry("swordfox", "schwertfuchs"), Map.entry("lightningrod", "blitzableiter"), Map.entry("repair", "reparatur"));
+		Map.entry("swordfox", "schwertfuchs"), Map.entry("lightningrod", "blitzableiter"), Map.entry("repair", "reparatur"), Map.entry("trumpwall", "trumpmauer"), Map.entry("trumprocket", "trumprakete"), Map.entry("ulbricht", "ulbricht"), Map.entry("merkel", "merkel"), Map.entry("putin", "putin"), Map.entry("stalin", "stalin"), Map.entry("kittens", "kaetzchen"), Map.entry("mausoleum", "mausoleum"), Map.entry("revolution", "revolution"), Map.entry("monument", "denkmal"), Map.entry("blackraven", "schwarzerrabe"), Map.entry("skyscraper", "hochhaus"));
 
 	public static final List<String> ENGLISH_NAMES = NAMES.stream()
 		.map(name -> ENGLISH.entrySet().stream().filter(entry -> entry.getValue().equals(name)).map(Map.Entry::getKey).findFirst().orElse(name))
@@ -202,6 +214,9 @@ public final class Situations {
 		lastBreakTime = level.getGameTime();
 		lastBreakPos = pos.immutable();
 		lastBreakState = state;
+		if (state.is(BlockTags.LOGS) && FakeDeathConfig.isEnabled("baum") && TreeScene.afterBreak(level, pos, state) != null) {
+			FakeDeath.onTreeCut();
+		}
 	}
 
 	public static void reset() {
@@ -224,7 +239,8 @@ public final class Situations {
 		if (lastBreakState.is(BlockTags.BASE_STONE_OVERWORLD)) {
 			// Digging in stone: the cave comes down, or silverfish come out of it.
 			boolean cave = FakeDeathConfig.isEnabled("hoehle") && !level.canSeeSky(player.blockPosition().above());
-			boolean silverfish = FakeDeathConfig.isEnabled("silberfische");
+			// Silverfish only deep down, never with the sky overhead.
+			boolean silverfish = FakeDeathConfig.isEnabled("silberfische") && !level.canSeeSky(player.blockPosition().above());
 
 			if (cave && (!silverfish || ThreadLocalRandom.current().nextBoolean())) {
 				return new CaveInScene();
@@ -255,10 +271,10 @@ public final class Situations {
 		}
 
 		if (options.wants("kaktus")) {
-			// Cacti around, as in a desert: the cactus pinball, with the closest one as the first.
-			BlockPos cactus = find(level, feet, 4, 2, state -> state.is(Blocks.CACTUS));
-			if (cactus != null) {
-				options.add("kaktus", 5, () -> new CactusScene(cactus.distSqr(feet) <= 2 ? cactus : null));
+			// Only out in the desert, standing on sand under the open sky: the ring of cacti grows out of it.
+			boolean desert = level.getBiome(feet).is(Biomes.DESERT) || level.getBiome(feet).is(BiomeTags.IS_BADLANDS);
+			if (desert && sky && level.getBlockState(feet.below()).is(net.minecraft.tags.BlockTags.SAND)) {
+				options.add("kaktus", 5, CactusScene::new);
 			}
 		}
 
@@ -298,6 +314,42 @@ public final class Situations {
 			options.add("riese", 2, GiantScene::new);
 		}
 
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("trumpmauer", sky ? 2 : 1, TrumpWallScene::new);
+		}
+		if (sky && level.dimension() == Level.OVERWORLD) {
+			options.add("trumprakete", 2, TrumpRocketScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("ulbricht", 2, UlbrichtScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("merkel", 2, MerkelScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("putin", sky ? 2 : 1, PutinScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("stalin", 2, StalinScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("kaetzchen", 2, KittenScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("mausoleum", dark ? 2 : 1, MausoleumScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("revolution", sky ? 2 : 1, RevolutionScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("denkmal", sky ? 2 : 0, MonumentScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("schwarzerrabe", dark ? 3 : 0, BlackRavenScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("hochhaus", sky ? 2 : 0, SkyscraperScene::new);
+		}
 		// The robot vacuums revolt, mostly at home, sometimes out in the open.
 		if (level.dimension() == Level.OVERWORLD) {
 			options.add("saugroboter", sky ? 1 : 3, RobotVacuumScene::new);
@@ -464,9 +516,10 @@ public final class Situations {
 			}
 		}
 		if (options.wants("delfin")) {
-			BlockPos sea = find(level, feet, 8, 3, state -> state.getFluidState().is(FluidTags.WATER));
-			if (sea != null) {
-				options.add("delfin", biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_BEACH) ? 4 : 1, () -> new DolphinScene(sea));
+			// Only right at the sea or a river, never next to a pond inland.
+			BlockPos sea = find(level, feet, 5, 2, state -> state.getFluidState().is(FluidTags.WATER));
+			if (sea != null && (biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_BEACH) || biome.is(BiomeTags.IS_RIVER))) {
+				options.add("delfin", 4, () -> new DolphinScene(sea));
 			}
 		}
 		if (!sky && !hasRoomAbove(level, head, 8)) {
@@ -725,7 +778,7 @@ public final class Situations {
 			}
 			case "hoehle" -> new CaveInScene();
 			case "blitz" -> new LightningScene();
-			case "kaktus" -> new CactusScene(find(level, feet, 1, 1, state -> state.is(Blocks.CACTUS)));
+			case "kaktus" -> new CactusScene();
 			case "beeren" -> new BerryScene(find(level, feet, 2, 1, state -> state.is(Blocks.SWEET_BERRY_BUSH)));
 			case "schnee" -> HazardScene.freeze(orFeet(find(level, feet, 2, 1, state -> state.is(Blocks.POWDER_SNOW)), feet));
 			case "hunger" -> HazardScene.starve();
@@ -736,6 +789,18 @@ public final class Situations {
 			}
 			case "riese" -> new GiantScene();
 			case "saugroboter" -> new RobotVacuumScene();
+			case "hochhaus" -> new SkyscraperScene();
+			case "schwarzerrabe" -> new BlackRavenScene();
+			case "denkmal" -> new MonumentScene();
+			case "revolution" -> new RevolutionScene();
+			case "mausoleum" -> new MausoleumScene();
+			case "kaetzchen" -> new KittenScene();
+			case "stalin" -> new StalinScene();
+			case "putin" -> new PutinScene();
+			case "merkel" -> new MerkelScene();
+			case "ulbricht" -> new UlbrichtScene();
+			case "trumprakete" -> new TrumpRocketScene();
+			case "trumpmauer" -> new TrumpWallScene();
 			case "skelett" -> new SkeletonScene();
 			case "creeper" -> new CreeperScene();
 			case "finanzamt" -> new TaxAuditScene();
