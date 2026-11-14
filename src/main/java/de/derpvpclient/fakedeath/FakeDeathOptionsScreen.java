@@ -31,15 +31,13 @@ public class FakeDeathOptionsScreen extends OptionsSubScreen {
 			minutes("fakedeath.options.max", FakeDeathConfig.randomMaxMinutes, value -> FakeDeathConfig.randomMaxMinutes = value));
 		list.addBig(OptionInstance.createBoolean("fakedeath.options.flashing", tooltip("fakedeath.options.flashing.tooltip"),
 			FakeDeathConfig.flashing, value -> FakeDeathConfig.flashing = value));
-		list.addBig(OptionInstance.createBoolean("fakedeath.options.update_check", tooltip("fakedeath.options.update_check.tooltip"),
-			FakeDeathConfig.updateCheck, value -> FakeDeathConfig.updateCheck = value));
 
 		// The scenes in the same groups as in the test screen, each sorted by name, with a switch for all of them at once.
 		list.addHeader(Component.translatable("fakedeath.options.scenes"));
 		list.addSmall(
 			Button.builder(Component.translatable("fakedeath.options.all_on"), button -> setAll(true)).build(),
 			Button.builder(Component.translatable("fakedeath.options.all_off"), button -> setAll(false)).build());
-		for (String group : java.util.List.of("world", "animals", "monsters", "characters")) {
+		for (String group : java.util.List.of("world", "animals", "monsters", "characters", "famous")) {
 			java.util.List<String> ids = Situations.NAMES.stream()
 				.filter(id -> TestScreen.categoryOf(id).equals(group))
 				.sorted(java.util.Comparator.comparing(id -> Component.translatable("fakedeath.scene." + id).getString()))

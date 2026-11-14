@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 final class Looks {
 	static final BlockState BLACK_CONCRETE = Blocks.CONCRETE.black().defaultBlockState();
 	static final BlockState WHITE_CONCRETE = Blocks.CONCRETE.white().defaultBlockState();
+	static final BlockState YELLOW_GLOW = Blocks.CONCRETE.yellow().defaultBlockState();
 	static final BlockState LIGHT_BLUE_GLASS = Blocks.STAINED_GLASS.lightBlue().defaultBlockState();
 	static final BlockState RED_WOOL = Blocks.WOOL.red().defaultBlockState();
 	static final BlockState WHITE_WOOL = Blocks.WOOL.white().defaultBlockState();

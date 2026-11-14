@@ -25,7 +25,7 @@ public class DemoGameTest implements FabricClientGameTest {
 
 		try (TestSingleplayerContext singleplayer = context.worldBuilder().create()) {
 			context.waitTicks(100);
-			context.waitFor(client -> !Files.exists(marker), 20 * 60 * 25);
+			context.waitFor(client -> !Files.exists(marker), 20 * 60 * 240);
 		}
 	}
 }

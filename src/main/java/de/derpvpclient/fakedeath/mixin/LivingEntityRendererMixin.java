@@ -47,6 +47,13 @@ public class LivingEntityRendererMixin {
 			state.walkAnimationPos = CameraDirector.walkPos();
 			state.walkAnimationSpeed = CameraDirector.walkSpeed();
 		}
+		if (scene != null && scene.bodyScale() != 1.0F) {
+			state.scale *= scene.bodyScale();
+		}
+		if (scene != null && scene.dancing()) {
+			state.walkAnimationPos = state.ageInTicks * 0.9F;
+			state.walkAnimationSpeed = 0.8F;
+		}
 
 		// On the death screen it tips over and turns red like on a real death.
 		if (FakeDeath.isActive()) {

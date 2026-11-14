@@ -49,10 +49,6 @@ final class UpdateCheck {
 			return null;
 		}
 
-		if (!FakeDeathConfig.updateCheck) {
-			return null;
-		}
-
 		String own = version(MOD_ID);
 		String game = version("minecraft");
 		if (own == null || game == null) {

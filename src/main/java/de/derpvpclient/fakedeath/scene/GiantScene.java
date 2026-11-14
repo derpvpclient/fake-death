@@ -18,8 +18,8 @@ import net.minecraft.world.phys.Vec3;
  */
 public class GiantScene extends Scene {
 	private static final int APPEAR = 30;
-	private static final double DISTANCE = 34.0;
-	private static final int RUN_TICKS = 110;
+	private static final double DISTANCE = 22.0;
+	private static final int RUN_TICKS = 90;
 	private static final int STOMP = APPEAR + RUN_TICKS;
 	private static final int STEP_EVERY = 9;
 	private static final double OVERSHOOT = 8.0;
@@ -27,8 +27,6 @@ public class GiantScene extends Scene {
 	private Giant giant;
 	private Vec3 start;
 	private Vec3 direction;
-	private boolean shockwave1;
-	private boolean shockwave2;
 	private int tint;
 
 	@Override
@@ -61,7 +59,7 @@ public class GiantScene extends Scene {
 		}
 
 		if (tick == APPEAR) {
-			start = groundSpot(level, player, DISTANCE, (random.nextDouble() - 0.5) * 30.0);
+			start = groundSpot(level, player, DISTANCE, (random.nextDouble() - 0.5) * 16.0);
 			Vec3 away = start.subtract(player.position());
 			direction = new Vec3(-away.x, 0.0, -away.z).normalize();
 			giant = spawn(level, EntityTypes.GIANT, start);
@@ -102,14 +100,7 @@ public class GiantScene extends Scene {
 			sound(level, ground, SoundEvents.ZOMBIE_AMBIENT, SoundSource.HOSTILE, 5.0F, 0.3F);
 		}
 
-		if (!shockwave1 && distance < 14.0 && tick < STOMP) {
-			shockwave1 = true;
-			hurt(level, player, SoundEvents.PLAYER_HURT, 0.2F);
-		}
-		if (!shockwave2 && distance < 7.0 && tick < STOMP) {
-			shockwave2 = true;
-			hurt(level, player, SoundEvents.PLAYER_HURT, 0.3F);
-		}
+		// No damage from afar: the only hit is the foot coming down.
 
 		if (tick < STOMP) {
 			// Looking up at the giant, higher and higher the closer it gets.

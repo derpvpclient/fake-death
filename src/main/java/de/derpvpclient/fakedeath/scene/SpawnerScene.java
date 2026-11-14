@@ -41,6 +41,14 @@ public class SpawnerScene extends Scene {
 	private Vec3 seat;
 	private float angle;
 	private float tint;
+	private int now;
+	private final java.util.List<LivingEntity> spawned = new java.util.ArrayList<>();
+
+	@Override
+	public boolean hidesBody() {
+		// In F5 the big body is gone once the cage has swallowed it; the little one is the player now.
+		return now >= INSIDE;
+	}
 
 	public SpawnerScene(BlockPos spawner) {
 		this.found = spawner;
@@ -70,6 +78,7 @@ public class SpawnerScene extends Scene {
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
 		Vec3 feet = player.position();
 		Vec3 head = player.getEyePosition();
+		now = tick;
 
 		if (tick == 0) {
 			BlockPos block = found;
@@ -109,6 +118,21 @@ public class SpawnerScene extends Scene {
 			}
 
 			turnTowards(player, cage, 0.2F);
+		}
+
+		if (tick == 8 || tick == 18 || tick == 28) {
+			// First it does its job: mobs pop out of it in a cloud of smoke and flames, and stay to watch.
+			Vec3 out = orbit(cage, 1.6, (tick / 10) * 2.1 + 0.6, 0.0);
+			out = ground(level, out, player);
+			LivingEntity mob = tick == 18 ? spawn(level, EntityTypes.SKELETON, out) : spawn(level, EntityTypes.ZOMBIE, out);
+			mob.noPhysics = true;
+			spawned.add(mob);
+			particles(level, ParticleTypes.POOF, out.add(0.0, 0.9, 0.0), 20, 0.4, 0.06);
+			particles(level, ParticleTypes.FLAME, out.add(0.0, 0.9, 0.0), 10, 0.4, 0.04);
+			sound(level, out, SoundEvents.FIRECHARGE_USE, SoundSource.HOSTILE, 0.8F, 1.4F);
+		}
+		for (LivingEntity mob : spawned) {
+			face(mob, mini != null ? mini.getEyePosition() : head);
 		}
 
 		if (tick >= PULL && tick < SPIT) {

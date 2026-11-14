@@ -21,6 +21,10 @@ public abstract class OptionsScreenMixin extends Screen {
 	// A "Fake Death..." button at the end of the options grid, next to Music & Sounds, Video Settings and the rest.
 	@Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/layouts/HeaderAndFooterLayout;addToContents(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;"))
 	private void fakedeath$addSettingsButton(CallbackInfo ci, @Local GridLayout.RowHelper rows) {
+		// With Sodium the settings live in its video settings, like Emberflow and every graphics option.
+		if (de.derpvpclient.fakedeath.SodiumCheck.hasPage()) {
+			return;
+		}
 		rows.addChild(Button.builder(Component.translatable("fakedeath.options.button"), button -> minecraft.gui.setScreen(new FakeDeathOptionsScreen(this))).build());
 	}
 }
