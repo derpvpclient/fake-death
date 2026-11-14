@@ -25,15 +25,16 @@ import net.minecraft.network.chat.Component;
 public class TestScreen extends Screen {
 	private static final int BUTTON_WIDTH = 118;
 	private static final int FOOTER_WIDTH = 88;
-	private static final List<String> CATEGORIES = List.of("all", "world", "animals", "monsters", "characters");
+	private static final List<String> CATEGORIES = List.of("all", "world", "animals", "monsters", "characters", "famous");
 	private static final Map<String, List<String>> SORTED = Map.of(
 		"animals", List.of("bienen", "woelfe", "froesche", "riesenfrosch", "silberfische", "ziege", "fledermaeuse", "papagei", "delfin",
-			"kamel", "fuchs", "huehner", "bienennest", "axolotl", "panda", "katzen", "allay", "ziegenchor"),
+			"kamel", "fuchs", "huehner", "bienennest", "axolotl", "panda", "katzen", "allay", "ziegenchor", "kaetzchen"),
 		"monsters", List.of("spieler", "riese", "skelett", "creeper", "unsichtbar", "herobrine", "slenderman", "phantom", "geister",
 			"doppelgaenger", "ertrunkener", "magier", "ueberfall", "ghast", "enderman", "saugroboter"),
 		"characters", List.of("finanzamt", "paketbote", "mama", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker",
 			"zauberer", "klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch", "fahrlehrer",
-			"wahrsagerin", "weihnachtsmann", "werbung", "oma", "kellner", "navi", "bombenprank"));
+			"wahrsagerin", "weihnachtsmann", "werbung", "oma", "kellner", "navi", "bombenprank"),
+		"famous", List.of("trumprakete", "trumpmauer", "merkel", "putin", "stalin", "schwarzerrabe", "hochhaus", "ulbricht", "mausoleum", "revolution", "denkmal"));
 	private static boolean openNextTick;
 	// Remembered while the game runs, so the screen opens again on the same tab.
 	private static String category = "all";
