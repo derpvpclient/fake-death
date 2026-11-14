@@ -43,6 +43,7 @@ final class Demo {
 	private static boolean deathPhoto;
 	private static int waitedForGround;
 	private static final List<String> results = new ArrayList<>();
+	private static List<String> stillPlaying = List.of();
 
 	private Demo() {
 	}
@@ -68,7 +69,8 @@ final class Demo {
 			if (scene != current) {
 				// The scene is over, after the death screen or because it failed.
 				String error = FakeDeath.lastError;
-				results.add(name + ": " + (error != null ? "FEHLER " + error : deathPhoto ? "ok" : "ohne Todesbildschirm"));
+				results.add(name + ": " + (error != null ? "FEHLER " + error : deathPhoto ? "ok" : "ohne Todesbildschirm")
+					+ (stillPlaying.isEmpty() ? "" : ", Ton läuft weiter: " + stillPlaying));
 				FakeDeathClient.LOGGER.info("[Fake Death demo] {} done: {}", name, results.getLast());
 				unstage(level);
 				current = null;
@@ -77,8 +79,9 @@ final class Demo {
 				return;
 			}
 
-			if (!VIEW.isEmpty() && minecraft.options.getCameraType().isFirstPerson()) {
-				minecraft.options.setCameraType(VIEW.equals("front") ? net.minecraft.client.CameraType.THIRD_PERSON_FRONT : net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+			String view = view(name);
+			if (!view.isEmpty() && minecraft.options.getCameraType().isFirstPerson()) {
+				minecraft.options.setCameraType(view.equals("front") ? net.minecraft.client.CameraType.THIRD_PERSON_FRONT : net.minecraft.client.CameraType.THIRD_PERSON_BACK);
 			}
 
 			if (FRAMES > 0 && !FakeDeath.isActive()) {
@@ -98,6 +101,9 @@ final class Demo {
 				if (!deathPhoto && FakeDeath.deathTicks() >= DEATH_PHOTO) {
 					deathPhoto = true;
 					photo(minecraft, name + "-death");
+				}
+				if (FakeDeath.deathTicks() == DEATH_SCREEN - 2) {
+					stillPlaying = de.derpvpclient.fakedeath.scene.Scene.soundsStillPlaying();
 				}
 				if (FakeDeath.deathTicks() >= DEATH_SCREEN) {
 					FakeDeath.reveal(minecraft);
@@ -125,8 +131,8 @@ final class Demo {
 
 		Scene next;
 		try {
-			stagePortal(name, level, player);
-			next = Situations.create(name, level, player);
+			stagePortal(scene(name), level, player);
+			next = Situations.create(scene(name), level, player);
 		} catch (RuntimeException e) {
 			FakeDeathClient.LOGGER.error("[Fake Death demo] {} could not start", name, e);
 			next = null;
@@ -146,6 +152,7 @@ final class Demo {
 		lastFrame = -1;
 		photo = false;
 		deathPhoto = false;
+		stillPlaying = List.of();
 		FakeDeath.startNow(minecraft, next);
 	}
 
@@ -174,10 +181,33 @@ final class Demo {
 		try {
 			List<String> chosen = java.util.Arrays.stream(Files.readString(marker()).split(","))
 				.map(String::trim).filter(Situations.NAMES::contains).toList();
-			return chosen.isEmpty() ? Situations.NAMES : chosen;
+			return withViews(chosen.isEmpty() ? Situations.NAMES : chosen);
 		} catch (IOException e) {
-			return Situations.NAMES;
+			return withViews(Situations.NAMES);
 		}
+	}
+
+	/** With -Dfakedeath.demoView=all every scene plays three times: from the eyes, from behind (F5) and from the front (F5 twice). */
+	private static List<String> withViews(List<String> scenes) {
+		if (!VIEW.equals("all")) {
+			return scenes;
+		}
+		List<String> all = new ArrayList<>();
+		for (String scene : scenes) {
+			all.add(scene + "-v1");
+			all.add(scene + "-v2back");
+			all.add(scene + "-v3front");
+		}
+		return all;
+	}
+
+	private static String scene(String entry) {
+		int cut = entry.indexOf("-v");
+		return cut < 0 ? entry : entry.substring(0, cut);
+	}
+
+	private static String view(String entry) {
+		return entry.endsWith("-v2back") ? "back" : entry.endsWith("-v3front") ? "front" : entry.endsWith("-v1") ? "" : VIEW;
 	}
 
 	private static Path marker() {
@@ -205,6 +235,17 @@ final class Demo {
 					stage(level, middle.offset(x, 0, z), edge
 						? net.minecraft.world.level.block.Blocks.END_PORTAL_FRAME.defaultBlockState().setValue(net.minecraft.world.level.block.EndPortalFrameBlock.HAS_EYE, true)
 						: net.minecraft.world.level.block.Blocks.END_PORTAL.defaultBlockState());
+				}
+			}
+		} else if (name.equals("baum")) {
+			// An oak three steps ahead: a trunk of five and a round crown.
+			net.minecraft.core.BlockPos foot = feet.relative(ahead, 3);
+			for (int y = 0; y < 5; y++) {
+				stage(level, foot.above(y), net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState());
+			}
+			for (net.minecraft.core.BlockPos leaf : net.minecraft.core.BlockPos.betweenClosed(foot.offset(-2, 3, -2), foot.offset(2, 6, 2))) {
+				if (leaf.distSqr(foot.above(4)) <= 6.5) {
+					stage(level, leaf.immutable(), net.minecraft.world.level.block.Blocks.OAK_LEAVES.defaultBlockState());
 				}
 			}
 		} else if (name.equals("ofen")) {

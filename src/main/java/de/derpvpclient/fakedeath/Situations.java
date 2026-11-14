@@ -202,6 +202,9 @@ public final class Situations {
 		lastBreakTime = level.getGameTime();
 		lastBreakPos = pos.immutable();
 		lastBreakState = state;
+		if (state.is(BlockTags.LOGS) && FakeDeathConfig.isEnabled("baum") && TreeScene.afterBreak(level, pos, state) != null) {
+			FakeDeath.onTreeCut();
+		}
 	}
 
 	public static void reset() {
@@ -224,7 +227,8 @@ public final class Situations {
 		if (lastBreakState.is(BlockTags.BASE_STONE_OVERWORLD)) {
 			// Digging in stone: the cave comes down, or silverfish come out of it.
 			boolean cave = FakeDeathConfig.isEnabled("hoehle") && !level.canSeeSky(player.blockPosition().above());
-			boolean silverfish = FakeDeathConfig.isEnabled("silberfische");
+			// Silverfish only deep down, never with the sky overhead.
+			boolean silverfish = FakeDeathConfig.isEnabled("silberfische") && !level.canSeeSky(player.blockPosition().above());
 
 			if (cave && (!silverfish || ThreadLocalRandom.current().nextBoolean())) {
 				return new CaveInScene();
@@ -255,10 +259,10 @@ public final class Situations {
 		}
 
 		if (options.wants("kaktus")) {
-			// Cacti around, as in a desert: the cactus pinball, with the closest one as the first.
-			BlockPos cactus = find(level, feet, 4, 2, state -> state.is(Blocks.CACTUS));
-			if (cactus != null) {
-				options.add("kaktus", 5, () -> new CactusScene(cactus.distSqr(feet) <= 2 ? cactus : null));
+			// Only out in the desert, standing on sand under the open sky: the ring of cacti grows out of it.
+			boolean desert = level.getBiome(feet).is(Biomes.DESERT) || level.getBiome(feet).is(BiomeTags.IS_BADLANDS);
+			if (desert && sky && level.getBlockState(feet.below()).is(net.minecraft.tags.BlockTags.SAND)) {
+				options.add("kaktus", 5, CactusScene::new);
 			}
 		}
 
@@ -464,9 +468,10 @@ public final class Situations {
 			}
 		}
 		if (options.wants("delfin")) {
-			BlockPos sea = find(level, feet, 8, 3, state -> state.getFluidState().is(FluidTags.WATER));
-			if (sea != null) {
-				options.add("delfin", biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_BEACH) ? 4 : 1, () -> new DolphinScene(sea));
+			// Only right at the sea or a river, never next to a pond inland.
+			BlockPos sea = find(level, feet, 5, 2, state -> state.getFluidState().is(FluidTags.WATER));
+			if (sea != null && (biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_BEACH) || biome.is(BiomeTags.IS_RIVER))) {
+				options.add("delfin", 4, () -> new DolphinScene(sea));
 			}
 		}
 		if (!sky && !hasRoomAbove(level, head, 8)) {
@@ -725,7 +730,7 @@ public final class Situations {
 			}
 			case "hoehle" -> new CaveInScene();
 			case "blitz" -> new LightningScene();
-			case "kaktus" -> new CactusScene(find(level, feet, 1, 1, state -> state.is(Blocks.CACTUS)));
+			case "kaktus" -> new CactusScene();
 			case "beeren" -> new BerryScene(find(level, feet, 2, 1, state -> state.is(Blocks.SWEET_BERRY_BUSH)));
 			case "schnee" -> HazardScene.freeze(orFeet(find(level, feet, 2, 1, state -> state.is(Blocks.POWDER_SNOW)), feet));
 			case "hunger" -> HazardScene.starve();

@@ -202,6 +202,19 @@ public final class FakeDeath {
 		return randomTicks;
 	}
 
+	/** How long the random timer was set for, so chopping a tree can pull the event forward once half of it has run down. */
+	private static int randomSpan = -1;
+
+	/**
+	 * The player cut into a tree. Once the random event is at least half due, it comes right now: the tree falling on
+	 * them while they chop it is the best moment there is.
+	 */
+	public static void onTreeCut() {
+		if (FakeDeathConfig.randomEvent && scene == null && randomTicks > 0 && randomSpan > 0 && randomTicks <= randomSpan / 2) {
+			randomTicks = 0;
+		}
+	}
+
 	public static void rollRandomTimer() {
 		armedTicks = -1;
 
@@ -213,6 +226,7 @@ public final class FakeDeath {
 		int min = Math.clamp(FakeDeathConfig.randomMinMinutes, 1, FakeDeathConfig.MAX_MINUTES) * 1200;
 		int max = Math.max(min, Math.clamp(FakeDeathConfig.randomMaxMinutes, 1, FakeDeathConfig.MAX_MINUTES) * 1200);
 		randomTicks = ThreadLocalRandom.current().nextInt(min, max + 1);
+		randomSpan = randomTicks;
 	}
 
 	public static void tick(Minecraft minecraft) {
@@ -467,6 +481,8 @@ public final class FakeDeath {
 			return;
 		}
 
+		// Whatever the scene still plays stops with the death, only the killing blow of the last moment may ring out.
+		de.derpvpclient.fakedeath.scene.Scene.stopSounds(level.getGameTime() - 6);
 		level.playLocalSound(player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_DEATH, SoundSource.PLAYERS, 1.0F, 1.0F, false);
 		minecraft.gui.hud.getChat().addServerSystemMessage(message);
 		minecraft.gui.setScreen(new DeathScreen(message, level.getLevelData().isHardcore(), player));
@@ -490,6 +506,7 @@ public final class FakeDeath {
 			}
 		}
 
+		de.derpvpclient.fakedeath.scene.Scene.stopSounds(Long.MAX_VALUE);
 		scene = null;
 		sceneLevel = null;
 		sceneStart = null;

@@ -27,5 +27,12 @@
 			{"name": "minecraft:item/elytra/elytra_loop", "pitch": 1.6, "volume": 0.8},
 			{"name": "minecraft:block/conduit/attack1", "pitch": 0.7, "volume": 0.6}
 		]
+	},
+	"wolf.howl": {
+		"subtitle": "fakedeath.subtitles.wolf.howl",
+		"sounds": [
+			{"name": "minecraft:mob/wolf/howl1", "attenuation_distance": 64},
+			{"name": "minecraft:mob/wolf/howl2", "attenuation_distance": 64}
+		]
 	}
 }

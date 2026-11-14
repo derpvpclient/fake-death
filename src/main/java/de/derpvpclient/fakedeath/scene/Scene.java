@@ -117,6 +117,7 @@ public abstract class Scene {
 	/** Removes every trace of the scene from the client. */
 	public void end(ClientLevel level, LocalPlayer player) {
 		for (Entity actor : actors) {
+			Skins.forget(actor.getId());
 			level.removeEntity(actor.getId(), Entity.RemovalReason.DISCARDED);
 		}
 		actors.clear();
@@ -170,8 +171,21 @@ public abstract class Scene {
 
 	protected void despawn(ClientLevel level, Entity entity) {
 		if (actors.remove(entity)) {
+			Skins.forget(entity.getId());
 			level.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
 		}
+	}
+
+	/**
+	 * A person in the scene: a player body with the mod's own skin {@code textures/entity/skin/<skin>.png} and a name over
+	 * the head, or none. Their own id, never a real player's, so no real skin is looked up for them.
+	 */
+	protected net.minecraft.client.player.RemotePlayer person(ClientLevel level, String name, String skin, boolean slim, boolean showName, Vec3 pos) {
+		java.util.UUID id = java.util.UUID.nameUUIDFromBytes(("fakedeath-person-" + skin).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+		net.minecraft.client.player.RemotePlayer body = new net.minecraft.client.player.RemotePlayer(level, new com.mojang.authlib.GameProfile(id, name));
+		int entityId = nextEntityId;
+		Skins.give(entityId, skin, slim, showName);
+		return spawn(level, body, pos);
 	}
 
 	/** Lets a block fall from where it stands, the real block is hidden until the scene ends. */
@@ -327,7 +341,40 @@ public abstract class Scene {
 	}
 
 	protected static void sound(ClientLevel level, Vec3 pos, SoundEvent sound, SoundSource source, float volume, float pitch) {
-		level.playLocalSound(pos.x, pos.y, pos.z, sound, source, volume, pitch, false);
+		// The death screen is quiet, only its own death sound plays there.
+		if (FakeDeath.isActive()) {
+			return;
+		}
+		net.minecraft.client.resources.sounds.SimpleSoundInstance instance = new net.minecraft.client.resources.sounds.SimpleSoundInstance(
+			sound, source, volume, pitch, RandomSource.create(level.getRandom().nextLong()), pos.x, pos.y, pos.z);
+		Minecraft.getInstance().getSoundManager().play(instance);
+		long now = level.getGameTime();
+		PLAYING.removeIf(playing -> now - playing.started() > 40 && !Minecraft.getInstance().getSoundManager().isActive(playing.instance()));
+		PLAYING.add(new PlayingSound(instance, now, sound.location().toString()));
+	}
+
+	private record PlayingSound(net.minecraft.client.resources.sounds.SoundInstance instance, long started, String name) {
+	}
+
+	// Every sound a scene played, so none of them keeps going on the death screen or after the scene.
+	private static final List<PlayingSound> PLAYING = new ArrayList<>();
+
+	/** Stops every scene sound that started before the given game time; later ones, like the killing blow, may ring out. */
+	public static void stopSounds(long startedBefore) {
+		var manager = Minecraft.getInstance().getSoundManager();
+		PLAYING.removeIf(playing -> {
+			if (playing.started() < startedBefore) {
+				manager.stop(playing.instance());
+				return true;
+			}
+			return false;
+		});
+	}
+
+	/** The scene sounds still playing, for the test run. */
+	public static List<String> soundsStillPlaying() {
+		var manager = Minecraft.getInstance().getSoundManager();
+		return PLAYING.stream().filter(playing -> manager.isActive(playing.instance())).map(PlayingSound::name).toList();
 	}
 
 	/** A fake hit: hurt animation, sound and the hearts drop by the given share of the starting health. */
