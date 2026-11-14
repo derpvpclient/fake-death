@@ -161,7 +161,8 @@ final class UpdateCheck {
 
 	/** The version in the public repository's branch for this Minecraft version, if it is newer. */
 	static String fromGitHub(String own, String game) throws Exception {
-		String branch = "26.3".equals(game) ? "main" : "mc/" + game;
+		// The branch comes from the own version: "1.1.0+26.1" was built from mc/26.1, a plain number from main.
+		String branch = own.contains("+") ? "mc/" + own.substring(own.indexOf('+') + 1) : "main";
 		URI uri = URI.create("https://raw.githubusercontent.com/derpvpclient/" + SLUG + "/" + branch + "/gradle.properties");
 		HttpRequest request = HttpRequest.newBuilder(uri)
 			.header("User-Agent", "derpvpclient/" + SLUG + "/" + own)
