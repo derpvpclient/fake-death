@@ -28,6 +28,7 @@
 	"fakedeath.options.update_check": "Update-Hinweis",
 	"fakedeath.options.update_check.tooltip": "Zeigt im Mod-Menü an, wenn es eine neuere Version auf Modrinth und CurseForge gibt. Es wird nichts automatisch heruntergeladen.",
 	"fakedeath.update.message": "v%s auf Modrinth und CurseForge",
+	"fakedeath.update.message.curseforge": "v%s auf CurseForge und Modrinth",
 	"fakedeath.message.all_off": "Alle Szenen, die hier passen würden, sind in den Einstellungen ausgeschaltet.",
 	"fakedeath.message.waiting": "Der Fake-Tod wartet noch: %s.",
 	"fakedeath.command.test": "Szene „%s“ startet, sobald du sicher stehst.",
