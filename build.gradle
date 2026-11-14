@@ -58,3 +58,14 @@ loom {
 		}
 	}
 }
+
+// The file uploaded to CurseForge carries a small marker, so the update notice there names CurseForge first.
+// The Modrinth file stays the plain jar.
+tasks.register('curseforgeJar', Zip) {
+	dependsOn tasks.named('jar')
+	from(zipTree(tasks.named('jar').flatMap { it.archiveFile }))
+	from(file('src/curseforge'))
+	destinationDirectory = layout.buildDirectory.dir('libs/curseforge')
+	archiveFileName = tasks.named('jar').flatMap { it.archiveFileName }
+}
+tasks.named('build') { dependsOn 'curseforgeJar' }
