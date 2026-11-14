@@ -99,9 +99,24 @@ public abstract class Scene {
 		return false;
 	}
 
+	/** How big the own body is in third person, 1 for normal size; smaller when the player has been shrunk. */
+	public float bodyScale() {
+		return 1.0F;
+	}
+
+	/** True while the own body dances in third person, arms and legs swinging to the beat. */
+	public boolean dancing() {
+		return false;
+	}
+
+	/** True while the own body is gone in third person, like swallowed by a spawner or erased from history. */
+	public boolean hidesBody() {
+		return false;
+	}
+
 	/** A point the own body faces in third person whatever way the camera looks, so the camera can film it from the side. Null to turn with the camera. */
 	public Vec3 bodyFaces() {
-		return null;
+		return thirdPerson() ? watched : null;
 	}
 
 	/** The best moment of the scene for a picture, used by the demo run. */
@@ -181,7 +196,7 @@ public abstract class Scene {
 	 * the head, or none. Their own id, never a real player's, so no real skin is looked up for them.
 	 */
 	protected net.minecraft.client.player.RemotePlayer person(ClientLevel level, String name, String skin, boolean slim, boolean showName, Vec3 pos) {
-		java.util.UUID id = java.util.UUID.nameUUIDFromBytes(("fakedeath-person-" + skin).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+		java.util.UUID id = java.util.UUID.nameUUIDFromBytes(("fakedeath-person-" + skin + nextEntityId).getBytes(java.nio.charset.StandardCharsets.UTF_8));
 		net.minecraft.client.player.RemotePlayer body = new net.minecraft.client.player.RemotePlayer(level, new com.mojang.authlib.GameProfile(id, name));
 		int entityId = nextEntityId;
 		Skins.give(entityId, skin, slim, showName);
@@ -440,7 +455,32 @@ public abstract class Scene {
 
 	/** Pans the camera towards a point. Only the camera, the player's real rotation is left alone. */
 	protected static void turnTowards(LocalPlayer player, Vec3 target, float speed) {
+		if (thirdPerson()) {
+			// From outside (F5, F5 twice) the body would stand right in front of what it looks at and hide it. So the
+			// camera films from a little to the side, and the body itself turns to the thing: both are in the picture.
+			watched = target;
+			Vec3 eyes = player.getEyePosition();
+			Vec3 delta = target.subtract(eyes);
+			Vec3 aside = new Vec3(delta.x, 0.0, delta.z).yRot(SIDE_ANGLE);
+			// Never steeply up or down: from outside the camera would dive under the body or over it, and the body
+			// would fill the whole picture. Something high up is still in the shot above the head.
+			double flat = Math.max(1.0, aside.length());
+			double up = Mth.clamp(delta.y, -0.7 * flat, 0.35 * flat);
+			CameraDirector.turnTowards(player, eyes.add(aside.x, up, aside.z), speed);
+			return;
+		}
+		watched = null;
 		CameraDirector.turnTowards(player, target, speed);
+	}
+
+	/** How far the camera films from the side in third person, in radians. */
+	private static final float SIDE_ANGLE = 0.5F;
+	/** What the scene last turned the view to; in third person the body faces it. */
+	private static Vec3 watched;
+
+	/** A new scene starts looking at nothing in particular. */
+	public static void resetWatch() {
+		watched = null;
 	}
 
 	/**

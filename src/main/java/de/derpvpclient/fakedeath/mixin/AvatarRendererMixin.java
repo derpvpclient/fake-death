@@ -25,9 +25,14 @@ public class AvatarRendererMixin {
 				state.nameTag = null;
 			}
 		}
+		de.derpvpclient.fakedeath.scene.Skins.posed(state, de.derpvpclient.fakedeath.scene.Skins.poseOf(entity.getId()));
 		Scene scene = FakeDeath.currentScene();
 		if (entity == Minecraft.getInstance().player) {
 			CameraDirector.pushUpState = scene != null && scene.pushUp() ? state : null;
+		}
+		if (entity == Minecraft.getInstance().player && scene != null && scene.hidesBody()) {
+			state.isInvisible = true;
+			state.isInvisibleToPlayer = true;
 		}
 		if (entity != Minecraft.getInstance().player || scene == null || scene.lying() <= 0.0F) {
 			return;

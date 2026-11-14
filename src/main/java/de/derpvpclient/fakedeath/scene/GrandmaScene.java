@@ -16,8 +16,9 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
- * Grandma makes videos now. Her selfie stick is a trident. "Say cheese!" Flash. "And now really close!" Three pokes, the
- * last one too close. "Oh. Is this live now?"
+ * Grandma makes videos now: a ring light on its tripod, a tin of cookies, her knitting, and a selfie stick with a pink
+ * phone. "Say cheese!" Flash. "And now really close!" Three pokes with the stick, the last one too close. "Oh. Is this
+ * live now?"
  */
 public class GrandmaScene extends NpcScene {
 	private static final int CHEESE = 20;
@@ -26,9 +27,34 @@ public class GrandmaScene extends NpcScene {
 	private static final int POKE = 8;
 	private Display.ItemDisplay stick;
 	private int flash;
+	private Display.ItemDisplay ringLight;
+	private Display.ItemDisplay cookies;
 
 	public GrandmaScene() {
 		super("oma", ChatFormatting.LIGHT_PURPLE);
+	}
+
+	@Override
+	protected ItemStack held() {
+		// Knitting while she talks, the stick comes out for the video.
+		return Looks.prop(Items.STRING, "knitting");
+	}
+
+	@Override
+	protected void setup(Minecraft minecraft, ClientLevel level, LocalPlayer player) {
+		// Her studio: the ring light glowing next to her, the cookie tin on the ground at her other side.
+		Vec3 toward = towardPlayer(player);
+		Vec3 side = toward.yRot(Mth.HALF_PI);
+		Vec3 light = stand.add(side.scale(1.3)).add(toward.scale(-0.3));
+		light = new Vec3(light.x, floor(level, light.x, light.z, player.getY()), light.z);
+		ringLight = itemDisplay(level, Looks.prop(Items.IRON_NUGGET, "ring_light"), light);
+		Looks.glow(ringLight);
+		float yaw = (float) Math.atan2(toward.x, toward.z);
+		place(ringLight, light.add(0.0, 1.0, 0.0), new Vector3f(1.0F), new Quaternionf().rotateY(yaw + Mth.PI));
+		Vec3 tin = stand.add(side.scale(-1.0)).add(toward.scale(0.4));
+		tin = new Vec3(tin.x, floor(level, tin.x, tin.z, player.getY()), tin.z);
+		cookies = itemDisplay(level, Looks.prop(Items.COOKIE, "cookie_tin"), tin);
+		place(cookies, tin.add(0.0, 0.5, 0.0), new Vector3f(0.8F), new Quaternionf().rotateY(yaw));
 	}
 
 	@Override
@@ -53,7 +79,8 @@ public class GrandmaScene extends NpcScene {
 
 	@Override
 	public int screenTint() {
-		return flash > 0 ? (Math.min(255, flash * 60) << 24) | 0xFFFFFF : 0;
+		// The camera flash, only when flashing effects are allowed in the settings.
+		return flash > 0 && de.derpvpclient.fakedeath.FakeDeathConfig.flashing ? (Math.min(255, flash * 60) << 24) | 0xFFFFFF : 0;
 	}
 
 	@Override
@@ -68,7 +95,8 @@ public class GrandmaScene extends NpcScene {
 		}
 		Vec3 toward = towardPlayer(player);
 		if (t == 0) {
-			stick = itemDisplay(level, new ItemStack(Items.TRIDENT), npc.getEyePosition());
+			stick = itemDisplay(level, Looks.prop(Items.STICK, "grandma_selfie_stick"), npc.getEyePosition());
+			npc.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, ItemStack.EMPTY);
 		}
 
 		// Waving it around looking for the right angle, then poking at the player's face.
@@ -87,7 +115,7 @@ public class GrandmaScene extends NpcScene {
 			}
 			if (p == POKE / 2) {
 				Looks.swing(npc);
-				sound(level, player.position(), SoundEvents.TRIDENT_HIT, SoundSource.NEUTRAL, 1.5F, 1.0F);
+				sound(level, player.position(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, SoundSource.NEUTRAL, 1.5F, 1.2F);
 				particles(level, ParticleTypes.CRIT, player.getEyePosition(), 15, 0.4, 0.2);
 				hit(level, player, SoundEvents.PLAYER_HURT, 0.3F, i == POKES.length - 1);
 				if (i < POKES.length - 1) {
@@ -97,10 +125,8 @@ public class GrandmaScene extends NpcScene {
 			}
 		}
 		Vec3 at = hand.add(aim.scale(reach + 0.6));
-		// The trident icon points to the top right, turned so that the tip points along the aim.
-		float yaw = (float) Math.atan2(-aim.z, aim.x);
-		float pitch = (float) Math.atan2(aim.y, Math.sqrt(aim.x * aim.x + aim.z * aim.z));
-		place(stick, at, new Vector3f(1.0F), new Quaternionf().rotateY(yaw).rotateZ(pitch - Mth.PI / 4));
+		// The stick runs up its model, the phone at the top: turned so the phone end points along the aim.
+		place(stick, at, new Vector3f(0.55F), new Quaternionf().rotationTo(new Vector3f(0.0F, 1.0F, 0.0F), new Vector3f((float) aim.x, (float) aim.y, (float) aim.z)));
 
 		if (t == CHEESE) {
 			speak(minecraft, level, "fakedeath.oma.cheese");

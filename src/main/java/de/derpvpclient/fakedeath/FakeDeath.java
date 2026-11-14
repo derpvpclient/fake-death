@@ -437,6 +437,7 @@ public final class FakeDeath {
 	}
 
 	private static void begin(Minecraft minecraft, Scene next) {
+		de.derpvpclient.fakedeath.scene.Scene.resetWatch();
 		FakeDeathClient.LOGGER.info("Fake death scene starts: {}", next.getClass().getSimpleName());
 		scene = next;
 		sceneTick = 0;

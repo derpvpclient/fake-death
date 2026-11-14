@@ -16,6 +16,48 @@ import net.minecraft.world.entity.player.PlayerSkin;
 public final class Skins {
 	private static final Map<Integer, PlayerSkin> SKINS = new HashMap<>();
 	private static final Set<Integer> NAMELESS = new HashSet<>();
+	private static final Map<Integer, Pose> POSES = new HashMap<>();
+	private static final Map<Object, Pose> POSED = new java.util.WeakHashMap<>();
+
+	/** How a person in a scene holds the arms. */
+	public enum Pose {
+		/** Both hands together in front of the belly, fingertips touching. */
+		RAUTE,
+		/** The right arm stretched out, pointing ahead. */
+		POINT,
+		/** Both arms up in the air. */
+		CHEER,
+		/** The right arm raised, holding something up high, like a flag. */
+		RAISE,
+		/** The right hand at the forehead. */
+		SALUTE
+	}
+
+	/** Sets the arms of an actor, or back to normal with null. */
+	static void pose(int entityId, Pose pose) {
+		if (pose == null) {
+			POSES.remove(entityId);
+		} else {
+			POSES.put(entityId, pose);
+		}
+	}
+
+	public static Pose poseOf(int entityId) {
+		return POSES.get(entityId);
+	}
+
+	/** Remembers which render state belongs to a posed actor, for the model to read. */
+	public static void posed(Object state, Pose pose) {
+		if (pose == null) {
+			POSED.remove(state);
+		} else {
+			POSED.put(state, pose);
+		}
+	}
+
+	public static Pose posedState(Object state) {
+		return POSED.get(state);
+	}
 
 	private Skins() {
 	}
@@ -31,6 +73,7 @@ public final class Skins {
 	}
 
 	static void forget(int entityId) {
+		POSES.remove(entityId);
 		SKINS.remove(entityId);
 		NAMELESS.remove(entityId);
 	}
