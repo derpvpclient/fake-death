@@ -32,7 +32,13 @@ public abstract class CameraMixin {
 		Vec3 offset = CameraDirector.positionOffset();
 
 		if (offset.lengthSqr() > 1.0E-6) {
-			setPosition(getPosition().add(offset));
+			Vec3 moved = getPosition().add(offset);
+			if (detached && entity != null) {
+				// From outside the camera stays above the body, it never sinks into the ground with a lying body.
+				double feet = entity.getPosition(partialTicks).y + CameraDirector.bodyOffset(entity).y;
+				moved = new Vec3(moved.x, Math.max(moved.y, feet + 0.9), moved.z);
+			}
+			setPosition(moved);
 		}
 	}
 
