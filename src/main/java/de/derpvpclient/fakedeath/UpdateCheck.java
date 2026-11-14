@@ -23,15 +23,21 @@ final class UpdateCheck {
 	/** The same release is on both sites. */
 	static final String MODRINTH = "https://modrinth.com/mod/" + SLUG;
 	static final String CURSEFORGE = "https://www.curseforge.com/minecraft/mc-mods/" + SLUG;
+	private static final int CURSEFORGE_ID = 1795579;
+	/** Where the found update can be downloaded: Modrinth, or CurseForge while Modrinth does not list the project. */
+	static volatile String link = MODRINTH + "/versions";
+	/** Set by newer(): the notice names CurseForge first. */
+	static volatile boolean curseForgeFirst;
 
 	private UpdateCheck() {
 	}
 
 	/** The newer version number without the Minecraft part, like "1.0.56", or null if there is none. Blocks while asking. */
 	static String newer() {
-		if (!FakeDeathConfig.updateCheck) {
-			return null;
-		}
+		// Whoever got the file from CurseForge is sent to CurseForge first, everyone else to Modrinth.
+		curseForgeFirst = fromCurseForgeApp();
+		link = curseForgeFirst ? CURSEFORGE + "/files" : MODRINTH + "/versions";
+		FakeDeathClient.LOGGER.info("Update check, {} first", curseForgeFirst ? "CurseForge" : "Modrinth");
 
 		// For the game test: pretends this version is out, so the notice can be seen without asking Modrinth.
 		String pretend = System.getProperty("fakedeath.updateTest");
@@ -43,10 +49,21 @@ final class UpdateCheck {
 			return null;
 		}
 
+		if (!FakeDeathConfig.updateCheck) {
+			return null;
+		}
+
 		String own = version(MOD_ID);
 		String game = version("minecraft");
 		if (own == null || game == null) {
 			return null;
+		}
+
+		if (curseForgeFirst) {
+			String found = fromCurseForge(own, game);
+			if (found != null) {
+				return found;
+			}
 		}
 
 		try {
@@ -58,7 +75,26 @@ final class UpdateCheck {
 				.build();
 			HttpResponse<String> response = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build()
 				.send(request, HttpResponse.BodyHandlers.ofString());
-			return response.statusCode() == 200 ? read(response.body(), own) : null;
+			if (response.statusCode() == 200) {
+				String found = read(response.body(), own);
+				if (found != null) {
+					link = MODRINTH + "/versions";
+					return found;
+				}
+			}
+			// Modrinth answers 404 while the project is still waiting for review: then CurseForge, then the public source.
+			if (!curseForgeFirst) {
+				String found = fromCurseForge(own, game);
+				if (found != null) {
+					link = CURSEFORGE + "/files";
+					return found;
+				}
+			}
+			if (response.statusCode() != 200) {
+				// Not listed on Modrinth yet: the download is on CurseForge.
+				link = CURSEFORGE + "/files";
+			}
+			return fromGitHub(own, game);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			return null;
@@ -66,6 +102,83 @@ final class UpdateCheck {
 			FakeDeathClient.LOGGER.debug("Update check failed", e);
 			return null;
 		}
+	}
+
+	/**
+	 * True for the file downloaded from CurseForge (it carries fakedeath-download.txt), or, for older files, when the game
+	 * runs from a CurseForge app instance (its folders live under "curseforge").
+	 */
+	static boolean fromCurseForgeApp() {
+		if (FabricLoader.getInstance().getModContainer(MOD_ID).flatMap(mod -> mod.findPath("fakedeath-download.txt")).isPresent()) {
+			return true;
+		}
+		String dir = FabricLoader.getInstance().getGameDir().toAbsolutePath().toString().toLowerCase(java.util.Locale.ROOT);
+		return dir.contains("curseforge");
+	}
+
+	/** The newest approved release on CurseForge for this Minecraft version, if it is newer. Read from the file names. */
+	static String fromCurseForge(String own, String game) {
+		try {
+			URI uri = URI.create("https://www.curseforge.com/api/v1/mods/" + CURSEFORGE_ID + "/files?pageIndex=0&pageSize=50&sort=dateCreated&sortDescending=true");
+			HttpRequest request = HttpRequest.newBuilder(uri)
+				.header("User-Agent", "derpvpclient/" + SLUG + "/" + own)
+				.timeout(Duration.ofSeconds(15))
+				.build();
+			HttpResponse<String> response = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build()
+				.send(request, HttpResponse.BodyHandlers.ofString());
+			if (response.statusCode() != 200) {
+				return null;
+			}
+			String best = null;
+			for (JsonElement element : JsonParser.parseString(response.body()).getAsJsonObject().getAsJsonArray("data")) {
+				JsonObject file = element.getAsJsonObject();
+				// 4 is approved, 1 a release (not beta or alpha).
+				if (file.get("status").getAsInt() != 4 || file.get("releaseType").getAsInt() != 1) {
+					continue;
+				}
+				boolean forThisGame = false;
+				for (JsonElement version : file.getAsJsonArray("gameVersions")) {
+					forThisGame |= game.equals(version.getAsString());
+				}
+				String name = file.get("fileName").getAsString();
+				if (!forThisGame || !name.startsWith(MOD_ID + "-") || !name.endsWith(".jar")) {
+					continue;
+				}
+				String number = name.substring(MOD_ID.length() + 1, name.length() - ".jar".length()).split("[+-]")[0];
+				if (compare(number, best != null ? best : own) > 0) {
+					best = plain(number);
+				}
+			}
+			return best;
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			return null;
+		} catch (Exception e) {
+			FakeDeathClient.LOGGER.debug("CurseForge update check failed", e);
+			return null;
+		}
+	}
+
+	/** The version in the public repository's branch for this Minecraft version, if it is newer. */
+	static String fromGitHub(String own, String game) throws Exception {
+		String branch = "26.3".equals(game) ? "main" : "mc/" + game;
+		URI uri = URI.create("https://raw.githubusercontent.com/derpvpclient/" + SLUG + "/" + branch + "/gradle.properties");
+		HttpRequest request = HttpRequest.newBuilder(uri)
+			.header("User-Agent", "derpvpclient/" + SLUG + "/" + own)
+			.timeout(Duration.ofSeconds(15))
+			.build();
+		HttpResponse<String> response = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build()
+			.send(request, HttpResponse.BodyHandlers.ofString());
+		if (response.statusCode() != 200) {
+			return null;
+		}
+		for (String line : response.body().split("\\R")) {
+			if (line.startsWith("version=")) {
+				String number = line.substring("version=".length()).trim();
+				return compare(number, own) > 0 ? plain(number) : null;
+			}
+		}
+		return null;
 	}
 
 	/** The highest release Modrinth lists, if it is newer than the installed one. */
