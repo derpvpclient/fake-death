@@ -30,8 +30,8 @@ import org.joml.Vector3f;
 public class SkyscraperScene extends CastScene {
 	/** The tiers from the bottom: width, height, depth. */
 	private static final float[][] TIERS = {{9.0F, 6.0F, 7.0F}, {7.0F, 6.0F, 5.0F}, {5.0F, 5.0F, 3.6F}, {3.2F, 5.0F, 2.6F}, {1.0F, 7.0F, 1.0F}};
-	private static final int ORDER = 12;
-	private static final int FIRST = 30;
+	private static final int ORDER = ARRIVE + 8;
+	private static final int FIRST = ARRIVE + 26;
 	private static final int TIER = 26;
 	private static final int DONE = FIRST + TIERS.length * TIER;
 	private static final int WOBBLE = DONE + 20;
@@ -199,8 +199,11 @@ public class SkyscraperScene extends CastScene {
 		Vec3 stand = onGround(level, player, player.position().add(look.scale(4.0)).add(side.scale(-3.0)));
 		place(blockDisplay(level, Blocks.RED_CONCRETE.defaultBlockState(), stand, 3.0F), stand.add(0.0, 0.3, 0.0), new Vector3f(1.4F, 0.6F, 1.4F), new Quaternionf().rotateY(yaw));
 		stalin = actor(level, "fakedeath.hochhaus.stalin", "stalin", false, stand.add(0.0, 0.6, 0.0));
+		arrive(level, player, stalin, 0);
 		for (int i = 0; i < 3; i++) {
-			workers.add(extra(level, i == 1 ? "builder" : "worker", onGround(level, player, player.position().add(look.scale(6.5)).add(side.scale((i - 1) * 1.8 + 1.5)))));
+			RemotePlayer worker = extra(level, i == 1 ? "builder" : "worker", onGround(level, player, player.position().add(look.scale(6.5)).add(side.scale((i - 1) * 1.8 + 1.5))));
+			arrive(level, player, worker, 3 + i * 4);
+			workers.add(worker);
 		}
 		standFlag(level, player, stand.add(side.scale(-1.3)).add(look.scale(0.6)), "flag_soviet", 1.3F);
 	}
