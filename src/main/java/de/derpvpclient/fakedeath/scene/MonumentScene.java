@@ -27,8 +27,8 @@ import org.joml.Vector3f;
  * then all at once, right onto the player.
  */
 public class MonumentScene extends CastScene {
-	private static final int[] HEAVES = {20, 50, 78};
-	private static final int CRACK = 92;
+	private static final int[] HEAVES = {ARRIVE + 14, ARRIVE + 44, ARRIVE + 72};
+	private static final int CRACK = ARRIVE + 86;
 	private static final int FALL = 30;
 	private static final int IMPACT = CRACK + FALL;
 	private static final ChatFormatting WORKERS = ChatFormatting.GRAY;
@@ -108,7 +108,10 @@ public class MonumentScene extends CastScene {
 				stepTowards(level, player, puller, puller.position().add(toward.yRot(i == 0 ? 1.4F : -1.4F).scale(3.0)), 0.25);
 			}
 			face(puller, neck);
-			if (i < ropes.size()) {
+			if (i < ropes.size() && entering(puller)) {
+				// The rope is picked up once they stand at their place.
+				place(ropes.get(i), puller.position(), new Vector3f(0.0F), new Quaternionf());
+			} else if (i < ropes.size()) {
 				Vec3 hand = puller.position().add(0.0, 1.2, 0.0);
 				Vec3 mid = hand.lerp(neck, 0.5);
 				Vec3 dir = neck.subtract(hand);
@@ -160,6 +163,7 @@ public class MonumentScene extends CastScene {
 		for (int s : new int[] {-1, 1}) {
 			RemotePlayer puller = actor(level, s < 0 ? "fakedeath.denkmal.worker1" : "fakedeath.denkmal.worker2", "worker", false,
 				onGround(level, player, base.add(toward.scale(3.5)).add(side.scale(s * 3.5))));
+			arrive(level, player, puller, s < 0 ? 0 : 5);
 			pullers.add(puller);
 			ropes.add(blockDisplay(level, Blocks.WOOL.brown().defaultBlockState(), puller.position(), 16.0F));
 		}

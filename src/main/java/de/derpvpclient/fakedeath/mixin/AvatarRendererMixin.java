@@ -26,6 +26,7 @@ public class AvatarRendererMixin {
 			}
 		}
 		de.derpvpclient.fakedeath.scene.Skins.posed(state, de.derpvpclient.fakedeath.scene.Skins.poseOf(entity.getId()));
+		de.derpvpclient.fakedeath.scene.Skins.widened(state, de.derpvpclient.fakedeath.scene.Skins.widthOf(entity.getId()));
 		Scene scene = FakeDeath.currentScene();
 		if (entity == Minecraft.getInstance().player) {
 			CameraDirector.pushUpState = scene != null && scene.pushUp() ? state : null;
@@ -44,6 +45,15 @@ public class AvatarRendererMixin {
 		state.walkAnimationSpeed = 0.5F;
 		if (scene.pushUp()) {
 			state.walkAnimationSpeed = 0.0F;
+		}
+	}
+
+	// Someone stretched wide: only sideways, after the game has scaled the body.
+	@Inject(method = "scale(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V", at = @At("TAIL"))
+	private void fakedeath$wide(AvatarRenderState state, com.mojang.blaze3d.vertex.PoseStack poseStack, CallbackInfo ci) {
+		float width = de.derpvpclient.fakedeath.scene.Skins.widthOfState(state);
+		if (width != 1.0F) {
+			poseStack.scale(width, 1.0F, 1.0F);
 		}
 	}
 }

@@ -109,6 +109,11 @@ public abstract class Scene {
 		return false;
 	}
 
+	/** Scenes that only work through the own eyes: F5 does nothing while they play, the camera stays in first person. */
+	public boolean firstPersonOnly() {
+		return false;
+	}
+
 	/** True while the own body is gone in third person, like swallowed by a spawner or erased from history. */
 	public boolean hidesBody() {
 		return false;
@@ -497,8 +502,14 @@ public abstract class Scene {
 		mob.walkAnimation.update(Math.min((float) distance * 4.0F, 1.0F), 0.4F, mob.isBaby() ? 3.0F : 1.0F);
 	}
 
+	/** People still walking in from the side look where they go, whatever the scene wants them to look at. */
+	protected static final java.util.Set<Entity> ENTERING = new java.util.HashSet<>();
+
 	/** Makes a client-only mob look at a point, head and body together. */
 	protected static void face(Entity entity, Vec3 target) {
+		if (ENTERING.contains(entity)) {
+			return;
+		}
 		Vec3 delta = target.subtract(entity.getEyePosition());
 		float yaw = (float) (Mth.atan2(delta.z, delta.x) * Mth.RAD_TO_DEG) - 90.0F;
 		float pitch = (float) -(Mth.atan2(delta.y, delta.horizontalDistance()) * Mth.RAD_TO_DEG);
