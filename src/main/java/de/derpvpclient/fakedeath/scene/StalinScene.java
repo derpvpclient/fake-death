@@ -24,19 +24,21 @@ import org.joml.Vector3f;
 
 /**
  * The Soviet Union. Stalin walks to his desk, two soldiers march in holding up great red flags with the hammer and
- * sickle, a choir of villagers lines up and sings the anthem: the first line, then the refrain. Everybody sings.
+ * sickle, a choir of villagers lines up and sings the anthem: the first lines of the verse, then the refrain. Everybody sings.
  * Except the player. Stalin notices. "Comrade ... why are you not singing?" He takes the red pencil and crosses a name
  * off the list. The colours drain out of the world, and the player is retouched out of history like out of the old
  * photographs.
  */
 public class StalinScene extends CastScene {
 	/**
-	 * The anthem's melody (Alexandrov, 1944; public domain music) after the score: the first line of the verse, the
-	 * one everybody knows, then straight into the refrain. MIDI notes and lengths in eighths.
+	 * The anthem's melody (Alexandrov, 1944; public domain music) after the score: the first two lines of the verse,
+	 * then the first two lines of the refrain. MIDI notes and lengths in sixteenths.
 	 */
 	private static final int[][] MELODY = {
 		// Со-юз не-ру-ши-мый рес-пуб-лик сво-бод-ных
-		{67, 2}, {72, 4}, {67, 3}, {69, 1}, {71, 4}, {64, 2}, {64, 2}, {69, 4}, {67, 3}, {65, 1}, {67, 4}, {60, 3}, {67, 1},
+		{67, 2}, {72, 4}, {67, 3}, {69, 1}, {71, 4}, {64, 2}, {64, 2}, {69, 4}, {67, 3}, {65, 1}, {67, 4}, {60, 3}, {60, 1},
+		// Спло-ти-ла на-ве-ки Ве-ли-ка-я Русь.
+		{62, 4}, {62, 3}, {64, 1}, {65, 4}, {65, 2}, {67, 2}, {69, 4}, {71, 3}, {72, 1}, {74, 6}, {67, 2},
 		// Сла-вься, О-те-че-ство на-ше сво-бод-ное,
 		{76, 8}, {74, 2}, {72, 2}, {71, 2}, {72, 2}, {74, 6}, {67, 2}, {67, 8},
 		// Друж-бы на-ро-дов на-дёж-ный оп-лот!
@@ -44,18 +46,20 @@ public class StalinScene extends CastScene {
 	/** The first note comes before the first bar. */
 	private static final int PICKUP = 2;
 	private static final int[] CHORD_C = {55, 60, 64};
-	private static final int[] CHORD_E = {56, 59, 64};
 	private static final int[] CHORD_EM = {55, 59, 64};
 	private static final int[] CHORD_F = {57, 60, 65};
-	private static final int[] CHORD_G = {55, 59, 62};
-	/** The harmony, one chord to each bar, over the bass of the score: C E F C, then the refrain C E G G, F E E E. */
-	private static final int[][] CHORDS = {CHORD_C, CHORD_E, CHORD_F, CHORD_C, CHORD_C, CHORD_EM, CHORD_G, CHORD_G, CHORD_F, CHORD_EM, CHORD_E, CHORD_E};
-	private static final int[] BASS = {36, 40, 41, 36, 36, 40, 43, 43, 41, 40, 40, 40};
-	/** Ticks to a beat: slow and solemn, about 109 beats a minute. */
-	private static final int QUARTER = 11;
+	private static final int[] CHORD_DM = {57, 62, 65};
+	private static final int[] CHORD_D = {57, 62, 66};
+	private static final int[] CHORD_G7 = {55, 59, 62, 65};
+	/** The harmony of the score, one chord to each half bar: C Em F C, Dm F D G7, then the refrain C Em G7 G7, F Em Em Em. */
+	private static final int[][] CHORDS = {CHORD_C, CHORD_EM, CHORD_F, CHORD_C, CHORD_DM, CHORD_F, CHORD_D, CHORD_G7,
+		CHORD_C, CHORD_EM, CHORD_G7, CHORD_G7, CHORD_F, CHORD_EM, CHORD_EM, CHORD_EM};
+	private static final int[] BASS = {36, 40, 41, 36, 38, 41, 38, 43, 36, 40, 43, 43, 41, 40, 40, 40};
+	/** Ticks to a sixteenth: a beat is 16 ticks, 75 beats a minute, the tempo of the score. */
+	private static final int STEP = 4;
 	private static final int SING = ARRIVE + 12;
 	/** He notices when the second line of the refrain starts. */
-	private static final int NOTICE = SING + at(66);
+	private static final int NOTICE = SING + at(98);
 	private static final int WHY = NOTICE + 12;
 	private static final int PENCIL = WHY + 55;
 	private static final int ERASE = PENCIL + 25;
@@ -84,9 +88,9 @@ public class StalinScene extends CastScene {
 		return SING + at(40);
 	}
 
-	/** The tick of the song at a number of eighths. */
-	private static int at(int eighths) {
-		return eighths * QUARTER / 2;
+	/** The tick of the song at a number of sixteenths. */
+	private static int at(int sixteenths) {
+		return sixteenths * STEP;
 	}
 
 	private static float pitchOf(int midi, int base) {
@@ -145,19 +149,19 @@ public class StalinScene extends CastScene {
 			Vec3 by = singer.getEyePosition().add(0.0, 0.6, 0.0);
 			level.addParticle(ParticleTypes.NOTE, by.x, by.y, by.z, (midi - 60) / 24.0, 0.0, 0.0);
 		}
-		// The chords on every beat, the bass and the drum on the first and the third.
+		// The chords on every beat, a new chord and the bass every half bar, the drum on the first beat of the bar.
 		int sinceBar = beat - at(PICKUP);
-		if (sinceBar >= 0 && sinceBar % QUARTER == 0 && tick < ERASE) {
-			int quarter = sinceBar / QUARTER;
-			int bar = quarter / 4;
-			if (bar < CHORDS.length) {
+		if (sinceBar >= 0 && sinceBar % at(4) == 0 && tick < ERASE) {
+			int quarter = sinceBar / at(4);
+			int half = quarter / 2;
+			if (half < CHORDS.length) {
 				boolean strong = quarter % 2 == 0;
-				for (int midi : CHORDS[bar]) {
+				for (int midi : CHORDS[half]) {
 					sound(level, desk, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, volume * (strong ? 0.45F : 0.3F), pitchOf(midi, 66));
 				}
 				if (strong) {
 					boolean first = quarter % 4 == 0;
-					sound(level, desk, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.RECORDS, volume * (first ? 1.0F : 0.7F), pitchOf(BASS[bar], 42));
+					sound(level, desk, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.RECORDS, volume * (first ? 1.0F : 0.8F), pitchOf(BASS[half], 42));
 					if (first) {
 						sound(level, desk, SoundEvents.NOTE_BLOCK_BASEDRUM.value(), SoundSource.RECORDS, volume * 0.5F, 1.0F);
 					}
@@ -191,7 +195,7 @@ public class StalinScene extends CastScene {
 		}
 
 		face(stalin, tick < NOTICE ? desk.add(horizontalLook(player).scale(-3.0)).add(0.0, 1.0, 0.0) : eyes);
-		if (tick >= SING + at(PICKUP) && tick < NOTICE && (tick - SING - at(PICKUP)) % (4 * QUARTER) == 0) {
+		if (tick >= SING + at(PICKUP) && tick < NOTICE && (tick - SING - at(PICKUP)) % at(16) == 0) {
 			// Conducting, once a bar.
 			Looks.swing(stalin);
 		}

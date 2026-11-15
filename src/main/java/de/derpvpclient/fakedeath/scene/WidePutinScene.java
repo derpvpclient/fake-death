@@ -56,6 +56,7 @@ public class WidePutinScene extends CastScene {
 	private float yaw;
 	private int death = Integer.MAX_VALUE;
 	private float squeeze;
+	private boolean ownMusic = true;
 
 	@Override
 	public int length() {
@@ -110,8 +111,10 @@ public class WidePutinScene extends CastScene {
 			((TextDisplayAccessor) title).fakedeath$setText(Component.literal("IT'S HIM").withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE));
 			((TextDisplayAccessor) title).fakedeath$setBackgroundColor(0xA0000000);
 			sound(level, eyes, SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.RECORDS, 1.0F, 0.7F);
+			// The original song of the meme, if the player brings it in a resource pack of their own.
+			ownMusic = !packMusic(level, eyes, "meme.wideputin");
 		}
-		if (tick >= TITLE) {
+		if (tick >= TITLE && ownMusic) {
 			music(level, tick - TITLE, eyes);
 		}
 
