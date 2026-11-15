@@ -27,6 +27,12 @@ public class MagicianScene extends NpcScene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// The trick is made for the volunteer's eyes, from outside there is no box to see.
+		return true;
+	}
+
+	@Override
 	protected int lineCount() {
 		return 3;
 	}

@@ -26,6 +26,12 @@ public class EndermanScene extends Scene {
 	private int taken;
 
 	@Override
+	public boolean firstPersonOnly() {
+		// Looking into its eyes only works through your own.
+		return true;
+	}
+
+	@Override
 	public int length() {
 		return DEATH + 20;
 	}

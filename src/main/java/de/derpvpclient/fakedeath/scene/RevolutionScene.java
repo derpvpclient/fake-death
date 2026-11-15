@@ -24,8 +24,9 @@ import org.joml.Vector3f;
  * one there ... is a bourgeois!" The crowd turns round. And runs.
  */
 public class RevolutionScene extends CastScene {
-	private static final int COMRADES = 15;
-	private static final int POWER = 55;
+	private static final int HOP_UP = ARRIVE;
+	private static final int COMRADES = ARRIVE + 22;
+	private static final int POWER = ARRIVE + 62;
 	private static final int CHEER = POWER + 20;
 	private static final int POINT = CHEER + 40;
 	private static final int TURN = POINT + 25;
@@ -39,6 +40,7 @@ public class RevolutionScene extends CastScene {
 	private final List<Display.ItemDisplay> banners = new ArrayList<>();
 	private RemotePlayer lenin;
 	private Vec3 car;
+	private Vec3 carSide;
 	private boolean down;
 
 	@Override
@@ -71,6 +73,12 @@ public class RevolutionScene extends CastScene {
 		}
 		bubbles();
 		Vec3 eyes = player.getEyePosition();
+		if (tick >= HOP_UP && tick <= HOP_UP + 8) {
+			// Up onto the armoured car.
+			float p = (tick - HOP_UP) / 8.0F;
+			Vec3 at = carSide.lerp(car.add(0.0, 2.1, 0.0), p).add(0.0, Math.sin(p * Math.PI) * 0.8, 0.0);
+			lenin.setPos(at.x, at.y, at.z);
+		}
 		face(lenin, tick < POINT ? lenin.getEyePosition().add(horizontalLook(player).scale(-4.0)).add(0.0, 0.5, 0.0) : eyes);
 
 		if (tick == COMRADES) {
@@ -118,10 +126,14 @@ public class RevolutionScene extends CastScene {
 			}
 		}
 		for (int i = 0; i < banners.size(); i++) {
+			// The pole in the hand at the side, the flag high above the crowd, the printed side to the player.
 			RemotePlayer bearer = crowd.get(i * 5);
+			Vec3 facing = Vec3.directionFromRotation(0.0F, bearer.getYRot());
+			Vec3 hand = bearer.position().add(new Vec3(-facing.z, 0.0, facing.x).scale(0.42)).add(facing.scale(0.15));
 			Vec3 toPlayer = player.position().subtract(bearer.position());
 			float yaw = (float) Math.atan2(toPlayer.x, toPlayer.z);
-			place(banners.get(i), bearer.position().add(0.0, 2.7, 0.0), new Vector3f(1.3F), new Quaternionf().rotateY(yaw).rotateZ(Mth.sin(tick * 0.08F + i) * 0.07F));
+			Vec3 pole = new Vec3(Math.cos(yaw), 0.0, -Math.sin(yaw)).scale(0.5 * 1.3);
+			place(banners.get(i), hand.subtract(pole).add(0.0, 2.7, 0.0), new Vector3f(1.3F), new Quaternionf().rotateY(yaw));
 		}
 		turnTowards(player, tick < TURN ? lenin.getEyePosition() : crowd.get(CROWD / 2).getEyePosition(), 0.1F);
 		for (int i = 0; i < HITS.length; i++) {
@@ -154,14 +166,19 @@ public class RevolutionScene extends CastScene {
 				place(blockDisplay(level, Looks.BLACK_CONCRETE, wheel, 2.0F), wheel, new Vector3f(0.3F, 0.8F, 0.8F), new Quaternionf().rotateY(yaw + Mth.HALF_PI));
 			}
 		}
-		lenin = actor(level, "fakedeath.revolution.lenin", "lenin", false, car.add(0.0, 2.1, 0.0));
+		// Lenin walks up to the car and climbs on, the crowd comes in from both sides.
+		carSide = onGround(level, player, car.add(look.scale(-1.3)).add(side.scale(0.8)));
+		lenin = actor(level, "fakedeath.revolution.lenin", "lenin", false, carSide);
+		arrive(level, player, lenin, 0);
 		for (int i = 0; i < CROWD; i++) {
 			double angle = (i - (CROWD - 1) / 2.0) * 0.3;
 			Vec3 at = car.add(look.yRot((float) angle).scale(-3.0 - (i % 2) * 0.8));
-			crowd.add(extra(level, "worker", onGround(level, player, at)));
+			RemotePlayer worker = extra(level, "worker", onGround(level, player, at));
+			arrive(level, player, worker, 4 + i * 2);
+			crowd.add(worker);
 		}
 		for (int i = 0; i < 2; i++) {
-			banners.add(itemDisplay(level, Looks.prop(net.minecraft.world.item.Items.IRON_NUGGET, "flag_red"), crowd.get(i * 5).position()));
+			banners.add(itemDisplay(level, Looks.prop(net.minecraft.world.item.Items.IRON_NUGGET, "flag_soviet"), crowd.get(i * 5).position()));
 		}
 	}
 }
