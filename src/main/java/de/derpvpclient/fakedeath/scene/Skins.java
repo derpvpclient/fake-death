@@ -16,6 +16,8 @@ public final class Skins {
 	private static final Set<Integer> NAMELESS = new HashSet<>();
 	private static final Map<Integer, Pose> POSES = new HashMap<>();
 	private static final Map<Object, Pose> POSED = new java.util.WeakHashMap<>();
+	private static final Map<Integer, Float> WIDE = new HashMap<>();
+	private static final Map<Object, Float> WIDENED = new java.util.WeakHashMap<>();
 
 	/** How a person in a scene holds the arms. */
 	public enum Pose {
@@ -57,6 +59,32 @@ public final class Skins {
 		return POSED.get(state);
 	}
 
+	/** Stretches a person sideways, wider than any door, like in a certain video. 1 for normal. */
+	static void wide(int entityId, float width) {
+		if (width == 1.0F) {
+			WIDE.remove(entityId);
+		} else {
+			WIDE.put(entityId, width);
+		}
+	}
+
+	public static float widthOf(int entityId) {
+		return WIDE.getOrDefault(entityId, 1.0F);
+	}
+
+	/** Remembers how wide the body of a render state is drawn, for the renderer to read. */
+	public static void widened(Object state, float width) {
+		if (width == 1.0F) {
+			WIDENED.remove(state);
+		} else {
+			WIDENED.put(state, width);
+		}
+	}
+
+	public static float widthOfState(Object state) {
+		return WIDENED.getOrDefault(state, 1.0F);
+	}
+
 	private Skins() {
 	}
 
@@ -70,6 +98,7 @@ public final class Skins {
 	}
 
 	static void forget(int entityId) {
+		WIDE.remove(entityId);
 		POSES.remove(entityId);
 		SKINS.remove(entityId);
 		NAMELESS.remove(entityId);
