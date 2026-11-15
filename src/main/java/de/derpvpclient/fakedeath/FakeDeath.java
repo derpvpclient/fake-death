@@ -35,6 +35,9 @@ public final class FakeDeath {
 	/** What went wrong in the last scene that failed, for the demo run. Null if nothing did. */
 	public static String lastError;
 	private static CameraType cameraBefore;
+	// F5 is off for the rest of the scene: it is made for the eyes, or the camera got jammed between blocks.
+	private static boolean firstPersonLock;
+	private static int crampedTicks;
 	private static boolean active;
 	private static int deathTicks;
 	private static float startHealth;
@@ -64,6 +67,11 @@ public final class FakeDeath {
 	}
 
 	/** True while the fake death screen is open. */
+	/** True while F5 is off for the running scene. */
+	public static boolean firstPersonLocked() {
+		return firstPersonLock;
+	}
+
 	public static boolean isActive() {
 		return active;
 	}
@@ -399,6 +407,20 @@ public final class FakeDeath {
 			return;
 		}
 
+		// F5 only as long as it looks right. A scene made for the eyes, or a third-person camera jammed between blocks
+		// (walled in, buried), goes back to first person until the scene is over.
+		if (!minecraft.options.getCameraType().isFirstPerson()) {
+			Vec3 anchor = player.getEyePosition().add(CameraDirector.positionOffset());
+			double distance = minecraft.gameRenderer.getMainCamera().getPosition().distanceTo(anchor);
+			crampedTicks = distance < 1.6 ? crampedTicks + 1 : 0;
+			if (scene.firstPersonOnly() || crampedTicks >= 3) {
+				firstPersonLock = true;
+			}
+		}
+		if (firstPersonLock && !minecraft.options.getCameraType().isFirstPerson()) {
+			minecraft.options.setCameraType(CameraType.FIRST_PERSON);
+		}
+
 		try {
 			scene.tick(minecraft, level, player, sceneTick++);
 		} catch (RuntimeException e) {
@@ -456,6 +478,8 @@ public final class FakeDeath {
 			sceneStart = minecraft.player.position();
 		}
 
+		firstPersonLock = false;
+		crampedTicks = 0;
 		// The scenes are filmed from the player's eyes.
 		cameraBefore = minecraft.options.getCameraType();
 		if (!cameraBefore.isFirstPerson()) {

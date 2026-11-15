@@ -30,4 +30,13 @@ public class PlayerRendererMixin {
 		Scene scene = FakeDeath.currentScene();
 		return player == Minecraft.getInstance().player && scene != null ? scene.lying() : 0.0F;
 	}
+
+	// Someone stretched wide: only sideways, after the game has scaled the body.
+	@org.spongepowered.asm.mixin.injection.Inject(method = "scale(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;F)V", at = @At("TAIL"))
+	private void fakedeath$wide(AbstractClientPlayer player, com.mojang.blaze3d.vertex.PoseStack poseStack, float partialTicks, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+		float width = de.derpvpclient.fakedeath.scene.Skins.widthOf(player.getId());
+		if (width != 1.0F) {
+			poseStack.scale(width, 1.0F, 1.0F);
+		}
+	}
 }

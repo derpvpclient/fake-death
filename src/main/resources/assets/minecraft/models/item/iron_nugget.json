@@ -14,6 +14,8 @@
     { "predicate": { "custom_model_data": 4711028 }, "model": "fakedeath:item/flag_germany" },
     { "predicate": { "custom_model_data": 4711029 }, "model": "fakedeath:item/flag_red" },
     { "predicate": { "custom_model_data": 4711032 }, "model": "fakedeath:item/ring_light" },
-    { "predicate": { "custom_model_data": 4711035 }, "model": "fakedeath:item/red_star" }
+    { "predicate": { "custom_model_data": 4711035 }, "model": "fakedeath:item/red_star" },
+    { "predicate": { "custom_model_data": 4711036 }, "model": "fakedeath:item/flag_russia" },
+    { "predicate": { "custom_model_data": 4711037 }, "model": "fakedeath:item/flag_france" }
   ]
 }
