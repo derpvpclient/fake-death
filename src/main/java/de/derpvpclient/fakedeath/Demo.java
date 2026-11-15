@@ -80,7 +80,7 @@ final class Demo {
 			}
 
 			String view = view(name);
-			if (!view.isEmpty() && minecraft.options.getCameraType().isFirstPerson()) {
+			if (!view.isEmpty() && minecraft.options.getCameraType().isFirstPerson() && !FakeDeath.firstPersonLocked()) {
 				minecraft.options.setCameraType(view.equals("front") ? net.minecraft.client.CameraType.THIRD_PERSON_FRONT : net.minecraft.client.CameraType.THIRD_PERSON_BACK);
 			}
 

@@ -23,7 +23,87 @@ import net.minecraft.world.phys.Vec3;
  * also in chat, so it can be read from any view), walking, looking, holding things.
  */
 public abstract class CastScene extends Scene {
+	/** Ticks the people take to walk in from the side to their spots. The scenes start their action after it. */
+	protected static final int ARRIVE = 50;
+
 	private final Map<RemotePlayer, Bubble> bubbles = new HashMap<>();
+	private final java.util.List<Entrance> entrances = new java.util.ArrayList<>();
+	private int clock = -1;
+
+	/**
+	 * Instead of standing there from the first tick on, someone walks in from the side of the view to where they were
+	 * put, starting {@code delay} ticks into the scene and standing on the spot by tick {@link #ARRIVE}.
+	 */
+	protected void arrive(ClientLevel level, LocalPlayer player, net.minecraft.world.entity.LivingEntity who, int delay) {
+		Vec3 to = who.position();
+		Vec3 look = horizontalLook(player);
+		Vec3 side = look.yRot(net.minecraft.util.Mth.HALF_PI);
+		double across = to.subtract(player.position()).dot(side);
+		// From well outside the view, a little further back than the spot, on the side the spot is on.
+		Vec3 from = onGround(level, player, to.add(side.scale((across >= 0.0 ? 1.0 : -1.0) * 10.0)).add(look.scale(2.0)));
+		who.moveTo(from.x, from.y, from.z, who.getYRot(), 0.0F);
+		ENTERING.add(who);
+		entrances.add(new Entrance(who, from, to, delay, Math.max(16, ARRIVE - 4 - delay)));
+	}
+
+	/** Like {@link #arrive(ClientLevel, LocalPlayer, net.minecraft.world.entity.LivingEntity, int)}, from a given spot. */
+	protected void arrive(ClientLevel level, LocalPlayer player, net.minecraft.world.entity.LivingEntity who, int delay, Vec3 from) {
+		Vec3 start = onGround(level, player, from);
+		Vec3 to = who.position();
+		who.moveTo(start.x, start.y, start.z, who.getYRot(), 0.0F);
+		ENTERING.add(who);
+		entrances.add(new Entrance(who, start, to, delay, Math.max(16, ARRIVE - 4 - delay)));
+	}
+
+	/** True while the person is still walking in. */
+	protected static boolean entering(net.minecraft.world.entity.Entity who) {
+		return ENTERING.contains(who);
+	}
+
+	/** Shows or hides the name sign over the head, like for someone lying still in a coffin. */
+	protected void showName(RemotePlayer actor, boolean shown) {
+		Bubble bubble = bubbles.get(actor);
+		if (bubble != null) {
+			((TextDisplayAccessor) bubble.tag).fakedeath$setText(shown ? Component.translatable(bubble.nameKey()) : Component.empty());
+			((TextDisplayAccessor) bubble.tag).fakedeath$setBackgroundColor(shown ? 0x40000000 : 0);
+		}
+	}
+
+	/** Moves everyone still on their way one step. Runs with {@link #bubbles()}. */
+	private void entrances() {
+		clock++;
+		LocalPlayer player = Minecraft.getInstance().player;
+		ClientLevel level = Minecraft.getInstance().level;
+		if (player == null || level == null) {
+			return;
+		}
+		for (Entrance entrance : entrances) {
+			if (!ENTERING.contains(entrance.who) || clock < entrance.delay) {
+				continue;
+			}
+			float p = Math.min(1.0F, (clock - entrance.delay) / (float) entrance.ticks);
+			// A steady pace that slows down over the last steps.
+			float eased = p < 0.75F ? p * 1.1F : 0.825F + (1.0F - (1.0F - (p - 0.75F) * 4.0F) * (1.0F - (p - 0.75F) * 4.0F)) * 0.175F;
+			Vec3 at = entrance.from.lerp(entrance.to, Math.min(1.0F, eased));
+			Vec3 step = new Vec3(at.x, floor(level, at.x, at.z, player.getY()), at.z);
+			Vec3 way = entrance.to.subtract(entrance.from);
+			float yaw = (float) (net.minecraft.util.Mth.atan2(way.z, way.x) * net.minecraft.util.Mth.RAD_TO_DEG) - 90.0F;
+			entrance.who.setYRot(yaw);
+			entrance.who.setYHeadRot(yaw);
+			entrance.who.setYBodyRot(yaw);
+			entrance.who.setXRot(0.0F);
+			if (p >= 1.0F) {
+				// On the spot exactly, even when it is up on something, like a stand.
+				walk(entrance.who, entrance.to);
+				ENTERING.remove(entrance.who);
+			} else {
+				walk(entrance.who, step);
+			}
+		}
+	}
+
+	private record Entrance(net.minecraft.world.entity.LivingEntity who, Vec3 from, Vec3 to, int delay, int ticks) {
+	}
 
 	/** A person with a name over the head, a skin of the mod's own and a bubble ready for speaking. */
 	protected RemotePlayer actor(ClientLevel level, String nameKey, String skin, boolean slim, Vec3 pos) {
@@ -66,6 +146,7 @@ public abstract class CastScene extends Scene {
 
 	/** Keeps every bubble over its head and takes it away when its time is up. Call once every tick. */
 	protected void bubbles() {
+		entrances();
 		for (Map.Entry<RemotePlayer, Bubble> entry : bubbles.entrySet()) {
 			Bubble bubble = entry.getValue();
 			RemotePlayer actor = entry.getKey();
@@ -117,6 +198,10 @@ public abstract class CastScene extends Scene {
 	@Override
 	public void end(ClientLevel level, LocalPlayer player) {
 		bubbles.clear();
+		for (Entrance entrance : entrances) {
+			ENTERING.remove(entrance.who);
+		}
+		entrances.clear();
 		super.end(level, player);
 	}
 
