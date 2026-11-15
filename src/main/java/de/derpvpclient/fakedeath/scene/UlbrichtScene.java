@@ -28,12 +28,12 @@ import org.joml.Vector3f;
  * front, the slabs press in. "... to build a wall."
  */
 public class UlbrichtScene extends CastScene {
-	private static final int SAY_1 = 15;
-	private static final int SAY_2 = 80;
-	private static final int SAY_3 = 140;
-	private static final int SAY_4 = 190;
+	private static final int SAY_1 = ARRIVE + 10;
+	private static final int SAY_2 = ARRIVE + 75;
+	private static final int SAY_3 = ARRIVE + 135;
+	private static final int SAY_4 = ARRIVE + 185;
 	private static final int SLABS = 14;
-	private static final int FIRST_SLAB = 30;
+	private static final int FIRST_SLAB = ARRIVE + 25;
 	private static final int SLAB_EVERY = 9;
 	private static final int RISE = 12;
 	private static final int WIRE = FIRST_SLAB + SLABS * SLAB_EVERY + 6;
@@ -45,6 +45,7 @@ public class UlbrichtScene extends CastScene {
 	private final List<Slab> slabs = new ArrayList<>();
 	private final List<Display.BlockDisplay> wire = new ArrayList<>();
 	private RemotePlayer ulbricht;
+	private final List<RemotePlayer> guards = new ArrayList<>();
 	private Vec3 center;
 	private float facing;
 	private float dark;
@@ -79,6 +80,9 @@ public class UlbrichtScene extends CastScene {
 		}
 		bubbles();
 		face(ulbricht, player.getEyePosition());
+		for (RemotePlayer guard : guards) {
+			face(guard, player.getEyePosition());
+		}
 
 		if (tick == SAY_1) {
 			speak(level, ulbricht, "fakedeath.ulbricht.say", GDR, 60);
@@ -154,8 +158,13 @@ public class UlbrichtScene extends CastScene {
 			place(blockDisplay(level, Looks.GRAY_CONCRETE, mic, 1.0F), mic.add(look.scale(-0.08)).add(0.0, 0.17, 0.0), new Vector3f(0.09F), new Quaternionf());
 		}
 		ulbricht = actor(level, "fakedeath.ulbricht.name", "ulbricht", false, onGround(level, player, table.add(look.scale(0.8))));
-		extra(level, "bodyguard", onGround(level, player, table.add(look.scale(1.4)).add(side.scale(1.4))));
-		extra(level, "nkvd", onGround(level, player, table.add(look.scale(1.4)).add(side.scale(-1.4))));
+		arrive(level, player, ulbricht, 0);
+		RemotePlayer bodyguard = extra(level, "bodyguard", onGround(level, player, table.add(look.scale(1.4)).add(side.scale(1.4))));
+		arrive(level, player, bodyguard, 4);
+		guards.add(bodyguard);
+		RemotePlayer agent = extra(level, "nkvd", onGround(level, player, table.add(look.scale(1.4)).add(side.scale(-1.4))));
+		arrive(level, player, agent, 6);
+		guards.add(agent);
 		standFlag(level, player, table.add(look.scale(1.8)).add(side.scale(-2.2)), "flag_gdr", 1.4F);
 	}
 

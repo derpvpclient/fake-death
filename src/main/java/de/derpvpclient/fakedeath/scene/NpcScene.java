@@ -22,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
 public abstract class NpcScene extends Scene {
 	/** Ticks between two chat lines. */
 	protected static final int LINE = 80;
-	private static final int ARRIVE = 40;
+	private static final int ARRIVE = 50;
 
 	protected final String id;
 	protected final Component name;
@@ -96,9 +96,11 @@ public abstract class NpcScene extends Scene {
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
 		if (tick == 0) {
-			start = groundSpot(level, player, 9.0, (random.nextDouble() - 0.5) * 70.0);
-			Vec3 toward = player.position().subtract(start);
-			Vec3 flat = new Vec3(toward.x, 0.0, toward.z).normalize();
+			// From the side, out of view, over to a spot in front of the player: nobody just appears there.
+			double fromSide = random.nextBoolean() ? 1.0 : -1.0;
+			start = groundSpot(level, player, 10.0, fromSide * (78.0 + random.nextDouble() * 12.0));
+			Vec3 ahead = horizontalLook(player).yRot((float) ((random.nextDouble() - 0.5) * 0.5));
+			Vec3 flat = ahead.scale(-1.0);
 			stand = player.position().subtract(flat.scale(standDistance()));
 			stand = new Vec3(stand.x, floor(level, stand.x, stand.z, player.getY()), stand.z);
 			approach = player.position().subtract(flat.scale(standDistance() + 0.9));
@@ -126,6 +128,9 @@ public abstract class NpcScene extends Scene {
 		if (tick < actStart()) {
 			if (tick > ARRIVE && walksIn()) {
 				live(level, player, tick);
+			} else if (walksIn() && tick < ARRIVE - 8) {
+				// Looking where they go, turning to the player for the last steps.
+				face(npc, new Vec3(approach.x, npc.getEyeY(), approach.z));
 			} else {
 				face(npc, player.getEyePosition());
 			}
