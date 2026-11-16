@@ -256,7 +256,7 @@ public class StalinScene extends CastScene {
 		}
 		// The choir in a row in front of the desk, off to the side, all facing him.
 		for (int i = 0; i < 6; i++) {
-			Vec3 at = onGround(level, player, player.position().add(look.scale(1.9 + (i % 2) * 0.6)).add(side.scale(2.2 + i * 0.75)));
+			Vec3 at = onGround(level, player, player.position().add(look.scale(2.5 + (i % 2) * 0.6)).add(side.scale(2.7 + i * 0.75)));
 			Villager singer = spawn(level, EntityTypes.VILLAGER, at);
 			singer.noPhysics = true;
 			arrive(level, player, singer, 10 + i * 3);

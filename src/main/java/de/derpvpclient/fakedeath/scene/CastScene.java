@@ -150,8 +150,8 @@ public abstract class CastScene extends Scene {
 		for (Map.Entry<RemotePlayer, Bubble> entry : bubbles.entrySet()) {
 			Bubble bubble = entry.getValue();
 			RemotePlayer actor = entry.getKey();
-			place(bubble.tag, actor.position().add(0.0, 2.05, 0.0), 0.6F);
-			place(bubble.display(), actor.position().add(0.0, 2.45, 0.0), 0.8F);
+			place(bubble.tag, actor.position().add(0.0, 2.05 + bubble.lift, 0.0), 0.6F);
+			place(bubble.display(), actor.position().add(0.0, 2.45 + bubble.lift, 0.0), 0.8F);
 			if (bubble.left > 0 && --bubble.left == 0) {
 				((TextDisplayAccessor) bubble.display()).fakedeath$setText(Component.empty());
 			}
@@ -168,6 +168,15 @@ public abstract class CastScene extends Scene {
 
 	protected static void holdLeft(RemotePlayer actor, ItemStack stack) {
 		actor.setItemSlot(EquipmentSlot.OFFHAND, stack);
+	}
+
+	/** A hat on the head, own models like a bicorne; the name sign and the bubble move up by {@code lift} to stay above it. */
+	protected void wear(RemotePlayer actor, ItemStack hat, double lift) {
+		actor.setItemSlot(EquipmentSlot.HEAD, hat);
+		Bubble bubble = bubbles.get(actor);
+		if (bubble != null) {
+			bubble.lift = lift;
+		}
 	}
 
 	/** One step of walking from where the person is towards a spot, at a walking pace, feet on the ground. */
@@ -210,6 +219,7 @@ public abstract class CastScene extends Scene {
 		private final String nameKey;
 		private final Display.TextDisplay tag;
 		int left;
+		double lift;
 
 		Bubble(Display.TextDisplay display, Display.TextDisplay tag, String nameKey) {
 			this.display = display;
