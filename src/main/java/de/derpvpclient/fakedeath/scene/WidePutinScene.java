@@ -108,7 +108,7 @@ public class WidePutinScene extends CastScene {
 			}
 		}
 		if (tick == TITLE) {
-			((TextDisplayAccessor) title).fakedeath$setText(Component.literal("IT'S HIM").withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE));
+			((TextDisplayAccessor) title).fakedeath$setText(Component.translatable("fakedeath.wideputin.title").withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE));
 			((TextDisplayAccessor) title).fakedeath$setBackgroundColor(0xA0000000);
 			sound(level, eyes, SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.RECORDS, 1.0F, 0.7F);
 			// The original song of the meme, if the player brings it in a resource pack of their own.

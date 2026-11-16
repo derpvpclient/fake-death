@@ -62,7 +62,8 @@ public class StalinScene extends CastScene {
 	private static final int NOTICE = SING + at(98);
 	private static final int WHY = NOTICE + 12;
 	private static final int PENCIL = WHY + 55;
-	private static final int ERASE = PENCIL + 25;
+	/** Erased once the choir has sung the last note of the line. */
+	private static final int ERASE = SING + at(122) + 6;
 	private static final int ERASE_TICKS = 50;
 	private static final int DEATH = ERASE + ERASE_TICKS;
 	private static final ChatFormatting RED = ChatFormatting.RED;

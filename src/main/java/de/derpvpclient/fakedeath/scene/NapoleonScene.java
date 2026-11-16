@@ -59,6 +59,7 @@ public class NapoleonScene extends CastScene {
 	private final List<Integer> tuneSteps = new ArrayList<>();
 	private final List<RemotePlayer> guards = new ArrayList<>();
 	private final List<Display.BlockDisplay> drum = new ArrayList<>();
+	private final List<Display.BlockDisplay> ballEdges = new ArrayList<>();
 	private RemotePlayer napoleon;
 	private RemotePlayer general;
 	private RemotePlayer drummer;
@@ -181,13 +182,19 @@ public class NapoleonScene extends CastScene {
 			particles(level, ParticleTypes.LARGE_SMOKE, cannon.add(0.0, 1.0, 0.0), 30, 0.8, 0.05);
 			particles(level, ParticleTypes.EXPLOSION, cannon.add(0.0, 1.0, 0.0), 3, 0.3, 0.0);
 			sound(level, eyes.add(cannon.subtract(eyes).normalize().scale(8.0)), Looks.EXPLODE, SoundSource.HOSTILE, 2.5F, 0.5F);
+			// Three cubes turned against each other look like a round iron ball.
 			ball = blockDisplay(level, Looks.BLACK_CONCRETE, cannon, 32.0F);
+			ballEdges.add(blockDisplay(level, Looks.BLACK_CONCRETE, cannon, 32.0F));
+			ballEdges.add(blockDisplay(level, Looks.BLACK_CONCRETE, cannon, 32.0F));
 		}
 		if (ball != null && tick <= HIT) {
 			// The ball in a high, slow arc right at the player's head, whistling lower and lower as it comes down.
 			float p = (tick - FIRE) / (float) FLY;
 			Vec3 at = cannon.add(0.0, 1.2, 0.0).lerp(eyes, p).add(0.0, Math.sin(p * Math.PI) * 9.0, 0.0);
-			place(ball, at, new Vector3f(0.55F), new Quaternionf().rotateX(tick * 0.3F));
+			Quaternionf spin = new Quaternionf().rotateX(tick * 0.3F);
+			place(ball, at, new Vector3f(0.5F), spin);
+			place(ballEdges.get(0), at, new Vector3f(0.5F), new Quaternionf(spin).rotateY(Mth.PI / 4.0F));
+			place(ballEdges.get(1), at, new Vector3f(0.5F), new Quaternionf(spin).rotateZ(Mth.PI / 4.0F).rotateX(Mth.PI / 4.0F));
 			level.addParticle(ParticleTypes.SMOKE, at.x, at.y, at.z, 0.0, 0.0, 0.0);
 			if (p > 0.45F && tick % 3 == 0) {
 				float fall = (p - 0.45F) / 0.55F;
