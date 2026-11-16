@@ -68,6 +68,7 @@ public class UlbrichtScene extends CastScene {
 	private Vec3 center;
 	private float facing;
 	private float dark;
+	private boolean ownMusic = true;
 
 	@Override
 	public int length() {
@@ -169,6 +170,13 @@ public class UlbrichtScene extends CastScene {
 
 	/** The anthem, quietly under everything: the tune on trumpet and flute, a chord and the bass on every quarter. */
 	private void anthem(ClientLevel level, int tick) {
+		if (tick == MUSIC) {
+			// Music of the player's own, if they bring it in a resource pack (the sound event fakedeath:meme.ulbricht), instead of the tune.
+			ownMusic = !packMusic(level, center, "meme.ulbricht");
+		}
+		if (!ownMusic) {
+			return;
+		}
 		int units = 0;
 		for (int[] note : TUNE) {
 			if (tick == MUSIC + units * STEP) {
