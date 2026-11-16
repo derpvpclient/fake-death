@@ -105,11 +105,12 @@ public class BismarckScene extends CastScene {
 		if (since >= 0 && since % DROP_EVERY == 0 && dropped < DROPS) {
 			boolean last = dropped == DROPS - 1;
 			double distance = last ? 0.0 : 4.5 - dropped * 0.45;
-			float angle = dropped * 2.3F;
+			// Always in front, left and right in turn: the view must not swing round to behind.
+			float angle = (dropped % 2 == 0 ? 1.0F : -1.0F) * (0.2F + dropped * 0.13F);
 			Vec3 to = last ? player.position() : onGround(level, player, player.position().add(horizontalLook(player).yRot(angle).scale(distance)));
-			float size = last ? 1.6F : 0.9F + random.nextFloat() * 0.3F;
+			float size = last ? 1.8F : 1.1F + random.nextFloat() * 0.4F;
 			BlockState iron = dropped % 3 == 2 ? Blocks.ANVIL.defaultBlockState() : Blocks.IRON_BLOCK.defaultBlockState();
-			Display.BlockDisplay block = blockDisplay(level, iron, to.add(0.0, 30.0, 0.0), 40.0F);
+			Display.BlockDisplay block = blockDisplay(level, iron, to.add(0.0, 16.0, 0.0), 40.0F);
 			Looks.farView(block);
 			drops.add(new Drop(block, to, tick, size, last));
 			Scene.sound(level, to.add(0.0, 10.0, 0.0), SoundEvents.ANVIL_PLACE, SoundSource.HOSTILE, 0.6F, 0.5F);
@@ -118,7 +119,10 @@ public class BismarckScene extends CastScene {
 		for (Iterator<Drop> it = drops.iterator(); it.hasNext();) {
 			Drop drop = it.next();
 			float t = Math.min(1.0F, (tick - drop.start()) / (float) FALL);
-			Vec3 at = drop.to().add(0.0, drop.size() * 0.5 + 30.0 * (1.0F - t * t), 0.0);
+			Vec3 at = drop.to().add(0.0, drop.size() * 0.5 + 16.0 * (1.0F - t * t), 0.0);
+			if (t < 1.0F) {
+				particles(level, ParticleTypes.SMOKE, at.add(0.0, drop.size() * 0.5, 0.0), 2, 0.2, 0.02);
+			}
 			place(drop.display(), at, new Vector3f(drop.size()), new Quaternionf().rotateY(drop.start() * 0.7F));
 			if (t >= 1.0F) {
 				// The crash: sparks, dust, the ground shakes under the player.
@@ -141,9 +145,9 @@ public class BismarckScene extends CastScene {
 		if (tick < IRON + 6) {
 			turnTowards(player, bismarck.getEyePosition(), 0.08F);
 		} else if (!drops.isEmpty()) {
-			// Looking up at what comes down next.
+			// Looking at where the next one comes down, the last one from right above.
 			Drop next = drops.getLast();
-			turnTowards(player, next.display().position(), drops.getLast().last() ? 0.25F : 0.1F);
+			turnTowards(player, next.last() ? next.display().position() : next.to().add(0.0, 2.5, 0.0), next.last() ? 0.25F : 0.12F);
 		}
 	}
 

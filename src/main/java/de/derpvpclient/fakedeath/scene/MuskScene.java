@@ -216,7 +216,7 @@ public class MuskScene extends CastScene {
 		Looks.farView(mast);
 		place(mast, tower.add(0.0, 11.0, 0.0), new Vector3f(1.4F, 22.0F, 1.4F), new Quaternionf().rotateY(yaw));
 		// The countdown board, big, in front.
-		Vec3 boardAt = onGround(level, player, player.position().add(look.scale(9.0)).add(side.scale(-3.0))).add(0.0, 3.2, 0.0);
+		Vec3 boardAt = onGround(level, player, player.position().add(look.scale(10.0)).add(side.scale(4.5))).add(0.0, 3.6, 0.0);
 		place(blockDisplay(level, Looks.BLACK_CONCRETE, boardAt, 6.0F), boardAt.add(look.scale(0.15)).add(0.0, 0.3, 0.0), new Vector3f(3.2F, 1.4F, 0.15F), new Quaternionf().rotateY(yaw));
 		place(blockDisplay(level, Looks.GRAY_CONCRETE, boardAt, 6.0F), boardAt.add(look.scale(0.2)).add(0.0, -1.7, 0.0), new Vector3f(0.2F, 3.0F, 0.2F), new Quaternionf().rotateY(yaw));
 		board = sign(level, boardAt, Component.literal("T-10").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD), 3.0F, yaw, 0);

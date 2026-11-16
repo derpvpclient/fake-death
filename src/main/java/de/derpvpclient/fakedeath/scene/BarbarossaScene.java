@@ -128,7 +128,7 @@ public class BarbarossaScene extends CastScene {
 	private void moveRavens(ClientLevel level, int tick) {
 		for (int r = 0; r < RAVENS; r++) {
 			double angle = tick * 0.04 + r * Mth.TWO_PI / RAVENS;
-			Vec3 center = tableAt.add(0.0, 4.5 + r * 0.4, 0.0);
+			Vec3 center = tableAt.add(look.scale(-0.8)).add(0.0, 4.2 + r * 0.4, 0.0);
 			Vec3 at = center.add(Math.cos(angle) * 3.2, Math.sin(tick * 0.1 + r) * 0.3, Math.sin(angle) * 3.2);
 			int away = tick - RAVENS_GO - r * 12;
 			if (away > 0) {
@@ -165,7 +165,7 @@ public class BarbarossaScene extends CastScene {
 				// Torn upwards with him.
 				at = at.add(0.0, Math.min(1.0, (tick - RISE) / 6.0) * 0.3, 0.0);
 			}
-			place(beard.get(i), at, new Vector3f(0.32F - t * 0.08F, 0.18F, 0.32F - t * 0.08F), new Quaternionf().rotateY(yaw + i * 0.4F));
+			place(beard.get(i), at, new Vector3f(0.22F - t * 0.08F, 0.16F, 0.12F), new Quaternionf().rotateY(yaw + i * 0.4F));
 		}
 	}
 
@@ -202,6 +202,17 @@ public class BarbarossaScene extends CastScene {
 		for (int i = 0; i < 2; i++) {
 			table.add(blockDisplay(level, i == 0 ? Blocks.SMOOTH_STONE.defaultBlockState() : stone, tableAt, 12.0F));
 		}
+		// The hall inside the mountain: rock walls all round, the ceiling over the ravens, a stone floor.
+		Vec3 middle = tableAt.add(look.scale(-0.8));
+		Quaternionf straight = new Quaternionf().rotateY(yaw);
+		BlockState rock = Blocks.STONE.defaultBlockState();
+		BlockState rough = Blocks.COBBLESTONE.defaultBlockState();
+		place(blockDisplay(level, rock, middle, 24.0F), middle.add(look.scale(4.6)).add(0.0, 3.2, 0.0), new Vector3f(10.0F, 6.6F, 0.6F), straight);
+		place(blockDisplay(level, rock, middle, 24.0F), middle.add(look.scale(-4.6)).add(0.0, 3.2, 0.0), new Vector3f(10.0F, 6.6F, 0.6F), straight);
+		place(blockDisplay(level, rough, middle, 24.0F), middle.add(side.scale(4.8)).add(0.0, 3.2, 0.0), new Vector3f(0.6F, 6.6F, 9.6F), straight);
+		place(blockDisplay(level, rough, middle, 24.0F), middle.add(side.scale(-4.8)).add(0.0, 3.2, 0.0), new Vector3f(0.6F, 6.6F, 9.6F), straight);
+		place(blockDisplay(level, rough, middle, 24.0F), middle.add(0.0, 6.5, 0.0), new Vector3f(10.2F, 0.6F, 9.8F), straight);
+		place(blockDisplay(level, Blocks.SMOOTH_STONE.defaultBlockState(), middle, 24.0F), middle.add(0.0, 0.02, 0.0), new Vector3f(9.6F, 0.04F, 9.2F), straight);
 		// Rough rock pillars and lanterns in the dark.
 		for (int s : new int[] {-1, 1}) {
 			Vec3 foot = onGround(level, player, tableAt.add(side.scale(s * 2.8)).add(look.scale(0.6)));

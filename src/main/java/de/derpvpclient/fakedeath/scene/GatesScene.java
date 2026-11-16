@@ -111,9 +111,9 @@ public class GatesScene extends CastScene {
 		if (tick == CRASH) {
 			// A big sad face, the message, the counter.
 			Vec3 front = center.add(look.scale(2.3)).add(0.0, 1.2, 0.0);
-			sad = sign(level, front.add(look.scale(-0.05)).add(look.yRot(Mth.HALF_PI).scale(0.6)).add(0.0, 1.0, 0.0), Component.literal(":(").withStyle(ChatFormatting.WHITE), 4.0F, yaw, 0);
-			problem = sign(level, front.add(look.scale(-0.05)).add(0.0, 0.2, 0.0), Component.translatable("fakedeath.gates.problem").withStyle(ChatFormatting.WHITE), 0.9F, yaw, 0);
-			percent = sign(level, front.add(look.scale(-0.05)).add(0.0, -0.4, 0.0), Component.translatable("fakedeath.gates.percent", 0).withStyle(ChatFormatting.WHITE), 0.9F, yaw, 0);
+			sad = sign(level, front.add(look.scale(-0.05)).add(look.yRot(Mth.HALF_PI).scale(0.6)).add(0.0, 1.1, 0.0), Component.literal(":(").withStyle(ChatFormatting.WHITE), 4.0F, yaw, 0);
+			problem = sign(level, front.add(look.scale(-0.05)).add(0.0, 0.55, 0.0), Component.translatable("fakedeath.gates.problem").withStyle(ChatFormatting.WHITE), 0.9F, yaw, 0);
+			percent = sign(level, front.add(look.scale(-0.05)).add(0.0, 0.15, 0.0), Component.translatable("fakedeath.gates.percent", 0).withStyle(ChatFormatting.WHITE), 0.9F, yaw, 0);
 			Scene.sound(level, eyes, Band.BIT, SoundSource.RECORDS, 1.2F, 0.5F);
 		}
 		if (tick > CRASH && percent != null && tick % 4 == 0) {
