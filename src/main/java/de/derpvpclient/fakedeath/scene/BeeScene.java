@@ -148,8 +148,8 @@ public class BeeScene extends Scene {
 			}
 			return;
 		}
-		// Out to the face, hovering there and looking, a little nervous once it is angry.
-		Vec3 hover = head.add(horizontalTo(head, home).scale(-0.9)).add(0.0, -0.1 + 0.08 * Mth.sin(tick * 0.4F), 0.0);
+		// Out of the hive and right up to the face, hovering there and looking, a little nervous once it is angry.
+		Vec3 hover = head.add(horizontalTo(head, home).scale(1.7)).add(0.0, -0.1 + 0.08 * Mth.sin(tick * 0.4F), 0.0);
 		if (tick >= ANGRY) {
 			hover = hover.add((random.nextDouble() - 0.5) * 0.15, (random.nextDouble() - 0.5) * 0.1, (random.nextDouble() - 0.5) * 0.15);
 		}
@@ -182,14 +182,14 @@ public class BeeScene extends Scene {
 			Bee bee = bees.get(i);
 			int sign = i % 2 == 0 ? 1 : -1;
 			float phase = i * 2.39996F + tick * sign * (0.16F + tight * 0.08F);
-			double radius = 1.5 - tight * 0.55 + 0.25 * Mth.sin(tick * 0.27F + i);
+			double radius = 2.3 - tight * 0.7 + 0.25 * Mth.sin(tick * 0.27F + i);
 			Vec3 orbit = head.add(Mth.cos(phase) * radius, -0.5 + 0.55 * Mth.sin(tick * 0.21F + i * 1.7F), Mth.sin(phase) * radius);
 			float out = Math.min(1.0F, (tick - outAt.get(i)) / (float) FLIGHT);
 			Vec3 pos = out >= 1.0F ? orbit : bee == scout ? scoutHover.lerp(orbit, out)
 				: door.lerp(orbit, out * (2.0F - out)).add(0.0, Mth.sin(out * Mth.PI) * 0.6, 0.0);
 			if (bee == stinger) {
 				double dive = Math.sin(Math.PI * Math.min(1.0, (tick - stingStart) / (double) DIVE));
-				Vec3 face = head.add(horizontalTo(head, orbit).scale(0.3)).add(0.0, -0.15, 0.0);
+				Vec3 face = head.add(horizontalTo(head, orbit).scale(0.8)).add(0.0, -0.25, 0.0);
 				pos = pos.lerp(face, dive);
 			}
 			bee.setPos(pos.x, pos.y, pos.z);
