@@ -109,9 +109,9 @@ public abstract class Scene {
 		return false;
 	}
 
-	/** Scenes that only work through the own eyes: F5 does nothing while they play, the camera stays in first person. */
+	/** Every scene is made for the own eyes: F5 does nothing while one plays, the camera stays in first person. */
 	public boolean firstPersonOnly() {
-		return false;
+		return true;
 	}
 
 	/** True while the own body is gone in third person, like swallowed by a spawner or erased from history. */

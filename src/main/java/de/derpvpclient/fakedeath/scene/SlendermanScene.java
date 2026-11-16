@@ -18,10 +18,19 @@ public class SlendermanScene extends Scene {
 	private static final int SCARE = STEP * (DISTANCES.length - 1);
 
 	private Enderman figure;
+	private int now;
 
 	@Override
 	public int length() {
 		return SCARE + 14;
+	}
+
+	@Override
+	public int screenTint() {
+		// Dark all around, pulsing like the darkness effect. Its own tint, so nothing of it stays behind once the scene is over.
+		float in = Math.min(1.0F, now / 20.0F);
+		float pulse = 0.75F + 0.25F * net.minecraft.util.Mth.sin(now * 0.12F);
+		return (int) (in * pulse * 150.0F) << 24;
 	}
 
 	@Override
@@ -31,8 +40,8 @@ public class SlendermanScene extends Scene {
 
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
+		now = tick;
 		if (tick == 0) {
-			addEffect(player, MobEffects.DARKNESS, 300);
 			sound(level, player.position(), SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 1.0F, 0.6F);
 		}
 

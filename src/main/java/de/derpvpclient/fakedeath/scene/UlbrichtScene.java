@@ -41,6 +41,25 @@ public class UlbrichtScene extends CastScene {
 	private static final int DEATH = SQUEEZE + 30;
 	private static final double RADIUS = 1.6;
 	private static final ChatFormatting GDR = ChatFormatting.GOLD;
+	/**
+	 * The Deutschlandlied (Joseph Haydn, 1797, public domain) after the score in E flat: "Einigkeit und Recht und
+	 * Freiheit für das deutsche Vaterland!" Midi note and length in sixteenths. It plays all through the press
+	 * conference while the wall goes up.
+	 */
+	private static final int[][] TUNE = {{63, 6}, {65, 2}, {67, 4}, {65, 4}, {68, 4}, {67, 4}, {65, 2}, {62, 2}, {63, 4},
+		{72, 4}, {70, 4}, {68, 4}, {67, 4}, {65, 4}, {67, 2}, {63, 2}, {70, 8}};
+	private static final int[] CHORD_ES = {55, 58, 63};
+	private static final int[] CHORD_B7 = {56, 58, 62, 65};
+	private static final int[] CHORD_AS = {56, 60, 63};
+	private static final int[] CHORD_FM = {56, 60, 65};
+	private static final int[] CHORD_B = {58, 62, 65};
+	/** One chord and bass note to every quarter, from the first note on. */
+	private static final int[][] CHORDS = {CHORD_ES, CHORD_ES, CHORD_ES, CHORD_B7, CHORD_AS, CHORD_ES, CHORD_B7, CHORD_ES,
+		CHORD_AS, CHORD_ES, CHORD_FM, CHORD_ES, CHORD_B7, CHORD_ES, CHORD_B, CHORD_B};
+	private static final int[] BASS = {39, 39, 39, 34, 32, 39, 34, 39, 32, 39, 41, 39, 34, 39, 34, 34};
+	private static final int MUSIC = 4;
+	/** Ticks to a sixteenth: 75 beats a minute, slow and solemn. */
+	private static final int STEP = 4;
 
 	private final List<Slab> slabs = new ArrayList<>();
 	private final List<Display.BlockDisplay> wire = new ArrayList<>();
@@ -79,6 +98,7 @@ public class UlbrichtScene extends CastScene {
 			return;
 		}
 		bubbles();
+		anthem(level, tick);
 		face(ulbricht, player.getEyePosition());
 		for (RemotePlayer guard : guards) {
 			face(guard, player.getEyePosition());
@@ -140,6 +160,30 @@ public class UlbrichtScene extends CastScene {
 		if (tick == DEATH) {
 			sound(level, center, SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 2.0F, 0.5F);
 			kill(level, player, SoundEvents.PLAYER_HURT);
+		}
+	}
+
+	private static float pitchOf(int midi, int base) {
+		return (float) Math.pow(2.0, (midi - base) / 12.0);
+	}
+
+	/** The anthem, quietly under everything: the tune on trumpet and flute, a chord and the bass on every quarter. */
+	private void anthem(ClientLevel level, int tick) {
+		int units = 0;
+		for (int[] note : TUNE) {
+			if (tick == MUSIC + units * STEP) {
+				sound(level, center, SoundEvents.NOTE_BLOCK_TRUMPET.value(), SoundSource.RECORDS, 0.8F, pitchOf(note[0], 66));
+				sound(level, center, SoundEvents.NOTE_BLOCK_FLUTE.value(), SoundSource.RECORDS, 0.4F, pitchOf(note[0], 66));
+			}
+			units += note[1];
+		}
+		int since = tick - MUSIC;
+		if (since >= 0 && since % (4 * STEP) == 0 && since / (4 * STEP) < CHORDS.length) {
+			int quarter = since / (4 * STEP);
+			for (int midi : CHORDS[quarter]) {
+				sound(level, center, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, 0.3F, pitchOf(midi, 66));
+			}
+			sound(level, center, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.RECORDS, 0.6F, pitchOf(BASS[quarter], 42));
 		}
 	}
 
