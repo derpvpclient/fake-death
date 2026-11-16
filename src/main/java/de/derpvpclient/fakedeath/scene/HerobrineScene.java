@@ -195,9 +195,10 @@ public class HerobrineScene extends Scene {
 		float yaw = herobrine.getYHeadRot() * ((float) Math.PI / 180.0F);
 		Vec3 forward = new Vec3(-Math.sin(yaw), 0.0, Math.cos(yaw));
 		Vec3 side = new Vec3(forward.z, 0.0, -forward.x);
-		Vec3 center = herobrine.position().add(0.0, 1.66, 0.0).add(forward.scale(0.255));
+		// The model is drawn at 15/16 size: the eye row sits 4.5 pixels below the top of the head.
+		Vec3 center = herobrine.position().add(0.0, 1.612, 0.0).add(forward.scale(0.24));
 		Quaternionf turn = new Quaternionf().rotateY(-yaw);
-		place(leftEye, center.add(side.scale(-0.125)), new Vector3f(0.12F, 0.06F, 0.01F), turn);
-		place(rightEye, center.add(side.scale(0.125)), new Vector3f(0.12F, 0.06F, 0.01F), turn);
+		place(leftEye, center.add(side.scale(-0.117)), new Vector3f(0.118F, 0.059F, 0.01F), turn);
+		place(rightEye, center.add(side.scale(0.117)), new Vector3f(0.118F, 0.059F, 0.01F), turn);
 	}
 }

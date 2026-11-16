@@ -24,7 +24,7 @@ import org.joml.Vector3f;
 
 /**
  * The Soviet Union. Stalin walks to his desk, two soldiers march in holding up great red flags with the hammer and
- * sickle, a choir of villagers lines up and sings the anthem: the first verse, then the refrain. Everybody sings.
+ * sickle, a choir of villagers lines up and sings the anthem: the first lines of the verse, then the refrain. Everybody sings.
  * Except the player. Stalin notices. "Comrade ... why are you not singing?" He takes the red pencil and crosses a name
  * off the list. The colours drain out of the world, and the player is retouched out of history like out of the old
  * photographs.
@@ -32,7 +32,7 @@ import org.joml.Vector3f;
 public class StalinScene extends CastScene {
 	/**
 	 * The anthem's melody (Alexandrov, 1944; public domain music) after the score: the first two lines of the verse,
-	 * then the first two lines of the refrain. MIDI notes and lengths in eighths.
+	 * then the first two lines of the refrain. MIDI notes and lengths in sixteenths.
 	 */
 	private static final int[][] MELODY = {
 		// Со-юз не-ру-ши-мый рес-пуб-лик сво-бод-ных
@@ -43,15 +43,27 @@ public class StalinScene extends CastScene {
 		{76, 8}, {74, 2}, {72, 2}, {71, 2}, {72, 2}, {74, 6}, {67, 2}, {67, 8},
 		// Друж-бы на-ро-дов на-дёж-ный оп-лот!
 		{72, 8}, {71, 2}, {69, 2}, {67, 2}, {69, 2}, {71, 6}, {64, 2}, {64, 8}};
-	/** The bass, one note to each bar after the first note, as in the score: C E F C, D F D G, C E G G, F E E E. */
+	/** The first note comes before the first bar. */
+	private static final int PICKUP = 2;
+	private static final int[] CHORD_C = {55, 60, 64};
+	private static final int[] CHORD_EM = {55, 59, 64};
+	private static final int[] CHORD_F = {57, 60, 65};
+	private static final int[] CHORD_DM = {57, 62, 65};
+	private static final int[] CHORD_D = {57, 62, 66};
+	private static final int[] CHORD_G7 = {55, 59, 62, 65};
+	/** The harmony of the score, one chord to each half bar: C Em F C, Dm F D G7, then the refrain C Em G7 G7, F Em Em Em. */
+	private static final int[][] CHORDS = {CHORD_C, CHORD_EM, CHORD_F, CHORD_C, CHORD_DM, CHORD_F, CHORD_D, CHORD_G7,
+		CHORD_C, CHORD_EM, CHORD_G7, CHORD_G7, CHORD_F, CHORD_EM, CHORD_EM, CHORD_EM};
 	private static final int[] BASS = {36, 40, 41, 36, 38, 41, 38, 43, 36, 40, 43, 43, 41, 40, 40, 40};
-	private static final int HALF_BEAT = 5;
+	/** Ticks to a sixteenth: a beat is 16 ticks, 75 beats a minute, the tempo of the score. */
+	private static final int STEP = 4;
 	private static final int SING = ARRIVE + 12;
-	/** He notices when the refrain starts over the second time: after the verse and the first line of the refrain. */
-	private static final int NOTICE = SING + 98 * HALF_BEAT;
+	/** He notices when the second line of the refrain starts. */
+	private static final int NOTICE = SING + at(98);
 	private static final int WHY = NOTICE + 12;
 	private static final int PENCIL = WHY + 55;
-	private static final int ERASE = PENCIL + 25;
+	/** Erased once the choir has sung the last note of the line. */
+	private static final int ERASE = SING + at(122) + 6;
 	private static final int ERASE_TICKS = 50;
 	private static final int DEATH = ERASE + ERASE_TICKS;
 	private static final ChatFormatting RED = ChatFormatting.RED;
@@ -74,7 +86,16 @@ public class StalinScene extends CastScene {
 
 	@Override
 	public int photoTick() {
-		return SING + 40 * HALF_BEAT;
+		return SING + at(40);
+	}
+
+	/** The tick of the song at a number of sixteenths. */
+	private static int at(int sixteenths) {
+		return sixteenths * STEP;
+	}
+
+	private static float pitchOf(int midi, int base) {
+		return (float) Math.pow(2.0, (midi - base) / 12.0);
 	}
 
 	@Override
@@ -115,28 +136,36 @@ public class StalinScene extends CastScene {
 		float volume = tick < NOTICE ? 1.4F : 0.5F;
 		int note = noteTicks.indexOf(beat);
 		if (note >= 0 && tick < ERASE) {
+			// The tune on trumpet, with flute an octave above and harp.
 			int midi = MELODY[note][0];
-			float pitch = (float) Math.pow(2.0, (midi - 66) / 12.0);
-			sound(level, desk, SoundEvents.NOTE_BLOCK_FLUTE.value(), SoundSource.RECORDS, volume, pitch);
-			sound(level, desk, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, volume * 0.9F, pitch);
+			float pitch = pitchOf(midi, 66);
+			sound(level, desk, SoundEvents.NOTE_BLOCK_TRUMPET.value(), SoundSource.RECORDS, volume, pitch);
+			sound(level, desk, SoundEvents.NOTE_BLOCK_FLUTE.value(), SoundSource.RECORDS, volume * 0.5F, pitch);
+			sound(level, desk, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, volume * 0.6F, pitch);
 			Villager singer = choir.get(note % choir.size());
 			if (MELODY[note][1] >= 3) {
 				// The long notes are sung out by the choir.
-				sound(level, singer.position(), SoundEvents.VILLAGER_AMBIENT, SoundSource.NEUTRAL, volume * 0.6F, pitch);
+				sound(level, singer.position(), SoundEvents.VILLAGER_AMBIENT, SoundSource.NEUTRAL, volume * 0.4F, pitch);
 			}
 			Vec3 by = singer.getEyePosition().add(0.0, 0.6, 0.0);
 			level.addParticle(ParticleTypes.NOTE, by.x, by.y, by.z, (midi - 60) / 24.0, 0.0, 0.0);
 		}
-		// The bass: on the first and the third beat of every bar.
-		int bar = beat - 2 * HALF_BEAT;
-		if (bar >= 0 && bar % (4 * HALF_BEAT) == 0 && tick < ERASE) {
-			int index = bar / (8 * HALF_BEAT);
-			if (index < BASS.length) {
-				boolean first = bar % (8 * HALF_BEAT) == 0;
-				float pitch = (float) Math.pow(2.0, (BASS[index] - 42) / 12.0);
-				sound(level, desk, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.RECORDS, volume * (first ? 1.0F : 0.7F), pitch);
-				if (first) {
-					sound(level, desk, SoundEvents.NOTE_BLOCK_BASEDRUM.value(), SoundSource.RECORDS, volume * 0.5F, 1.0F);
+		// The chords on every beat, a new chord and the bass every half bar, the drum on the first beat of the bar.
+		int sinceBar = beat - at(PICKUP);
+		if (sinceBar >= 0 && sinceBar % at(4) == 0 && tick < ERASE) {
+			int quarter = sinceBar / at(4);
+			int half = quarter / 2;
+			if (half < CHORDS.length) {
+				boolean strong = quarter % 2 == 0;
+				for (int midi : CHORDS[half]) {
+					sound(level, desk, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, volume * (strong ? 0.45F : 0.3F), pitchOf(midi, 66));
+				}
+				if (strong) {
+					boolean first = quarter % 4 == 0;
+					sound(level, desk, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.RECORDS, volume * (first ? 1.0F : 0.8F), pitchOf(BASS[half], 42));
+					if (first) {
+						sound(level, desk, SoundEvents.NOTE_BLOCK_BASEDRUM.value(), SoundSource.RECORDS, volume * 0.5F, 1.0F);
+					}
 				}
 			}
 		}
@@ -167,7 +196,7 @@ public class StalinScene extends CastScene {
 		}
 
 		face(stalin, tick < NOTICE ? desk.add(horizontalLook(player).scale(-3.0)).add(0.0, 1.0, 0.0) : eyes);
-		if (tick >= SING && tick < NOTICE && (tick - SING) % (8 * HALF_BEAT) == 0) {
+		if (tick >= SING + at(PICKUP) && tick < NOTICE && (tick - SING - at(PICKUP)) % at(16) == 0) {
 			// Conducting, once a bar.
 			Looks.swing(stalin);
 		}
@@ -227,16 +256,16 @@ public class StalinScene extends CastScene {
 		}
 		// The choir in a row in front of the desk, off to the side, all facing him.
 		for (int i = 0; i < 6; i++) {
-			Vec3 at = onGround(level, player, player.position().add(look.scale(1.9 + (i % 2) * 0.6)).add(side.scale(2.2 + i * 0.75)));
+			Vec3 at = onGround(level, player, player.position().add(look.scale(2.5 + (i % 2) * 0.6)).add(side.scale(2.7 + i * 0.75)));
 			Villager singer = spawn(level, EntityTypes.VILLAGER, at);
 			singer.noPhysics = true;
 			arrive(level, player, singer, 10 + i * 3);
 			choir.add(singer);
 		}
-		int t = 0;
+		int eighths = 0;
 		for (int[] note : MELODY) {
-			noteTicks.add(t);
-			t += note[1] * HALF_BEAT;
+			noteTicks.add(at(eighths));
+			eighths += note[1];
 		}
 	}
 }
