@@ -39,7 +39,8 @@ public class TornadoScene extends Scene {
 	private static final String[][] FAMOUS = {
 		{"trump", "fakedeath.trumpmauer.trump"}, {"merkel", "fakedeath.merkel.name"}, {"putin", "fakedeath.putin.name"}, {"stalin", "fakedeath.stalin.name"},
 		{"ulbricht", "fakedeath.ulbricht.name"}, {"khrushchev", "fakedeath.chruschtschow.name"}, {"gagarin", "fakedeath.gagarin.name"},
-		{"napoleon", "fakedeath.napoleon.name"}, {"genghis", "fakedeath.genghis.name"}, {"lenin", "fakedeath.revolution.lenin"}, {"herobrine", null}};
+		{"napoleon", "fakedeath.napoleon.name"}, {"genghis", "fakedeath.genghis.name"}, {"lenin", "fakedeath.revolution.lenin"}, {"herobrine", null},
+		{"kim", "fakedeath.trumprakete.kim"}, {"caesar", "fakedeath.caesar.name"}, {"cleopatra", "fakedeath.cleopatra.name"}, {"wilhelm", "fakedeath.wilhelm.name"}, {"bismarck", "fakedeath.bismarck.name"}, {"barbarossa", "fakedeath.barbarossa.name"}, {"newton", "fakedeath.newton.name"}, {"leonardo", "fakedeath.leonardo.name"}, {"tesla", "fakedeath.tesla.name"}, {"musk", "fakedeath.musk.name"}, {"jobs", "fakedeath.jobs.name"}, {"gates", "fakedeath.gates.name"}, {"zuckerberg", "fakedeath.zuckerberg.name"}};
 
 	@Override
 	public int length() {

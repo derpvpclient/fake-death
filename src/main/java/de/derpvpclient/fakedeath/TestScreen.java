@@ -31,7 +31,8 @@ public class TestScreen extends Screen {
 	private static final List<String> EDITED = List.of("baum", "disco", "lore", "feuer", "kolben", "glitch", "kaktus", "mond", "ruestungsstaender",
 		"tornado", "woelfe", "riesenfrosch", "papagei", "kaetzchen", "katzen", "fuchs", "froesche", "fledermaeuse", "bienennest", "bienen", "allay",
 		"doppelgaenger", "geister", "slenderman", "revolution", "mausoleum", "ulbricht", "putin", "trumprakete", "napoleon", "gagarin", "sputnik",
-		"stalin", "herobrine", "wideputin");
+		"stalin", "herobrine", "wideputin",
+		"caesar", "kleopatra", "kaiserwilhelm", "bismarck", "barbarossa", "newton", "leonardo", "tesla", "musk", "jobs", "gates", "zuckerberg");
 	private static final Map<String, List<String>> SORTED = Map.of(
 		"animals", List.of("bienen", "woelfe", "froesche", "riesenfrosch", "silberfische", "ziege", "fledermaeuse", "papagei", "delfin",
 			"kamel", "fuchs", "huehner", "bienennest", "axolotl", "panda", "katzen", "allay", "ziegenchor", "kaetzchen"),
@@ -40,7 +41,7 @@ public class TestScreen extends Screen {
 		"characters", List.of("finanzamt", "paketbote", "mama", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker",
 			"zauberer", "klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch", "fahrlehrer",
 			"wahrsagerin", "weihnachtsmann", "werbung", "oma", "kellner", "navi", "bombenprank"),
-		"famous", List.of("trumprakete", "trumpmauer", "merkel", "putin", "stalin", "schwarzerrabe", "hochhaus", "ulbricht", "mausoleum", "revolution", "denkmal", "wideputin", "chruschtschow", "gagarin", "sputnik", "napoleon", "genghis"));
+		"famous", List.of("trumprakete", "trumpmauer", "merkel", "putin", "stalin", "schwarzerrabe", "hochhaus", "ulbricht", "mausoleum", "revolution", "denkmal", "wideputin", "chruschtschow", "gagarin", "sputnik", "napoleon", "genghis", "caesar", "kleopatra", "kaiserwilhelm", "bismarck", "barbarossa", "newton", "leonardo", "tesla", "musk", "jobs", "gates", "zuckerberg"));
 	private static boolean openNextTick;
 	// Remembered while the game runs, so the screen opens again on the same tab.
 	private static String category = "all";
