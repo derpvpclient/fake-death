@@ -125,7 +125,10 @@ public class UlbrichtScene extends CastScene {
 		dark = thirdPerson() ? 0.0F : Math.min(0.75F, slabs.size() / (float) SLABS * 0.6F + (tick > SQUEEZE ? 0.15F : 0.0F));
 		// Looking round at the wall growing, back to him at every line.
 		boolean speaking = Math.abs(tick - SAY_1) < 25 || Math.abs(tick - SAY_2) < 20 || Math.abs(tick - SAY_3) < 20 || tick >= SAY_4;
-		if (speaking || slabs.isEmpty()) {
+		// The first slabs go up behind the player: turning right round to them swings the view up through the sky,
+		// so those are only heard, and the eyes stay on him until the wall comes round to the sides.
+		boolean behind = !slabs.isEmpty() && slabs.getLast().top().subtract(center).dot(horizontalLook(player)) < -0.3;
+		if (speaking || slabs.isEmpty() || behind) {
 			turnTowards(player, ulbricht.getEyePosition(), 0.1F);
 		} else {
 			turnTowards(player, slabs.getLast().top(), 0.08F);
@@ -191,8 +194,9 @@ public class UlbrichtScene extends CastScene {
 	}
 
 	private record Slab(Display.BlockDisplay display, float angle, int start) {
+		/** Where the eyes go while it grows: its middle at eye height, so it rises into the picture instead of the view staring at the sky. */
 		Vec3 top() {
-			return display.position().add(0.0, 2.5, 0.0);
+			return display.position().add(0.0, 1.4, 0.0);
 		}
 	}
 }

@@ -64,12 +64,15 @@ public class SputnikScene extends Scene {
 		Vec3 look = horizontalLook(player);
 		if (tick == 0) {
 			// High up in front, a little to the side.
-			sky = eyes.add(look.scale(22.0)).add(look.yRot(Mth.HALF_PI).scale(8.0)).add(0.0, 34.0, 0.0);
+			sky = eyes.add(look.scale(20.0)).add(look.yRot(Mth.HALF_PI).scale(8.0)).add(0.0, 15.0, 0.0);
 			at = sky;
 			parts.add(blockDisplay(level, Blocks.IRON_BLOCK.defaultBlockState(), sky, 64.0F));
 			for (int i = 0; i < 4; i++) {
-				parts.add(blockDisplay(level, Blocks.IRON_BARS.defaultBlockState(), sky, 64.0F));
+				parts.add(blockDisplay(level, Blocks.IRON_BLOCK.defaultBlockState(), sky, 64.0F));
 			}
+			// Two more cubes turned against the first make the ball look round.
+			parts.add(blockDisplay(level, Blocks.IRON_BLOCK.defaultBlockState(), sky, 64.0F));
+			parts.add(blockDisplay(level, Blocks.IRON_BLOCK.defaultBlockState(), sky, 64.0F));
 			for (Display.BlockDisplay part : parts) {
 				Looks.glow(part);
 				((de.derpvpclient.fakedeath.mixin.DisplayAccessor) part).fakedeath$setViewRange(8.0F);
@@ -119,12 +122,19 @@ public class SputnikScene extends Scene {
 		// The shining ball and its four antennas, swept back.
 		Vec3 back = sky.subtract(target).normalize();
 		float spin = tick * 0.05F;
-		place(parts.get(0), at, new Vector3f(1.5F), new Quaternionf().rotateY(spin).rotateX(spin * 0.7F));
+		Vec3 across = back.cross(new Vec3(0.0, 1.0, 0.0)).normalize();
+		Vec3 up = across.cross(back).normalize();
+		Quaternionf roll = new Quaternionf().rotateY(spin).rotateX(spin * 0.7F);
+		place(parts.get(0), at, new Vector3f(2.0F), roll);
+		place(parts.get(5), at, new Vector3f(2.0F), new Quaternionf(roll).rotateY(Mth.PI / 4.0F));
+		place(parts.get(6), at, new Vector3f(2.0F), new Quaternionf(roll).rotateZ(Mth.PI / 4.0F).rotateX(Mth.PI / 4.0F));
 		for (int i = 0; i < 4; i++) {
-			Vec3 out = back.yRot(i * Mth.HALF_PI + 0.4F).add(back.scale(2.0)).normalize();
-			Vec3 mid = at.add(out.scale(1.8));
+			// Spread round the back like a cone, the way the four long antennas trail behind the ball.
+			double a = i * Mth.HALF_PI + spin * 0.5;
+			Vec3 out = back.scale(1.2).add(across.scale(Math.cos(a))).add(up.scale(Math.sin(a))).normalize();
+			Vec3 mid = at.add(out.scale(2.9));
 			Quaternionf along = new Quaternionf().rotationTo(new Vector3f(0.0F, 1.0F, 0.0F), new Vector3f((float) out.x, (float) out.y, (float) out.z));
-			place(parts.get(1 + i), mid, new Vector3f(0.09F, 3.0F, 0.09F), along);
+			place(parts.get(1 + i), mid, new Vector3f(0.12F, 4.6F, 0.12F), along);
 		}
 		turnTowards(player, at, tick < FALL ? 0.04F : 0.2F);
 		if (tick == HIT) {
