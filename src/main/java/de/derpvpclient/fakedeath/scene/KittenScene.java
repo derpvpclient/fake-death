@@ -37,6 +37,12 @@ public class KittenScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// Buried under the kittens, seen through the own eyes.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return RAIN + 50;
 	}

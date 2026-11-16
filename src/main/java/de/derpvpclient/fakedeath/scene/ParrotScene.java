@@ -37,6 +37,12 @@ public class ParrotScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// The creeper behind the dancing parrots is a surprise only through the own eyes.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return NOTICE + 8;
 	}
