@@ -640,9 +640,8 @@ public final class Situations {
 		}
 		if (options.wants("ruestungsstaender")) {
 			net.minecraft.world.entity.Entity stand = ArmorStandScene.near(level, player, 3.0);
-			if (stand != null) {
-				options.add("ruestungsstaender", 6, () -> new ArmorStandScene(stand));
-			}
+			// Without a stand nearby it brings its own along.
+			options.add("ruestungsstaender", stand != null ? 6 : 1, () -> new ArmorStandScene(stand));
 		}
 
 		// 1.0.53: nine more, each only for someone who stands right at the thing.

@@ -129,6 +129,11 @@ public abstract class Scene {
 		return length() * 2 / 3;
 	}
 
+	/** A color (ARGB) the sky and the horizon blend towards, alpha saying how far. 0 for the normal sky. */
+	public int skyTint() {
+		return 0;
+	}
+
 	/** A color (ARGB) laid over the world below the HUD, like the dark inside of a frog. 0 for none. */
 	public int screenTint() {
 		return 0;
