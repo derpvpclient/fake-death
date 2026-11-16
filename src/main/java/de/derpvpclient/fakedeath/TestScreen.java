@@ -26,7 +26,12 @@ import net.minecraft.network.chat.Component;
 public class TestScreen extends Screen {
 	private static final int BUTTON_WIDTH = 118;
 	private static final int FOOTER_WIDTH = 98;
-	private static final List<String> CATEGORIES = List.of("all", "world", "animals", "monsters", "characters", "famous");
+	private static final List<String> CATEGORIES = List.of("all", "world", "animals", "monsters", "characters", "famous", "edited");
+	/** The scenes changed during the test of 1.2.0, in a tab of their own on top of their usual one, so they can be checked again. */
+	private static final List<String> EDITED = List.of("baum", "disco", "lore", "feuer", "kolben", "glitch", "kaktus", "mond", "ruestungsstaender",
+		"tornado", "woelfe", "riesenfrosch", "papagei", "kaetzchen", "katzen", "fuchs", "froesche", "fledermaeuse", "bienennest", "bienen", "allay",
+		"doppelgaenger", "geister", "slenderman", "revolution", "mausoleum", "ulbricht", "putin", "trumprakete", "napoleon", "gagarin", "sputnik",
+		"stalin", "herobrine", "wideputin");
 	private static final Map<String, List<String>> SORTED = Map.of(
 		"animals", List.of("bienen", "woelfe", "froesche", "riesenfrosch", "silberfische", "ziege", "fledermaeuse", "papagei", "delfin",
 			"kamel", "fuchs", "huehner", "bienennest", "axolotl", "panda", "katzen", "allay", "ziegenchor", "kaetzchen"),
@@ -73,7 +78,7 @@ public class TestScreen extends Screen {
 		// A fresh layout every time, a tab or a search builds the screen anew.
 		layout = new HeaderAndFooterLayout(this, 78, 33);
 		shown = Situations.NAMES.stream()
-			.filter(id -> category.equals("all") || categoryOf(id).equals(category))
+			.filter(id -> category.equals("all") || (category.equals("edited") ? EDITED.contains(id) : categoryOf(id).equals(category)))
 			.filter(this::matches)
 			.sorted(Comparator.comparing(id -> Component.translatable("fakedeath.scene." + id).getString()))
 			.toList();
