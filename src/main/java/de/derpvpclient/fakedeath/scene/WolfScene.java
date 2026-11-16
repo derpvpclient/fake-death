@@ -57,6 +57,12 @@ public class WolfScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// The pack closing in and the leap at the throat are made for the own eyes.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return CIRCLE + 30;
 	}
