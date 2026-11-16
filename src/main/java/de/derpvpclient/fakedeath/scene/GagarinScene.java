@@ -189,20 +189,28 @@ public class GagarinScene extends CastScene {
 		BlockState white = Looks.WHITE_CONCRETE;
 		BlockState grey = Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState();
 		add(level, white, pad.add(0.0, 5.0, 0.0), new Vector3f(1.3F, 9.0F, 1.3F));
+		// The boosters stand on the diagonals, so none of them hides the letters on the side towards the player.
 		for (int s : new int[] {-1, 1}) {
-			add(level, grey, pad.add(side.scale(s * 1.05)).add(0.0, 2.6, 0.0), new Vector3f(0.8F, 4.4F, 0.8F));
-			add(level, grey, pad.add(look.scale(s * 1.05)).add(0.0, 2.6, 0.0), new Vector3f(0.8F, 4.4F, 0.8F));
+			for (int t : new int[] {-1, 1}) {
+				Vec3 corner = side.scale(s).add(look.scale(t)).normalize().scale(1.05);
+				add(level, grey, pad.add(corner).add(0.0, 2.6, 0.0), new Vector3f(0.8F, 4.4F, 0.8F), Mth.PI / 4.0F);
+			}
 		}
 		add(level, grey, pad.add(0.0, 9.9, 0.0), new Vector3f(1.0F, 0.8F, 1.0F));
 		add(level, white, pad.add(0.0, 10.6, 0.0), new Vector3f(0.6F, 0.6F, 0.6F));
 		add(level, white, pad.add(0.0, 11.1, 0.0), new Vector3f(0.25F, 0.5F, 0.25F));
 		// "СССР" down its side, towards the player.
-		Display.TextDisplay letters = spawn(level, EntityType.TEXT_DISPLAY, pad.add(0.0, 6.0, 0.0));
-		((TextDisplayAccessor) letters).fakedeath$setText(Component.literal("С\nС\nС\nР").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
-		((TextDisplayAccessor) letters).fakedeath$setBackgroundColor(0);
-		((DisplayAccessor) letters).fakedeath$setInterpolationDuration(1);
-		rocket.add(new Part(letters, pad.add(look.scale(-0.68)).add(0.0, 4.0, 0.0), new Vector3f(1.4F), Mth.PI));
-		place(letters, pad.add(look.scale(-0.68)).add(0.0, 4.0, 0.0), new Vector3f(1.4F), new Quaternionf().rotateY(yaw + Mth.PI));
+		String word = "СССР";
+		for (int i = 0; i < word.length(); i++) {
+			// One big letter under the other, from the top down.
+			Vec3 at = pad.add(look.scale(-0.67)).add(0.0, 8.3 - i * 0.95, 0.0);
+			Display.TextDisplay letter = spawn(level, EntityType.TEXT_DISPLAY, at);
+			((TextDisplayAccessor) letter).fakedeath$setText(Component.literal(word.substring(i, i + 1)).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+			((TextDisplayAccessor) letter).fakedeath$setBackgroundColor(0);
+			((DisplayAccessor) letter).fakedeath$setInterpolationDuration(1);
+			rocket.add(new Part(letter, at, new Vector3f(3.2F), Mth.PI));
+			place(letter, at, new Vector3f(3.2F), new Quaternionf().rotateY(yaw + Mth.PI));
+		}
 		// The gantry beside it, staying on the ground.
 		Vec3 gantry = pad.add(look.scale(-1.6)).add(side.scale(1.4));
 		place(blockDisplay(level, Blocks.RED_CONCRETE.defaultBlockState(), gantry, 12.0F), gantry.add(0.0, 5.0, 0.0), new Vector3f(0.5F, 10.0F, 0.5F), turn);
@@ -214,9 +222,13 @@ public class GagarinScene extends CastScene {
 	}
 
 	private void add(ClientLevel level, BlockState state, Vec3 at, Vector3f size) {
+		add(level, state, at, size, 0.0F);
+	}
+
+	private void add(ClientLevel level, BlockState state, Vec3 at, Vector3f size, float turn) {
 		Display.BlockDisplay display = blockDisplay(level, state, at, 24.0F);
-		place(display, at, size, new Quaternionf().rotateY(yaw));
-		rocket.add(new Part(display, at, size, 0.0F));
+		place(display, at, size, new Quaternionf().rotateY(yaw + turn));
+		rocket.add(new Part(display, at, size, turn));
 	}
 
 	private record Part(Display display, Vec3 at, Vector3f size, float turn) {

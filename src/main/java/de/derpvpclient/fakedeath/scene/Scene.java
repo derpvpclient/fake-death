@@ -371,6 +371,20 @@ public abstract class Scene {
 		PLAYING.add(new PlayingSound(instance, now, sound.getLocation().toString()));
 	}
 
+	/**
+	 * Music a player can bring along in a resource pack of their own, like the original song of a meme, which the mod
+	 * does not contain: the sound event {@code fakedeath:<name>} in the pack's sounds.json. Plays it and returns true when
+	 * a pack has it, otherwise false, and the scene plays its own tune.
+	 */
+	protected static boolean packMusic(ClientLevel level, Vec3 pos, String name) {
+		SoundEvent music = Looks.own(name);
+		if (Minecraft.getInstance().getSoundManager().getSoundEvent(music.getLocation()) == null) {
+			return false;
+		}
+		sound(level, pos, music, SoundSource.RECORDS, 1.0F, 1.0F);
+		return true;
+	}
+
 	private record PlayingSound(net.minecraft.client.resources.sounds.SoundInstance instance, long started, String name) {
 	}
 

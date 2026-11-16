@@ -103,7 +103,7 @@ final class Looks {
 		"dental_drill", "dumbbell", "invoice", "magic_saw", "mop", "phone", "pipe_wrench", "police_baton", "police_camera", "present",
 		"screwdriver", "selfie_stick", "soup_ladle", "syringe", "tarot_card", "roast_chicken", "rubber_stamp", "robot_vacuum", "robot_vacuum_angry",
 		"missing_block", "flag_soviet", "flag_gdr", "flag_usa", "flag_mexico", "flag_germany", "flag_red", "grandma_selfie_stick", "knitting", "ring_light",
-		"cookie_tin", "amazom_box", "red_star", "flag_russia", "flag_france");
+		"cookie_tin", "amazom_box", "red_star", "flag_russia", "flag_france", "bicorne", "bicorne_marshal", "bearskin");
 
 	static net.minecraft.world.item.ItemStack prop(net.minecraft.world.item.Item base, String model) {
 		net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(base);
