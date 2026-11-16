@@ -310,9 +310,8 @@ public class TreeScene extends Scene {
 		double half = foot.size() > 1 ? 1.0 : 0.5;
 		Vec3 base = new Vec3(footX, bottom, footZ);
 		Vec3 dir = new Vec3(player.getX() - base.x, 0.0, player.getZ() - base.z);
+		// Straight at the player: the trunk comes down right onto them.
 		dir = dir.lengthSqr() < 1.0E-4 ? horizontalLook(player).reverse() : dir.normalize();
-		// A little to one side, so it swings down across the view instead of straight at the eyes.
-		dir = dir.yRot((random.nextBoolean() ? 1 : -1) * 18.0F * Mth.DEG_TO_RAD);
 
 		// It tips over the edge of the trunk that faces the player.
 		pivot = new Vec3(base.x + dir.x * half, base.y, base.z + dir.z * half);
