@@ -19,6 +19,15 @@
     { "predicate": { "custom_model_data": 4711037 }, "model": "fakedeath:item/flag_france" },
     { "predicate": { "custom_model_data": 4711038 }, "model": "fakedeath:item/bicorne" },
     { "predicate": { "custom_model_data": 4711039 }, "model": "fakedeath:item/bicorne_marshal" },
-    { "predicate": { "custom_model_data": 4711040 }, "model": "fakedeath:item/bearskin" }
+    { "predicate": { "custom_model_data": 4711040 }, "model": "fakedeath:item/bearskin" },
+    { "predicate": { "custom_model_data": 4711041 }, "model": "fakedeath:item/laurel" },
+    { "predicate": { "custom_model_data": 4711042 }, "model": "fakedeath:item/pickelhaube" },
+    { "predicate": { "custom_model_data": 4711043 }, "model": "fakedeath:item/pickelhaube_gold" },
+    { "predicate": { "custom_model_data": 4711044 }, "model": "fakedeath:item/crown" },
+    { "predicate": { "custom_model_data": 4711045 }, "model": "fakedeath:item/vr_headset" },
+    { "predicate": { "custom_model_data": 4711046 }, "model": "fakedeath:item/flag_empire" },
+    { "predicate": { "custom_model_data": 4711047 }, "model": "fakedeath:item/flag_spqr" },
+    { "predicate": { "custom_model_data": 4711048 }, "model": "fakedeath:item/galea" },
+    { "predicate": { "custom_model_data": 4711049 }, "model": "fakedeath:item/galea_centurion" }
   ]
 }

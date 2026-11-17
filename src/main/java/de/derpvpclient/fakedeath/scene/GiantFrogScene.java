@@ -68,6 +68,12 @@ public class GiantFrogScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// Swallowed whole, seen from inside the own head.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return CROAK + 12;
 	}

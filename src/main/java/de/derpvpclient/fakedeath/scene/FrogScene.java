@@ -48,6 +48,12 @@ public class FrogScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// Buried under the frogs, seen through the own eyes.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return FIRST_TONGUE - 5;
 	}

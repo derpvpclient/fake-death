@@ -200,6 +200,22 @@ public abstract class CastScene extends Scene {
 		return flag;
 	}
 
+	/** Glowing text standing in the world, its front towards {@code yaw} (the way the player looks), like on a sign or a screen. */
+	protected Display.TextDisplay sign(ClientLevel level, Vec3 at, Component content, float size, float yaw, int background) {
+		Display.TextDisplay text = spawn(level, net.minecraft.world.entity.EntityType.TEXT_DISPLAY, at);
+		((de.derpvpclient.fakedeath.mixin.TextDisplayAccessor) text).fakedeath$setText(content);
+		((de.derpvpclient.fakedeath.mixin.TextDisplayAccessor) text).fakedeath$setBackgroundColor(background);
+		((de.derpvpclient.fakedeath.mixin.DisplayAccessor) text).fakedeath$setInterpolationDuration(1);
+		Looks.glow(text);
+		place(text, at, new org.joml.Vector3f(size), new org.joml.Quaternionf().rotateY(yaw + net.minecraft.util.Mth.PI));
+		return text;
+	}
+
+	/** Changes what a sign says. */
+	protected static void relabel(Display.TextDisplay text, Component content) {
+		((de.derpvpclient.fakedeath.mixin.TextDisplayAccessor) text).fakedeath$setText(content);
+	}
+
 	protected static Vec3 onGround(ClientLevel level, LocalPlayer player, Vec3 spot) {
 		return new Vec3(spot.x, floor(level, spot.x, spot.z, player.getY()), spot.z);
 	}

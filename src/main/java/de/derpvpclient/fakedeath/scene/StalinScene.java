@@ -34,7 +34,7 @@ public class StalinScene extends CastScene {
 	 * The anthem's melody (Alexandrov, 1944; public domain music) after the score: the first two lines of the verse,
 	 * then the first two lines of the refrain. MIDI notes and lengths in sixteenths.
 	 */
-	private static final int[][] MELODY = {
+	static final int[][] MELODY = {
 		// Со-юз не-ру-ши-мый рес-пуб-лик сво-бод-ных
 		{67, 2}, {72, 4}, {67, 3}, {69, 1}, {71, 4}, {64, 2}, {64, 2}, {69, 4}, {67, 3}, {65, 1}, {67, 4}, {60, 3}, {60, 1},
 		// Спло-ти-ла на-ве-ки Ве-ли-ка-я Русь.
@@ -44,7 +44,7 @@ public class StalinScene extends CastScene {
 		// Друж-бы на-ро-дов на-дёж-ный оп-лот!
 		{72, 8}, {71, 2}, {69, 2}, {67, 2}, {69, 2}, {71, 6}, {64, 2}, {64, 8}};
 	/** The first note comes before the first bar. */
-	private static final int PICKUP = 2;
+	static final int PICKUP = 2;
 	private static final int[] CHORD_C = {55, 60, 64};
 	private static final int[] CHORD_EM = {55, 59, 64};
 	private static final int[] CHORD_F = {57, 60, 65};
@@ -52,9 +52,9 @@ public class StalinScene extends CastScene {
 	private static final int[] CHORD_D = {57, 62, 66};
 	private static final int[] CHORD_G7 = {55, 59, 62, 65};
 	/** The harmony of the score, one chord to each half bar: C Em F C, Dm F D G7, then the refrain C Em G7 G7, F Em Em Em. */
-	private static final int[][] CHORDS = {CHORD_C, CHORD_EM, CHORD_F, CHORD_C, CHORD_DM, CHORD_F, CHORD_D, CHORD_G7,
+	static final int[][] CHORDS = {CHORD_C, CHORD_EM, CHORD_F, CHORD_C, CHORD_DM, CHORD_F, CHORD_D, CHORD_G7,
 		CHORD_C, CHORD_EM, CHORD_G7, CHORD_G7, CHORD_F, CHORD_EM, CHORD_EM, CHORD_EM};
-	private static final int[] BASS = {36, 40, 41, 36, 38, 41, 38, 43, 36, 40, 43, 43, 41, 40, 40, 40};
+	static final int[] BASS = {36, 40, 41, 36, 38, 41, 38, 43, 36, 40, 43, 43, 41, 40, 40, 40};
 	/** Ticks to a sixteenth: a beat is 16 ticks, 75 beats a minute, the tempo of the score. */
 	private static final int STEP = 4;
 	private static final int SING = ARRIVE + 12;

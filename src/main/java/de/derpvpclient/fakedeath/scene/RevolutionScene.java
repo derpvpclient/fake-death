@@ -35,6 +35,25 @@ public class RevolutionScene extends CastScene {
 	private static final int DEATH = STORM + 52;
 	private static final int CROWD = 10;
 	private static final ChatFormatting RED = ChatFormatting.RED;
+	/**
+	 * The refrain of the Internationale (Pierre De Geyter, 1888, public domain), as in the score in G major: "Völker,
+	 * hört die Signale! Auf zum letzten Gefecht!" Midi note and length in sixteenths, a pickup of a quarter first.
+	 */
+	private static final int[][] TUNE = {{71, 3}, {69, 1}, {67, 8}, {62, 6}, {59, 2}, {64, 8}, {60, 4}, {69, 3}, {67, 1}, {66, 8}, {64, 6}, {62, 2}, {62, 8}};
+	private static final int PICKUP = 4;
+	/** One chord and bass note to each bar: G, C, D7, G. */
+	private static final int[][] CHORDS = {{55, 59, 62}, {55, 60, 64}, {54, 57, 60, 62}, {55, 59, 62}};
+	private static final int[] BASS = {43, 36, 38, 43};
+	/** The band starts while the crowd is still coming in, 120 beats a minute like the score: two and a half ticks to a sixteenth. */
+	private static final int MUSIC = 8;
+	private static final int[] NOTE_TICKS = new int[TUNE.length];
+	static {
+		int units = 0;
+		for (int i = 0; i < TUNE.length; i++) {
+			NOTE_TICKS[i] = MUSIC + at(units);
+			units += TUNE[i][1];
+		}
+	}
 
 	private final List<RemotePlayer> crowd = new ArrayList<>();
 	private final List<Display.ItemDisplay> banners = new ArrayList<>();
@@ -46,6 +65,52 @@ public class RevolutionScene extends CastScene {
 	@Override
 	public int length() {
 		return DEATH + 1;
+	}
+
+	/** The tick of the refrain at a number of sixteenths, two and a half ticks each. */
+	private static int at(int sixteenths) {
+		return Math.round(sixteenths * 2.5F);
+	}
+
+	private static float pitchOf(int midi, int base) {
+		return (float) Math.pow(2.0, (midi - base) / 12.0);
+	}
+
+	/**
+	 * A brass band plays the Internationale while the crowd gathers: the tune on trumpet and flute, the chords, bass and
+	 * a marching drum. It breaks off when Lenin points at the player; when the crowd storms, only the drum rolls.
+	 */
+	private void band(ClientLevel level, int tick) {
+		if (tick < POINT) {
+			for (int i = 0; i < TUNE.length; i++) {
+				if (NOTE_TICKS[i] == tick) {
+					float pitch = pitchOf(TUNE[i][0], 66);
+					sound(level, car, SoundEvents.NOTE_BLOCK_FLUTE.value(), SoundSource.RECORDS, 1.4F, pitch);
+					sound(level, car, SoundEvents.NOTE_BLOCK_FLUTE.value(), SoundSource.RECORDS, 0.6F, pitch);
+				}
+			}
+			int sinceBar = tick - MUSIC - at(PICKUP);
+			for (int beat = 0; beat < CHORDS.length * 4; beat++) {
+				if (sinceBar != at(beat * 4)) {
+					continue;
+				}
+				int bar = beat / 4;
+				boolean strong = beat % 2 == 0;
+				for (int midi : CHORDS[bar]) {
+					sound(level, car, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, strong ? 0.5F : 0.35F, pitchOf(midi, 66));
+				}
+				if (strong) {
+					sound(level, car, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.RECORDS, 1.0F, pitchOf(BASS[bar] + (beat % 4 == 2 ? 7 : 0), 42));
+					sound(level, car, SoundEvents.NOTE_BLOCK_BASEDRUM.value(), SoundSource.RECORDS, 0.6F, 1.0F);
+				} else {
+					sound(level, car, SoundEvents.NOTE_BLOCK_SNARE.value(), SoundSource.RECORDS, 0.5F, 1.0F);
+				}
+			}
+		}
+		if (tick >= STORM && tick < HITS[0] && tick % 2 == 0) {
+			// The drum roll while they come.
+			sound(level, car, SoundEvents.NOTE_BLOCK_SNARE.value(), SoundSource.RECORDS, 0.4F + (tick - STORM) * 0.03F, 1.0F);
+		}
 	}
 
 	@Override
@@ -73,6 +138,7 @@ public class RevolutionScene extends CastScene {
 		}
 		bubbles();
 		Vec3 eyes = player.getEyePosition();
+		band(level, tick);
 		if (tick >= HOP_UP && tick <= HOP_UP + 8) {
 			// Up onto the armoured car.
 			float p = (tick - HOP_UP) / 8.0F;

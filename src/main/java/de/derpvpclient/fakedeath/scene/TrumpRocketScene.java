@@ -25,27 +25,40 @@ import org.joml.Vector3f;
  * Donald Trump and his generals and advisors walk up to a long table and all look at the player. "This guy. Very bad
  * guy." A general begs him not to. He holds up his phone: his button is much bigger. One tap. Far behind them a missile
  * climbs into the sky on a column of fire, everybody at the table runs. It turns over high up and comes down, straight
- * at the player: a blinding white flash, and when the light fades the mushroom cloud towers right overhead.
+ * at the player: a blinding white flash, and when the light fades the mushroom cloud towers right overhead. On the
+ * other side Kim Jong-un stands at his own desk: the nuclear button is always on it. When Trump taps, Kim slams his big
+ * red button too, and a second missile comes down from the other side.
  */
 public class TrumpRocketScene extends CastScene {
 	private static final int L1 = ARRIVE + 10;
-	private static final int L2 = ARRIVE + 60;
-	private static final int L3 = ARRIVE + 100;
-	private static final int TAP = ARRIVE + 145;
+	/** Kim at his own desk: the button is always on it. */
+	private static final int KIM_SAY = ARRIVE + 50;
+	private static final int L2 = ARRIVE + 92;
+	private static final int L3 = ARRIVE + 132;
+	private static final int TAP = ARRIVE + 177;
+	private static final int KIM_PRESS = TAP + 8;
 	private static final int LAUNCH = TAP + 15;
+	/** His missile goes a little later and from the other side, both come down on the player at the same moment. */
+	private static final int KIM_LAUNCH = LAUNCH + 6;
 	private static final int FLIGHT = 80;
 	private static final int IMPACT = LAUNCH + FLIGHT;
 	private static final int AFTER = 40;
 	private static final int DEATH = IMPACT + AFTER;
 	private static final ChatFormatting US = ChatFormatting.RED;
 	private static final ChatFormatting STAFF = ChatFormatting.GRAY;
+	private static final ChatFormatting KOREA = ChatFormatting.DARK_RED;
 
 	private final List<RemotePlayer> staff = new ArrayList<>();
-	private final List<Part> missile = new ArrayList<>();
+	private final List<Rocket> rockets = new ArrayList<>();
 	private RemotePlayer trump;
 	private Vec3 pad;
 	private Vec3 apex;
-	private Vec3 rocketAt;
+	private RemotePlayer kim;
+	private Display.BlockDisplay button;
+	private Vec3 buttonAt;
+	private float buttonYaw;
+	private Vec3 kimPad;
+	private Vec3 kimApex;
 	private Vec3 hit;
 	private float flash;
 
@@ -85,10 +98,32 @@ public class TrumpRocketScene extends CastScene {
 			for (int i = 0; i < staff.size(); i++) {
 				face(staff.get(i), tick > L2 && tick < L3 + 30 && i == 0 ? trump.getEyePosition() : eyes);
 			}
-			turnTowards(player, trump.getEyePosition(), 0.08F);
+			boolean kimsTurn = tick >= KIM_SAY - 6 && tick < KIM_SAY + 34 || tick >= KIM_PRESS - 5;
+			turnTowards(player, kimsTurn ? kim.getEyePosition() : trump.getEyePosition(), 0.1F);
 		}
+		// Kim looks at the player, down at his button for the press, then up after his missile.
+		face(kim, tick >= KIM_PRESS - 3 && tick < KIM_PRESS + 3 ? buttonAt : tick >= KIM_LAUNCH ? kim.getEyePosition().add(0.0, 3.0, 0.0).add(horizontalLook(player).scale(-2.0)) : eyes);
 		if (tick == L1) {
 			speak(level, trump, "fakedeath.trumprakete.l1", US, 45);
+		}
+		if (tick == KIM_SAY) {
+			speak(level, kim, "fakedeath.trumprakete.kim_say", KOREA, 40);
+		}
+		if (tick == KIM_PRESS) {
+			speak(level, kim, "fakedeath.trumprakete.kim_press", KOREA, 30);
+			Looks.swing(kim);
+			sound(level, buttonAt, SoundEvents.STONE_BUTTON_CLICK_ON, SoundSource.BLOCKS, 2.0F, 0.5F);
+			sound(level, buttonAt, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1.5F, 0.5F);
+		}
+		if (tick >= KIM_PRESS && tick <= KIM_PRESS + 6) {
+			// The big red button goes down under his fist and comes back up.
+			float pressed = tick < KIM_PRESS + 6 ? 0.4F : 1.0F;
+			place(button, buttonAt.add(0.0, 0.06 + 0.06 * pressed, 0.0), new Vector3f(0.28F, 0.12F * pressed, 0.28F), new Quaternionf().rotateY(buttonYaw));
+		}
+		if (tick == KIM_LAUNCH) {
+			rockets.add(buildMissile(level, kimPad, kimApex, KIM_LAUNCH, IMPACT - KIM_LAUNCH, Blocks.GREEN_CONCRETE.defaultBlockState()));
+			sound(level, kimPad, SoundEvents.FIREWORK_ROCKET_LAUNCH, SoundSource.HOSTILE, 4.0F, 0.45F);
+			sound(level, kimPad, SoundEvents.BLAZE_SHOOT, SoundSource.HOSTILE, 4.0F, 0.55F);
 		}
 		if (tick == L2) {
 			speak(level, staff.getFirst(), "fakedeath.trumprakete.l2", STAFF, 35);
@@ -104,14 +139,16 @@ public class TrumpRocketScene extends CastScene {
 		}
 
 		if (tick == LAUNCH) {
-			buildMissile(level);
+			rockets.add(buildMissile(level, pad, apex, LAUNCH, FLIGHT, Looks.WHITE_CONCRETE));
 			sound(level, pad, SoundEvents.FIREWORK_ROCKET_LAUNCH, SoundSource.HOSTILE, 4.0F, 0.4F);
 			sound(level, pad, SoundEvents.BLAZE_SHOOT, SoundSource.HOSTILE, 4.0F, 0.5F);
 			sound(level, eyes, SoundEvents.RAID_HORN.value(), SoundSource.HOSTILE, 1.5F, 0.8F);
 			speak(level, staff.get(1), "fakedeath.trumprakete.cover", STAFF, 40);
 		}
 		if (tick >= LAUNCH && tick < IMPACT) {
-			flyMissile(level, player, tick);
+			for (Rocket rocket : rockets) {
+				flyMissile(level, player, tick, rocket, rocket == rockets.getFirst());
+			}
 			// Everybody at the table runs off, away from the player.
 			Vec3 away = horizontalLook(player);
 			for (RemotePlayer person : staff) {
@@ -124,10 +161,12 @@ public class TrumpRocketScene extends CastScene {
 		if (tick == IMPACT) {
 			// Right on top of the player.
 			hit = player.position();
-			for (Part part : missile) {
-				despawn(level, part.display());
+			for (Rocket rocket : rockets) {
+				for (Part part : rocket.parts) {
+					despawn(level, part.display());
+				}
 			}
-			missile.clear();
+			rockets.clear();
 			flash = 1.0F;
 			sound(level, eyes, Looks.EXPLODE, SoundSource.HOSTILE, 6.0F, 0.4F);
 			sound(level, eyes, SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 2.0F, 0.5F);
@@ -190,32 +229,51 @@ public class TrumpRocketScene extends CastScene {
 		// The missile starts far behind them, climbs high and comes down on the player.
 		pad = onGround(level, player, center.add(look.scale(30.0)).add(side.scale(-6.0)));
 		apex = pad.lerp(player.position(), 0.45).add(0.0, 48.0, 0.0);
+		// Kim on the other side, at his own little desk with the big red button on it.
+		Vec3 desk = center.add(side.scale(-3.4)).add(look.scale(0.2));
+		place(blockDisplay(level, top, desk, 3.0F), desk.add(0.0, 0.8, 0.0), new Vector3f(1.1F, 0.12F, 0.7F), new Quaternionf().rotateY(yaw));
+		place(blockDisplay(level, top, desk, 2.0F), desk.add(0.0, 0.37, 0.0), new Vector3f(0.9F, 0.74F, 0.5F), new Quaternionf().rotateY(yaw));
+		buttonAt = desk.add(look.scale(-0.1)).add(0.0, 0.86, 0.0);
+		buttonYaw = yaw;
+		place(blockDisplay(level, Looks.BLACK_CONCRETE, buttonAt, 1.0F), buttonAt.add(0.0, 0.03, 0.0), new Vector3f(0.42F, 0.06F, 0.42F), new Quaternionf().rotateY(yaw));
+		button = blockDisplay(level, Blocks.RED_CONCRETE.defaultBlockState(), buttonAt, 1.0F);
+		Looks.glow(button);
+		place(button, buttonAt.add(0.0, 0.12, 0.0), new Vector3f(0.28F, 0.12F, 0.28F), new Quaternionf().rotateY(yaw));
+		kim = actor(level, "fakedeath.trumprakete.kim", "kim", false, onGround(level, player, desk.add(look.scale(0.7))));
+		arrive(level, player, kim, 10);
+		kimPad = onGround(level, player, center.add(look.scale(28.0)).add(side.scale(16.0)));
+		kimApex = kimPad.lerp(player.position(), 0.45).add(0.0, 44.0, 0.0);
 	}
 
-	private void buildMissile(ClientLevel level) {
-		// A white body, a red nose, grey fins.
-		missile.add(new Part(blockDisplay(level, Looks.WHITE_CONCRETE, pad, 8.0F), new Vector3f(-0.25F, -1.2F, -0.25F), new Vector3f(0.5F, 2.4F, 0.5F)));
-		missile.add(new Part(blockDisplay(level, Blocks.RED_CONCRETE.defaultBlockState(), pad, 8.0F), new Vector3f(-0.18F, 1.2F, -0.18F), new Vector3f(0.36F, 0.5F, 0.36F)));
-		missile.add(new Part(blockDisplay(level, Looks.GRAY_CONCRETE, pad, 8.0F), new Vector3f(-0.5F, -1.2F, -0.05F), new Vector3f(1.0F, 0.6F, 0.1F)));
-		missile.add(new Part(blockDisplay(level, Looks.GRAY_CONCRETE, pad, 8.0F), new Vector3f(-0.05F, -1.2F, -0.5F), new Vector3f(0.1F, 0.6F, 1.0F)));
+	/** A missile on its pad: a body in the given color, a red nose, grey fins. */
+	private Rocket buildMissile(ClientLevel level, Vec3 from, Vec3 top, int start, int flight, BlockState body) {
+		Rocket rocket = new Rocket(from, top, start, flight);
+		rocket.parts.add(new Part(blockDisplay(level, body, from, 8.0F), new Vector3f(-0.25F, -1.2F, -0.25F), new Vector3f(0.5F, 2.4F, 0.5F)));
+		rocket.parts.add(new Part(blockDisplay(level, Blocks.RED_CONCRETE.defaultBlockState(), from, 8.0F), new Vector3f(-0.18F, 1.2F, -0.18F), new Vector3f(0.36F, 0.5F, 0.36F)));
+		rocket.parts.add(new Part(blockDisplay(level, Looks.GRAY_CONCRETE, from, 8.0F), new Vector3f(-0.5F, -1.2F, -0.05F), new Vector3f(1.0F, 0.6F, 0.1F)));
+		rocket.parts.add(new Part(blockDisplay(level, Looks.GRAY_CONCRETE, from, 8.0F), new Vector3f(-0.05F, -1.2F, -0.5F), new Vector3f(0.1F, 0.6F, 1.0F)));
+		return rocket;
 	}
 
-	/** Up, over and down onto the player: a curve through a high point, the nose always along the way it flies. */
-	private void flyMissile(ClientLevel level, LocalPlayer player, int tick) {
-		float p = (tick - LAUNCH) / (float) FLIGHT;
+	/**
+	 * Up, over and down onto the player: a curve through a high point, the nose always along the way it flies. The view
+	 * follows the leading one.
+	 */
+	private void flyMissile(ClientLevel level, LocalPlayer player, int tick, Rocket rocket, boolean lead) {
+		float p = Math.min(1.0F, (tick - rocket.start) / (float) rocket.flight);
 		// Slow at the start, fast at the end.
 		float t = p * p * (1.5F - 0.5F * p);
 		Vec3 target = player.position().add(0.0, 1.0, 0.0);
-		Vec3 a = pad.lerp(apex, t);
-		Vec3 b = apex.lerp(target, t);
+		Vec3 a = rocket.pad.lerp(rocket.apex, t);
+		Vec3 b = rocket.apex.lerp(target, t);
 		Vec3 at = a.lerp(b, t);
-		Vec3 dir = rocketAt == null ? new Vec3(0.0, 1.0, 0.0) : at.subtract(rocketAt);
-		rocketAt = at;
+		Vec3 dir = rocket.at == null ? new Vec3(0.0, 1.0, 0.0) : at.subtract(rocket.at);
+		rocket.at = at;
 		if (dir.lengthSqr() < 1.0E-6) {
 			dir = new Vec3(0.0, 1.0, 0.0);
 		}
 		Quaternionf turn = new Quaternionf().rotationTo(new Vector3f(0.0F, 1.0F, 0.0F), new Vector3f((float) dir.x, (float) dir.y, (float) dir.z).normalize());
-		for (Part part : missile) {
+		for (Part part : rocket.parts) {
 			part.display().setPos(at.x, at.y, at.z);
 			transform(part.display(), new Transformation(new Vector3f(part.offset()).rotate(turn), new Quaternionf(turn), part.size(), new Quaternionf()));
 		}
@@ -231,10 +289,31 @@ public class TrumpRocketScene extends CastScene {
 		if (tick == IMPACT - 18) {
 			// The scream of the falling missile, coming closer.
 			sound(level, at, SoundEvents.FIREWORK_ROCKET_LARGE_BLAST_FAR, SoundSource.HOSTILE, 4.0F, 0.5F);
-			sound(level, player.getEyePosition(), SoundEvents.RAID_HORN.value(), SoundSource.HOSTILE, 1.0F, 1.2F);
+			if (lead) {
+				sound(level, player.getEyePosition(), SoundEvents.RAID_HORN.value(), SoundSource.HOSTILE, 1.0F, 1.2F);
+			}
 		}
-		// The view follows it up into the sky and down onto the player.
-		turnTowards(player, at, 0.18F);
+		if (lead) {
+			// The view follows it up into the sky and down onto the player.
+			turnTowards(player, at, 0.18F);
+		}
+	}
+
+	/** One missile in the air: where it starts, the high point of its curve, when it goes and how long it flies. */
+	private static final class Rocket {
+		final List<Part> parts = new ArrayList<>();
+		final Vec3 pad;
+		final Vec3 apex;
+		final int start;
+		final int flight;
+		Vec3 at;
+
+		Rocket(Vec3 pad, Vec3 apex, int start, int flight) {
+			this.pad = pad;
+			this.apex = apex;
+			this.start = start;
+			this.flight = flight;
+		}
 	}
 
 	/** The mushroom cloud right over the player: a column of fire and smoke, a broad cap rolling out at the top. */

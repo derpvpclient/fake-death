@@ -7,15 +7,24 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.goat.Goat;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-/** A tornado forms in the distance, comes closer, lifts the player high up, spins them around and drops them. */
+/**
+ * A tornado forms in the distance, comes closer, lifts the player high up, spins them around and drops them. A
+ * screaming goat goes round and round in it, and someone famous, a different one every time; once the player is up
+ * in the funnel, both fly right alongside them.
+ */
 public class TornadoScene extends Scene {
 	private static final int ARRIVE = 100;
 	private static final int LIFT = 45;
@@ -24,6 +33,14 @@ public class TornadoScene extends Scene {
 	private static final int DEATH = ARRIVE + LIFT + 20 + DROP;
 	private final List<Display.BlockDisplay> debris = new ArrayList<>();
 	private Vec3 start;
+	private Goat goat;
+	private RemotePlayer famous;
+	/** Skin and name of the famous people from the other scenes; Herobrine has no name in the language files. */
+	private static final String[][] FAMOUS = {
+		{"trump", "fakedeath.trumpmauer.trump"}, {"merkel", "fakedeath.merkel.name"}, {"putin", "fakedeath.putin.name"}, {"stalin", "fakedeath.stalin.name"},
+		{"ulbricht", "fakedeath.ulbricht.name"}, {"khrushchev", "fakedeath.chruschtschow.name"}, {"gagarin", "fakedeath.gagarin.name"},
+		{"napoleon", "fakedeath.napoleon.name"}, {"genghis", "fakedeath.genghis.name"}, {"lenin", "fakedeath.revolution.lenin"}, {"herobrine", null},
+		{"kim", "fakedeath.trumprakete.kim"}, {"caesar", "fakedeath.caesar.name"}, {"cleopatra", "fakedeath.cleopatra.name"}, {"wilhelm", "fakedeath.wilhelm.name"}, {"bismarck", "fakedeath.bismarck.name"}, {"barbarossa", "fakedeath.barbarossa.name"}, {"newton", "fakedeath.newton.name"}, {"leonardo", "fakedeath.leonardo.name"}, {"tesla", "fakedeath.tesla.name"}, {"musk", "fakedeath.musk.name"}, {"jobs", "fakedeath.jobs.name"}, {"gates", "fakedeath.gates.name"}, {"zuckerberg", "fakedeath.zuckerberg.name"}, {"schabowski", "fakedeath.mauerfall.schabowski"}};
 
 	@Override
 	public int length() {
@@ -49,10 +66,22 @@ public class TornadoScene extends Scene {
 				Looks.farView(piece);
 				debris.add(piece);
 			}
+			goat = spawn(level, EntityType.GOAT, start.add(0.0, 5.0, 0.0));
+			goat.noPhysics = true;
+			goat.setScreamingGoat(true);
+			String[] who = FAMOUS[random.nextInt(FAMOUS.length)];
+			String name = who[1] == null ? "Herobrine" : Component.translatable(who[1]).getString();
+			// A player name over the head holds 16 letters: the last name alone for longer ones.
+			if (name.length() > 16) {
+				name = name.substring(name.lastIndexOf(' ') + 1);
+			}
+			famous = person(level, name, who[0], false, true, start.add(0.0, 9.0, 0.0));
+			famous.noPhysics = true;
 		}
 
 		Vec3 center = tick < ARRIVE ? start.lerp(player.position(), tick / (double) ARRIVE) : player.position();
 		funnel(level, center, tick);
+		passengers(level, player, center, tick);
 
 		if (tick % 20 == 0 && tick < DEATH) {
 			sound(level, center, SoundEvents.ELYTRA_FLYING, SoundSource.WEATHER, 1.0F + Math.min(2.0F, tick / 50.0F), 0.6F);
@@ -82,6 +111,46 @@ public class TornadoScene extends Scene {
 			sound(level, player.position(), SoundEvents.PLAYER_BIG_FALL, SoundSource.PLAYERS, 1.5F, 1.0F);
 			kill(level, player, SoundEvents.PLAYER_HURT);
 		}
+	}
+
+	/**
+	 * The goat and the famous one: round and round in the funnel, then, with the player up in it, right next to them in
+	 * the picture, and at the end they come down with the player.
+	 */
+	private void passengers(ClientLevel level, LocalPlayer player, Vec3 center, int tick) {
+		if (goat == null || famous == null) {
+			return;
+		}
+		Vec3 goatAt = orbit(center, 2.6, tick * 0.45, 5.5);
+		Vec3 famousAt = orbit(center, 3.6, tick * 0.4 + Math.PI, 9.5);
+		if (tick >= ARRIVE) {
+			// The same height as the camera, a little ahead of where it looks while it circles.
+			double angle = (tick - ARRIVE) * 0.35;
+			float lift = Math.min(1.0F, (tick - ARRIVE) / (float) LIFT);
+			float fall = tick < ARRIVE + LIFT + 20 ? 0.0F : Math.min(1.0F, (tick - ARRIVE - LIFT - 20) / (float) DROP);
+			Vec3 eyes = player.getEyePosition().add(0.0, HEIGHT * lift * (1.0F - fall * fall), 0.0);
+			float blend = Mth.clamp((tick - ARRIVE) / 15.0F, 0.0F, 1.0F);
+			blend = blend * blend * (3.0F - 2.0F * blend);
+			goatAt = goatAt.lerp(orbit(eyes, 3.2, angle + 1.25, -1.6), blend);
+			famousAt = famousAt.lerp(orbit(eyes, 4.6, angle + 2.0, -1.4), blend);
+		}
+		if (tick >= DEATH) {
+			// Down next to the player.
+			goatAt = orbit(player.position(), 2.2, 0.8, 0.0);
+			famousAt = orbit(player.position(), 3.0, 2.6, 0.0);
+		}
+		spin(goat, goatAt, tick < DEATH ? tick * 31.0F : 0.0F);
+		spin(famous, famousAt, tick < DEATH ? tick * -27.0F : 120.0F);
+		if (tick % 22 == 5 && tick <= DEATH + 4) {
+			sound(level, goat.position(), SoundEvents.GOAT_SCREAMING_AMBIENT, SoundSource.NEUTRAL, 2.5F, 0.85F + random.nextFloat() * 0.3F);
+		}
+	}
+
+	private static void spin(LivingEntity who, Vec3 at, float yaw) {
+		who.setPos(at.x, at.y, at.z);
+		who.setYRot(yaw);
+		who.setYBodyRot(yaw);
+		who.setYHeadRot(yaw);
 	}
 
 	private void funnel(ClientLevel level, Vec3 center, int tick) {
