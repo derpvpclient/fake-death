@@ -35,6 +35,12 @@ public class BeeNestScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// Stung by the swarm from the nest, seen through the own eyes.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return SWARM + 20;
 	}

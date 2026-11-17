@@ -35,7 +35,10 @@ public class NapoleonScene extends CastScene {
 	/** The view follows the marshal's arm out to the enemy cannon. */
 	private static final int SHOW = WARN + 22;
 	private static final int ASK = ARRIVE + 82;
-	private static final int MUSIC = ARRIVE + 104;
+	/** The music right from the start, over the battle. */
+	private static final int MUSIC = 2;
+	/** The battle goes quiet and the picture fades into an old painting. */
+	private static final int FADE = ARRIVE + 104;
 	private static final int TURN = ARRIVE + 112;
 	private static final int NOTHING = ARRIVE + 140;
 	/** The soldiers lower their heads, Napoleon folds his hands. */
@@ -88,11 +91,11 @@ public class NapoleonScene extends CastScene {
 
 	@Override
 	public int screenTint() {
-		// Once the music begins the battle fades into an old, faded painting.
-		if (now < MUSIC) {
+		// Once the battle goes quiet it fades into an old, faded painting.
+		if (now < FADE) {
 			return 0;
 		}
-		int alpha = (int) (Math.min(1.0F, (now - MUSIC) / 40.0F) * 70.0F);
+		int alpha = (int) (Math.min(1.0F, (now - FADE) / 40.0F) * 70.0F);
 		return alpha << 24 | 0x4A3418;
 	}
 
@@ -173,7 +176,7 @@ public class NapoleonScene extends CastScene {
 			pose(drummer, Skins.Pose.SALUTE);
 		}
 
-		if (tick < MUSIC) {
+		if (tick < FADE) {
 			battle(level, player, tick, eyes);
 		}
 		if (tick == MUSIC) {

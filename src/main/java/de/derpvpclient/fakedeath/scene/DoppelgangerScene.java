@@ -11,7 +11,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.world.phys.Vec3;
@@ -28,10 +27,29 @@ public class DoppelgangerScene extends Scene {
 	private static final int[] HITS = {180, 196, 212};
 
 	private RemotePlayer copy;
+	private int now;
 
 	@Override
 	public int length() {
 		return HITS[HITS.length - 1] + 8;
+	}
+
+	@Override
+	public boolean firstPersonOnly() {
+		// Meeting yourself only works through the own eyes.
+		return true;
+	}
+
+	@Override
+	public int screenTint() {
+		// Too late: the world goes dark around it, pulsing like the darkness effect. Its own tint, so nothing of it
+		// stays behind once the scene is over.
+		if (now < TOO_LATE) {
+			return 0;
+		}
+		float in = Math.min(1.0F, (now - TOO_LATE) / 20.0F);
+		float pulse = 0.75F + 0.25F * net.minecraft.util.Mth.sin((now - TOO_LATE) * 0.12F);
+		return (int) (in * pulse * 170.0F) << 24;
 	}
 
 	@Override
@@ -41,6 +59,7 @@ public class DoppelgangerScene extends Scene {
 
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
+		now = tick;
 		// Its own footsteps, always a little behind.
 		if (tick < APPEAR && tick % 11 == 0) {
 			sound(level, player.position().add(horizontalLook(player).scale(-3.0)), SoundEvents.STONE_STEP, SoundSource.PLAYERS, 0.5F, 0.9F);
@@ -67,7 +86,6 @@ public class DoppelgangerScene extends Scene {
 
 		if (tick == TOO_LATE) {
 			say(minecraft, player.getDisplayName(), Component.translatable("fakedeath.doppel.too_late"));
-			addEffect(player, MobEffects.DARKNESS, 200);
 		}
 
 		if (tick == CLOSE) {
