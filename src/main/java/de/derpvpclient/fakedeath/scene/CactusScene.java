@@ -28,16 +28,20 @@ import org.joml.Vector3f;
 public class CactusScene extends Scene {
 	private static final int COUNT = 12;
 	private static final double START = 4.5;
-	private static final double END = 0.55;
+	private static final double END = 1.0;
+	/** From here on the ring is a closed wall, the cacti then gather into four, one on each side of the player. */
+	private static final double CLOSED = 1.9;
+	private static final int SETTLE = 5;
 	private static final int TREMBLE = 25;
 	private static final int GROW_EVERY = 3;
 	private static final int GROW = 10;
 	private static final int CLOSE = TREMBLE + COUNT * GROW_EVERY + GROW + 15;
 	private static final int CLOSE_TICKS = 80;
-	private static final double[] STINGS = {1.6, 1.15, 0.85};
+	private static final double[] STINGS = {2.4, 1.6, 1.15};
 
 	private final List<Column> columns = new ArrayList<>();
 	private Vec3 center;
+	private float facing;
 	private BlockState ground;
 	private int stung;
 
@@ -60,6 +64,8 @@ public class CactusScene extends Scene {
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
 		if (tick == 0) {
 			center = player.position();
+			Vec3 look = horizontalLook(player);
+			facing = (float) Math.atan2(look.z, look.x);
 			ground = level.getBlockState(player.blockPosition().below());
 			if (ground.isAir()) {
 				ground = Blocks.SAND.defaultBlockState();
@@ -117,7 +123,7 @@ public class CactusScene extends Scene {
 
 	/** One cactus column, three blocks, pushed up out of the sand. */
 	private void sprout(ClientLevel level, LocalPlayer player, int index, int tick) {
-		float angle = index * Mth.TWO_PI / COUNT + (random.nextFloat() - 0.5F) * 0.2F;
+		float angle = facing + index * Mth.TWO_PI / COUNT + (random.nextFloat() - 0.5F) * 0.2F;
 		int height = 2 + random.nextInt(2);
 		List<Display.BlockDisplay> blocks = new ArrayList<>();
 		for (int i = 0; i < height; i++) {
@@ -130,12 +136,19 @@ public class CactusScene extends Scene {
 	}
 
 	private void move(ClientLevel level, Column column, int tick, double radius) {
-		float rise = Math.min(1.0F, (tick - column.start()) / (float) GROW);
-		// Overshooting a little, then settling, like it bursts out of the sand.
-		double up = rise < 1.0F ? Mth.sin(rise * Mth.HALF_PI) * 1.08 : 1.0;
-		double x = center.x + Mth.cos(column.angle()) * radius;
-		double z = center.z + Mth.sin(column.angle()) * radius;
+		int grown = tick - column.start();
+		// Overshooting a little, then settling back over a few ticks, like it bursts out of the sand.
+		double up = grown < GROW ? Mth.sin(grown / (float) GROW * Mth.HALF_PI) * 1.08 : 1.0 + 0.08 * Math.max(0.0, 1.0 - (grown - GROW) / (double) SETTLE);
+		// Once the ring is a closed wall the cacti would only push into each other and into the eyes: they gather into
+		// four instead, in front, behind and to the sides, and those close in on the player.
+		float side = facing + Math.round((column.angle() - facing) / Mth.HALF_PI) * Mth.HALF_PI;
+		float gather = (float) Mth.clamp((CLOSED - radius) / (CLOSED - END), 0.0, 1.0);
+		float angle = Mth.lerp(gather * gather * (3.0F - 2.0F * gather), column.angle(), side);
+		double x = center.x + Mth.cos(angle) * radius;
+		double z = center.z + Mth.sin(angle) * radius;
 		double floor = floor(level, x, z, center.y);
+		// A flat side towards the player, so the ring closes into a wall and the last four into a box.
+		Quaternionf turn = new Quaternionf().rotateY(-angle);
 		int height = column.blocks().size();
 		for (int i = 0; i < height; i++) {
 			// The column comes out of the ground block by block; below the floor it is hidden.
@@ -143,7 +156,7 @@ public class CactusScene extends Scene {
 			Display.BlockDisplay block = column.blocks().get(i);
 			float shown = (float) Mth.clamp(y + 1.0 - floor, 0.0, 1.0);
 			block.setPos(x, floor, z);
-			transform(block, new Transformation(new Vector3f(-0.5F, (float) (y - floor + 1.0 - shown), -0.5F), new Quaternionf(),
+			transform(block, new Transformation(new Vector3f(-0.5F, (float) (y - floor + 1.0 - shown), -0.5F).rotate(turn), turn,
 				new Vector3f(1.0F, shown, 1.0F), new Quaternionf()));
 		}
 	}

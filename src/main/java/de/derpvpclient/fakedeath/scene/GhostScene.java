@@ -10,7 +10,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.phys.Vec3;
@@ -41,9 +40,25 @@ public class GhostScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// Haunted from all sides, seen through the own eyes.
+		return true;
+	}
+
+	@Override
 	public int screenTint() {
 		int since = now - flashTick;
-		return since < 0 || since >= FLASH ? 0 : (140 - since * 140 / FLASH) << 24 | ICE;
+		if (since >= 0 && since < FLASH) {
+			return (140 - since * 140 / FLASH) << 24 | ICE;
+		}
+		// The world goes dark around the ghosts, pulsing like the darkness effect. Its own tint, so nothing of it stays
+		// behind once the scene is over.
+		if (now < DARK) {
+			return 0;
+		}
+		float in = Math.min(1.0F, (now - DARK) / 20.0F);
+		float pulse = 0.75F + 0.25F * net.minecraft.util.Mth.sin((now - DARK) * 0.12F);
+		return (int) (in * pulse * 150.0F) << 24;
 	}
 
 	@Override
@@ -85,7 +100,6 @@ public class GhostScene extends Scene {
 		}
 
 		if (tick == DARK) {
-			addEffect(player, MobEffects.DARKNESS, 300);
 			sound(level, head, SoundEvents.AMBIENT_SOUL_SAND_VALLEY_ADDITIONS.value(), SoundSource.AMBIENT, 2.0F, 0.6F);
 		}
 

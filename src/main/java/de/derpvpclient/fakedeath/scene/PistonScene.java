@@ -45,6 +45,12 @@ public class PistonScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// Squeezed between the pistons, seen through the own eyes.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return PUSHES[1] + 3;
 	}
