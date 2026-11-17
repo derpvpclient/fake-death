@@ -632,5 +632,12 @@
 	"fakedeath.zuckerberg.welcome": "Willkommen im Metaverse!",
 	"fakedeath.zuckerberg.puton": "Hier, setz die mal auf.",
 	"fakedeath.zuckerberg.legs": "Hast du schon Beine gekauft? Nur 9,99 €!",
-	"fakedeath.zuckerberg.lost": "Verbindung zum Metaverse verloren."
+	"fakedeath.zuckerberg.lost": "Verbindung zum Metaverse verloren.",
+	"fakedeath.scene.mauerfall": "Mauerfall",
+	"fakedeath.death.mauerfall": "%1$s wurde von der fallenden Mauer erschlagen",
+	"fakedeath.mauerfall.schabowski": "Günter Schabowski",
+	"fakedeath.mauerfall.reporter": "Reporterin",
+	"fakedeath.mauerfall.question": "Wann tritt das in Kraft?",
+	"fakedeath.mauerfall.immediately": "Das tritt nach meiner Kenntnis … ist das sofort, unverzüglich.",
+	"fakedeath.mauerfall.mustgo": "Die Mauer muss weg!"
 }
