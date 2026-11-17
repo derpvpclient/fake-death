@@ -27,12 +27,9 @@ public class TestScreen extends Screen {
 	private static final int BUTTON_WIDTH = 118;
 	private static final int FOOTER_WIDTH = 98;
 	private static final List<String> CATEGORIES = List.of("all", "world", "animals", "monsters", "characters", "famous", "edited");
-	/** The scenes changed during the test of 1.2.0, in a tab of their own on top of their usual one, so they can be checked again. */
-	private static final List<String> EDITED = List.of("baum", "disco", "lore", "feuer", "kolben", "glitch", "kaktus", "mond", "ruestungsstaender",
-		"tornado", "woelfe", "riesenfrosch", "papagei", "kaetzchen", "katzen", "fuchs", "froesche", "fledermaeuse", "bienennest", "bienen", "allay",
-		"doppelgaenger", "geister", "slenderman", "revolution", "mausoleum", "ulbricht", "putin", "trumprakete", "napoleon", "gagarin", "sputnik",
-		"stalin", "herobrine", "wideputin",
-		"caesar", "kleopatra", "kaiserwilhelm", "bismarck", "barbarossa", "newton", "leonardo", "tesla", "musk", "jobs", "gates", "zuckerberg");
+	/** The last twenty scenes that are new or were changed, newest first, in a tab of their own on top of their usual one, so they can be checked again. */
+	private static final List<String> EDITED = List.of("caesar", "kleopatra", "kaiserwilhelm", "bismarck", "barbarossa", "newton", "leonardo", "tesla",
+		"musk", "jobs", "gates", "zuckerberg", "trumprakete", "ulbricht", "putin", "mausoleum", "revolution", "bienen", "doppelgaenger", "geister");
 	private static final Map<String, List<String>> SORTED = Map.of(
 		"animals", List.of("bienen", "woelfe", "froesche", "riesenfrosch", "silberfische", "ziege", "fledermaeuse", "papagei", "delfin",
 			"kamel", "fuchs", "huehner", "bienennest", "axolotl", "panda", "katzen", "allay", "ziegenchor", "kaetzchen"),
