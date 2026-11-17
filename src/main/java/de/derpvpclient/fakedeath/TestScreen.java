@@ -28,8 +28,8 @@ public class TestScreen extends Screen {
 	private static final int FOOTER_WIDTH = 98;
 	private static final List<String> CATEGORIES = List.of("all", "world", "animals", "monsters", "characters", "famous", "edited");
 	/** The last twenty scenes that are new or were changed, newest first, in a tab of their own on top of their usual one, so they can be checked again. */
-	private static final List<String> EDITED = List.of("mauerfall", "napoleon", "caesar", "kleopatra", "kaiserwilhelm", "bismarck", "barbarossa", "newton", "leonardo", "tesla",
-		"musk", "jobs", "gates", "zuckerberg", "trumprakete", "ulbricht", "putin", "mausoleum", "revolution", "bienen");
+	private static final List<String> EDITED = List.of("legion", "mauerfall", "napoleon", "caesar", "kleopatra", "kaiserwilhelm", "bismarck", "barbarossa", "newton", "leonardo", "tesla",
+		"musk", "jobs", "gates", "zuckerberg", "trumprakete", "ulbricht", "putin", "mausoleum", "revolution");
 	private static final Map<String, List<String>> SORTED = Map.of(
 		"animals", List.of("bienen", "woelfe", "froesche", "riesenfrosch", "silberfische", "ziege", "fledermaeuse", "papagei", "delfin",
 			"kamel", "fuchs", "huehner", "bienennest", "axolotl", "panda", "katzen", "allay", "ziegenchor", "kaetzchen"),
@@ -38,7 +38,7 @@ public class TestScreen extends Screen {
 		"characters", List.of("finanzamt", "paketbote", "mama", "influencer", "rundfunk", "zahnarzt", "bauamt", "umzug", "elektriker",
 			"zauberer", "klempner", "hausmeister", "arzt", "polizist", "schornsteinfeger", "trainer", "friseur", "koch", "fahrlehrer",
 			"wahrsagerin", "weihnachtsmann", "werbung", "oma", "kellner", "navi", "bombenprank"),
-		"famous", List.of("trumprakete", "trumpmauer", "merkel", "putin", "stalin", "schwarzerrabe", "hochhaus", "ulbricht", "mausoleum", "revolution", "denkmal", "wideputin", "chruschtschow", "gagarin", "sputnik", "napoleon", "genghis", "caesar", "kleopatra", "kaiserwilhelm", "bismarck", "barbarossa", "newton", "leonardo", "tesla", "musk", "jobs", "gates", "zuckerberg", "mauerfall"));
+		"famous", List.of("trumprakete", "trumpmauer", "merkel", "putin", "stalin", "schwarzerrabe", "hochhaus", "ulbricht", "mausoleum", "revolution", "denkmal", "wideputin", "chruschtschow", "gagarin", "sputnik", "napoleon", "genghis", "caesar", "kleopatra", "kaiserwilhelm", "bismarck", "barbarossa", "newton", "leonardo", "tesla", "musk", "jobs", "gates", "zuckerberg", "mauerfall", "legion"));
 	private static boolean openNextTick;
 	// Remembered while the game runs, so the screen opens again on the same tab.
 	private static String category = "all";

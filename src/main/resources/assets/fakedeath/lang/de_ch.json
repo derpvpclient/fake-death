@@ -639,5 +639,11 @@
 	"fakedeath.mauerfall.reporter": "Reporterin",
 	"fakedeath.mauerfall.question": "Wann tritt das in Kraft?",
 	"fakedeath.mauerfall.immediately": "Das tritt nach meiner Kenntnis … ist das sofort, unverzüglich.",
-	"fakedeath.mauerfall.mustgo": "Die Mauer muss weg!"
+	"fakedeath.mauerfall.mustgo": "Die Mauer muss weg!",
+	"fakedeath.scene.legion": "Die Legion",
+	"fakedeath.death.legion": "%1$s wurde von einer römischen Legion überrannt",
+	"fakedeath.legion.centurion": "Centurio",
+	"fakedeath.legion.testudo": "Legio! TESTUDO!",
+	"fakedeath.legion.pila": "PILA!",
+	"fakedeath.legion.victory": "AD VICTORIAM!"
 }

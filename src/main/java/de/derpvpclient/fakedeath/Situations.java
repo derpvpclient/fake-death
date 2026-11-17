@@ -33,6 +33,7 @@ import de.derpvpclient.fakedeath.scene.JobsScene;
 import de.derpvpclient.fakedeath.scene.GatesScene;
 import de.derpvpclient.fakedeath.scene.ZuckerbergScene;
 import de.derpvpclient.fakedeath.scene.WallFallScene;
+import de.derpvpclient.fakedeath.scene.LegionScene;
 import de.derpvpclient.fakedeath.scene.NapoleonScene;
 import de.derpvpclient.fakedeath.scene.SputnikScene;
 import de.derpvpclient.fakedeath.scene.GagarinScene;
@@ -169,7 +170,7 @@ public final class Situations {
 		"fahrlehrer", "axolotl", "panda",
 		"wahrsagerin", "weihnachtsmann", "werbung", "oma", "navi", "kellner", "katzen", "allay", "ziegenchor", "bombenprank", "netherportal", "endportal",
 		"verzauberungstisch", "glocke", "lore", "ruestungsstaender",
-		"gemaelde", "amethyst", "schneemann", "guerteltier", "anlauf", "schwertfuchs", "spawner", "blitzableiter", "reparatur", "saugroboter", "trumpmauer", "trumprakete", "ulbricht", "merkel", "putin", "stalin", "kaetzchen", "mausoleum", "revolution", "denkmal", "schwarzerrabe", "hochhaus", "wideputin", "chruschtschow", "gagarin", "sputnik", "napoleon", "genghis", "caesar", "kleopatra", "kaiserwilhelm", "bismarck", "barbarossa", "newton", "leonardo", "tesla", "musk", "jobs", "gates", "zuckerberg", "mauerfall");
+		"gemaelde", "amethyst", "schneemann", "guerteltier", "anlauf", "schwertfuchs", "spawner", "blitzableiter", "reparatur", "saugroboter", "trumpmauer", "trumprakete", "ulbricht", "merkel", "putin", "stalin", "kaetzchen", "mausoleum", "revolution", "denkmal", "schwarzerrabe", "hochhaus", "wideputin", "chruschtschow", "gagarin", "sputnik", "napoleon", "genghis", "caesar", "kleopatra", "kaiserwilhelm", "bismarck", "barbarossa", "newton", "leonardo", "tesla", "musk", "jobs", "gates", "zuckerberg", "mauerfall", "legion");
 
 	/** English scene names, both work in every language. Names that are the same in both are left out. */
 	private static final Map<String, String> ENGLISH = Map.ofEntries(
@@ -191,7 +192,7 @@ public final class Situations {
 		Map.entry("satnav", "navi"), Map.entry("waiter", "kellner"), Map.entry("cats", "katzen"), Map.entry("goatchoir", "ziegenchor"), Map.entry("bombprank", "bombenprank"),
 		Map.entry("enchantingtable", "verzauberungstisch"), Map.entry("bell", "glocke"), Map.entry("minecart", "lore"), Map.entry("armorstand", "ruestungsstaender"),
 		Map.entry("painting", "gemaelde"), Map.entry("snowman", "schneemann"), Map.entry("armadillo", "guerteltier"), Map.entry("goatcharge", "anlauf"),
-		Map.entry("swordfox", "schwertfuchs"), Map.entry("lightningrod", "blitzableiter"), Map.entry("repair", "reparatur"), Map.entry("trumpwall", "trumpmauer"), Map.entry("trumprocket", "trumprakete"), Map.entry("ulbricht", "ulbricht"), Map.entry("merkel", "merkel"), Map.entry("putin", "putin"), Map.entry("stalin", "stalin"), Map.entry("kittens", "kaetzchen"), Map.entry("mausoleum", "mausoleum"), Map.entry("revolution", "revolution"), Map.entry("monument", "denkmal"), Map.entry("blackraven", "schwarzerrabe"), Map.entry("skyscraper", "hochhaus"), Map.entry("wideputin", "wideputin"), Map.entry("khrushchev", "chruschtschow"), Map.entry("gagarin", "gagarin"), Map.entry("sputnik", "sputnik"), Map.entry("napoleon", "napoleon"), Map.entry("genghis", "genghis"), Map.entry("caesar", "caesar"), Map.entry("cleopatra", "kleopatra"), Map.entry("kaiserwilhelm", "kaiserwilhelm"), Map.entry("bismarck", "bismarck"), Map.entry("barbarossa", "barbarossa"), Map.entry("newton", "newton"), Map.entry("leonardo", "leonardo"), Map.entry("tesla", "tesla"), Map.entry("musk", "musk"), Map.entry("jobs", "jobs"), Map.entry("gates", "gates"), Map.entry("zuckerberg", "zuckerberg"), Map.entry("wallfall", "mauerfall"));
+		Map.entry("swordfox", "schwertfuchs"), Map.entry("lightningrod", "blitzableiter"), Map.entry("repair", "reparatur"), Map.entry("trumpwall", "trumpmauer"), Map.entry("trumprocket", "trumprakete"), Map.entry("ulbricht", "ulbricht"), Map.entry("merkel", "merkel"), Map.entry("putin", "putin"), Map.entry("stalin", "stalin"), Map.entry("kittens", "kaetzchen"), Map.entry("mausoleum", "mausoleum"), Map.entry("revolution", "revolution"), Map.entry("monument", "denkmal"), Map.entry("blackraven", "schwarzerrabe"), Map.entry("skyscraper", "hochhaus"), Map.entry("wideputin", "wideputin"), Map.entry("khrushchev", "chruschtschow"), Map.entry("gagarin", "gagarin"), Map.entry("sputnik", "sputnik"), Map.entry("napoleon", "napoleon"), Map.entry("genghis", "genghis"), Map.entry("caesar", "caesar"), Map.entry("cleopatra", "kleopatra"), Map.entry("kaiserwilhelm", "kaiserwilhelm"), Map.entry("bismarck", "bismarck"), Map.entry("barbarossa", "barbarossa"), Map.entry("newton", "newton"), Map.entry("leonardo", "leonardo"), Map.entry("tesla", "tesla"), Map.entry("musk", "musk"), Map.entry("jobs", "jobs"), Map.entry("gates", "gates"), Map.entry("zuckerberg", "zuckerberg"), Map.entry("wallfall", "mauerfall"), Map.entry("legion", "legion"));
 
 	public static final List<String> ENGLISH_NAMES = NAMES.stream()
 		.map(name -> ENGLISH.entrySet().stream().filter(entry -> entry.getValue().equals(name)).map(Map.Entry::getKey).findFirst().orElse(name))
@@ -425,6 +426,9 @@ public final class Situations {
 		}
 		if (level.dimension() == Level.OVERWORLD) {
 			options.add("mauerfall", 2, WallFallScene::new);
+		}
+		if (level.dimension() == Level.OVERWORLD) {
+			options.add("legion", 2, LegionScene::new);
 		}
 		// The robot vacuums revolt, mostly at home, sometimes out in the open.
 		if (level.dimension() == Level.OVERWORLD) {
@@ -878,6 +882,7 @@ public final class Situations {
 			case "gates" -> new GatesScene();
 			case "zuckerberg" -> new ZuckerbergScene();
 			case "mauerfall" -> new WallFallScene();
+			case "legion" -> new LegionScene();
 			case "napoleon" -> new NapoleonScene();
 			case "sputnik" -> new SputnikScene();
 			case "gagarin" -> new GagarinScene();

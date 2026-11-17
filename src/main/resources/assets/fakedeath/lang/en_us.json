@@ -639,5 +639,11 @@
 	"fakedeath.mauerfall.reporter": "Reporter",
 	"fakedeath.mauerfall.question": "When does that come into force?",
 	"fakedeath.mauerfall.immediately": "As far as I know … that is immediately, without delay.",
-	"fakedeath.mauerfall.mustgo": "The Wall must go!"
+	"fakedeath.mauerfall.mustgo": "The Wall must go!",
+	"fakedeath.scene.legion": "The Legion",
+	"fakedeath.death.legion": "%1$s was run down by a Roman legion",
+	"fakedeath.legion.centurion": "Centurion",
+	"fakedeath.legion.testudo": "Legio! TESTUDO!",
+	"fakedeath.legion.pila": "PILA!",
+	"fakedeath.legion.victory": "AD VICTORIAM!"
 }
