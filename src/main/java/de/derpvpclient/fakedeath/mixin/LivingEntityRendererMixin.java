@@ -51,8 +51,10 @@ public class LivingEntityRendererMixin {
 			state.scale *= scene.bodyScale();
 		}
 		if (scene != null && scene.dancing()) {
-			state.walkAnimationPos = state.ageInTicks * 0.9F;
-			state.walkAnimationSpeed = 0.8F;
+			// Swaying from side to side, the arms swinging along; the sneaking to the beat is set in AvatarRendererMixin.
+			state.bodyRot += Mth.sin(state.ageInTicks * Mth.PI / 16.0F) * 25.0F;
+			state.walkAnimationPos = state.ageInTicks * 0.5F;
+			state.walkAnimationSpeed = 0.35F;
 		}
 
 		// On the death screen it tips over and turns red like on a real death.
