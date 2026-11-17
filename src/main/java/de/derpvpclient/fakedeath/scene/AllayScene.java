@@ -46,6 +46,12 @@ public class AllayScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// The anvil comes down on the own head: seen through the own eyes.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return TRIPS[2] + HEAVY_IN;
 	}

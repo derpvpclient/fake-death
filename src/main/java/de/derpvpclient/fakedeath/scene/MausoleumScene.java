@@ -35,15 +35,25 @@ import org.joml.Vector3f;
  * player: "Who disturbs my rest?" The guards back away.
  */
 public class MausoleumScene extends CastScene {
-	private static final int BREATH = ARRIVE + 35;
-	private static final int OPEN = ARRIVE + 52;
-	private static final int CRACK = ARRIVE + 72;
-	private static final int SIT_UP = ARRIVE + 98;
+	/** The anthem has ended, the hall goes silent. */
+	private static final int BREATH = ARRIVE + 100;
+	private static final int OPEN = ARRIVE + 117;
+	private static final int CRACK = ARRIVE + 137;
+	private static final int SIT_UP = ARRIVE + 163;
 	private static final int SPEAK = SIT_UP + 12;
 	private static final int REACH = SPEAK + 40;
 	private static final int GRAB = REACH + 18;
 	private static final int DEATH = GRAB + 12;
 	private static final ChatFormatting RED = ChatFormatting.DARK_RED;
+	/** The anthem starts while the guard marches in. Ticks to a sixteenth, as in the anthem scene. */
+	private static final int ANTHEM = 2;
+	private static final int STEP = 4;
+	/** The notes of its first line, "Союз нерушимый республик свободных". */
+	private static final int LINE = 13;
+	/** The first line of the refrain, "Славься, Отечество наше свободное", where it comes back slow and deep. */
+	private static final int REFRAIN = 24;
+	private static final int REFRAIN_NOTES = 8;
+	private static final int SLOW = 5;
 
 	private final List<Display.BlockDisplay> glass = new ArrayList<>();
 	private final List<RemotePlayer> guards = new ArrayList<>();
@@ -60,6 +70,50 @@ public class MausoleumScene extends CastScene {
 	@Override
 	public int photoTick() {
 		return SPEAK + 10;
+	}
+
+	private static float pitchOf(int midi, int base) {
+		return (float) Math.pow(2.0, (midi - base) / 12.0);
+	}
+
+	/**
+	 * The Soviet anthem (the melody of the anthem scene): solemn, the first line while the guard of honour marches in,
+	 * then the hall goes silent. When Lenin climbs out of his coffin it comes back, slow and a fourth deeper, on bass and
+	 * didgeridoo, like a record running down.
+	 */
+	private void anthem(ClientLevel level, int tick) {
+		int units = 0;
+		for (int i = 0; i < LINE; i++) {
+			if (tick == ANTHEM + units * STEP) {
+				int midi = StalinScene.MELODY[i][0];
+				sound(level, coffin, SoundEvents.NOTE_BLOCK_FLUTE.value(), SoundSource.RECORDS, 1.0F, pitchOf(midi, 66));
+				sound(level, coffin, SoundEvents.NOTE_BLOCK_FLUTE.value(), SoundSource.RECORDS, 0.5F, pitchOf(midi, 66));
+			}
+			units += StalinScene.MELODY[i][1];
+		}
+		// The chords and the bass on every half bar of the line, C Em F C.
+		int sinceBar = tick - ANTHEM - StalinScene.PICKUP * STEP;
+		if (sinceBar >= 0 && sinceBar % (8 * STEP) == 0 && sinceBar / (8 * STEP) < 4) {
+			int half = sinceBar / (8 * STEP);
+			for (int midi : StalinScene.CHORDS[half]) {
+				sound(level, coffin, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, 0.4F, pitchOf(midi, 66));
+			}
+			sound(level, coffin, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.RECORDS, 0.9F, pitchOf(StalinScene.BASS[half], 42));
+			if (half % 2 == 0) {
+				sound(level, coffin, SoundEvents.NOTE_BLOCK_BASEDRUM.value(), SoundSource.RECORDS, 0.5F, 1.0F);
+			}
+		}
+
+		units = 0;
+		for (int i = REFRAIN; i < REFRAIN + REFRAIN_NOTES; i++) {
+			if (tick == SIT_UP + units * SLOW) {
+				int midi = StalinScene.MELODY[i][0] - 5;
+				sound(level, coffin, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.RECORDS, 1.2F, pitchOf(midi - 24, 42));
+				sound(level, coffin, SoundEvents.NOTE_BLOCK_DIDGERIDOO.value(), SoundSource.RECORDS, 0.8F, pitchOf(midi - 24, 42));
+				sound(level, coffin, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, 0.5F, pitchOf(midi, 66));
+			}
+			units += StalinScene.MELODY[i][1];
+		}
 	}
 
 	@Override
@@ -110,7 +164,8 @@ public class MausoleumScene extends CastScene {
 				face(guard, lenin.getEyePosition());
 			}
 		}
-		if (tick == ARRIVE + 8) {
+		anthem(level, tick);
+		if (tick == BREATH - 8) {
 			sound(level, coffin, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 1.0F, 0.5F);
 		}
 		if (tick == BREATH) {
