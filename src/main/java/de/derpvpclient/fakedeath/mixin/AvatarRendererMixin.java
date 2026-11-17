@@ -35,6 +35,10 @@ public class AvatarRendererMixin {
 			state.isInvisible = true;
 			state.isInvisibleToPlayer = true;
 		}
+		if (entity == Minecraft.getInstance().player && scene != null && scene.dancing()) {
+			// Dancing the way players do: sneaking down and up on every beat. Set after the game has filled in its own crouching.
+			state.isCrouching = state.ageInTicks % 8.0F < 4.0F;
+		}
 		if (entity != Minecraft.getInstance().player || scene == null || scene.lying() <= 0.0F) {
 			return;
 		}

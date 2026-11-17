@@ -35,6 +35,12 @@ public class BatScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// The swarm all around the head, seen through the own eyes.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return FIRST_BITE + 5;
 	}

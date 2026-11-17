@@ -31,7 +31,8 @@ public class DiscoScene extends Scene {
 	private static final int BEAT = 8;
 	/** The floor colors move on every second beat, calm enough to never flicker. */
 	private static final int FLOOR_STEP = BEAT * 2;
-	private static final int FLOOR_RADIUS = 2;
+	/** Reaches the player's feet: they dance on it too. */
+	private static final int FLOOR_RADIUS = 3;
 	private static final int BALL_DOWN = 40;
 	private static final double BALL_HEIGHT = 2.9;
 	private static final int CREEPER = 20;
@@ -205,7 +206,8 @@ public class DiscoScene extends Scene {
 			creeper.setYRot(spin);
 			creeper.setYBodyRot(spin);
 			creeper.setYHeadRot(spin);
-			turnTowards(player, creeper.getEyePosition(), 0.15F);
+			// At the middle of the floor, not at the hopping creeper: the view would bob along with every beat.
+			turnTowards(player, floor.add(0.0, 1.3, 0.0), 0.15F);
 		} else {
 			// The music stops for a moment, and the creeper looks the player in the eyes.
 			creeper.setPos(floor.x, floor.y, floor.z);

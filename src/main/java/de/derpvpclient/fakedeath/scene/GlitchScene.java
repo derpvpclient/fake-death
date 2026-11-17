@@ -26,6 +26,7 @@ public class GlitchScene extends Scene {
 	private static final int DEATH = FALL + FALL_TICKS;
 
 	private int tint;
+	private int now;
 	private final java.util.Map<BlockPos, net.minecraft.world.entity.Display.ItemDisplay> missing = new java.util.HashMap<>();
 	private final java.util.ArrayDeque<BlockPos> frontier = new java.util.ArrayDeque<>();
 	private final java.util.List<Flicker> flickers = new java.util.ArrayList<>();
@@ -51,8 +52,16 @@ public class GlitchScene extends Scene {
 	}
 
 	@Override
+	public int skyTint() {
+		// The sky slowly goes the magenta of a missing texture as well, more and more the more broken everything is.
+		float chaos = Math.min(1.0F, now / (float) (FALL * 0.7F));
+		return (int) (chaos * 175.0F) << 24 | 0xC800C8;
+	}
+
+	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
 		// How broken everything is, from a flicker now and then to all the time.
+		now = tick;
 		float chaos = Math.min(1.0F, tick / (float) FALL);
 		boolean flicker = tick < FALL && random.nextFloat() < 0.08F + chaos * 0.6F;
 

@@ -58,6 +58,12 @@ public class FireScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// Stamping, panicking and the bucket are made for the own eyes.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return POUR + 2;
 	}

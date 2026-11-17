@@ -81,8 +81,13 @@ public class MinecartScene extends Scene {
 
 		if (tick <= HIT) {
 			turnTowards(player, at.add(0.0, 0.5, 0.0), 0.2F);
-			if (tick % 10 == 0) {
-				sound(level, at, SoundEvents.MINECART_RIDING, SoundSource.NEUTRAL, 0.4F + p * 2.0F, 0.7F + p * 0.7F);
+			if (tick % 8 == 0) {
+				// Played a few steps from the player towards the cart instead of at the cart: 30 blocks away it is out of
+				// earshot, and at the end the cart would outrun its own rumble. So it is heard from the start, from the right side.
+				Vec3 eyes = player.getEyePosition();
+				Vec3 toward = at.subtract(eyes);
+				Vec3 heard = eyes.add(toward.scale(Math.min(1.0, 4.0 / Math.max(1.0, toward.length()))));
+				sound(level, heard, SoundEvents.MINECART_RIDING, SoundSource.NEUTRAL, 0.35F + p * 0.9F, 0.7F + p * 0.7F);
 			}
 			if (tick > 25 && tick % 2 == 0) {
 				particles(level, ParticleTypes.CRIT, at.add(0.0, 0.1, 0.0), 1 + (int) (p * 4.0F), 0.25, 0.2);

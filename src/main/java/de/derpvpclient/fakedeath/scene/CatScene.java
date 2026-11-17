@@ -34,6 +34,12 @@ public class CatScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// Purred at from all sides, seen through the own eyes.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return CROWD + ARRIVE + 10;
 	}

@@ -39,6 +39,12 @@ public class FoxScene extends Scene {
 	}
 
 	@Override
+	public boolean firstPersonOnly() {
+		// The thieving fox and its bites, seen through the own eyes.
+		return true;
+	}
+
+	@Override
 	public int photoTick() {
 		return GRAB - 2;
 	}

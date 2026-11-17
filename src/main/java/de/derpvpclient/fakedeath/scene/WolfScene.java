@@ -24,7 +24,9 @@ import org.joml.Vector3f;
 /**
  * Howling far off, from one side, then from the other. At the edge of the trees eyes light up in the dark, a whole
  * pack. They come out and circle the player, the circle getting tighter and faster, snapping at them one after the
- * other. Then the big leader of the pack, which held back the whole time, leaps right at the throat.
+ * other, the heart beating faster and faster, their breath steaming in the cold. Dusk falls while they come. Then the
+ * big leader of the pack, which held back the whole time, leaps right at the throat and knocks the player down: from
+ * the ground they look up at it, the whole pack gathers round and looks down, and the leader snaps once more.
  */
 public class WolfScene extends Scene {
 	// Adult wolf sounds depend on the wolf's sound variant in 26.3, these are the angry ones by id.
@@ -43,6 +45,9 @@ public class WolfScene extends Scene {
 	private static final int LEADER_LEAP = CIRCLE + 82;
 	private static final int LUNGE = 8;
 	private static final int LEADER_LUNGE = 12;
+	/** Knocked down by the leader: from here on the view is on the ground. */
+	private static final int DOWN = LEADER_LEAP + LEADER_LUNGE;
+	private static final int DEATH = DOWN + 30;
 
 	private final List<Wolf> wolves = new ArrayList<>();
 	private final List<Float> angles = new ArrayList<>();
@@ -50,15 +55,38 @@ public class WolfScene extends Scene {
 	private final List<Display.BlockDisplay> eyes = new ArrayList<>();
 	private Wolf leader;
 	private boolean dark;
+	private int now;
+	private int nextBeat = CIRCLE;
 
 	@Override
 	public int length() {
-		return LEADER_LEAP + LEADER_LUNGE + 4;
+		return DEATH + 4;
+	}
+
+	@Override
+	public boolean firstPersonOnly() {
+		// The pack closing in and the leap at the throat are made for the own eyes.
+		return true;
 	}
 
 	@Override
 	public int photoTick() {
 		return CIRCLE + 30;
+	}
+
+	/** How far dusk has fallen: it gets darker while the pack comes, darkest lying on the ground. */
+	private float dusk() {
+		return Mth.clamp(now / (float) CIRCLE, 0.0F, 1.0F) * 0.7F + (now >= DOWN ? Math.min(0.3F, (now - DOWN) * 0.02F) : 0.0F);
+	}
+
+	@Override
+	public int screenTint() {
+		return (int) (dusk() * 120.0F) << 24 | 0x060A18;
+	}
+
+	@Override
+	public int skyTint() {
+		return (int) (dusk() * 200.0F) << 24 | 0x0B1020;
 	}
 
 	@Override
@@ -68,12 +96,16 @@ public class WolfScene extends Scene {
 
 	@Override
 	public void tick(Minecraft minecraft, ClientLevel level, LocalPlayer player, int tick) {
+		now = tick;
 		if (tick == 0) {
 			setUp(level, player);
 		}
 		if (wolves.isEmpty()) {
 			return;
 		}
+		Vec3 look = horizontalLook(player);
+		// Lying on the ground after the leap, a little back from where the player stood.
+		Vec3 ground = player.getEyePosition().add(look.scale(-0.3)).add(0.0, -1.35, 0.0);
 
 		for (int i = 0; i < HOWLS.length; i++) {
 			if (tick == HOWLS[i]) {
@@ -114,28 +146,62 @@ public class WolfScene extends Scene {
 					Vec3 face = player.position().add(horizontalLook(player).scale(0.7));
 					pos = pos.lerp(face, t * 0.85).add(0.0, t * 0.9, 0.0);
 				}
-				if (isLeader && tick >= LEADER_LEAP) {
-					// The leap: up and right onto the player, it stays there.
+				if (isLeader && tick >= LEADER_LEAP && tick < DOWN) {
+					// The leap: up and right at the throat.
 					float t = Math.min(1.0F, (tick - LEADER_LEAP) / (float) LEADER_LUNGE);
-					Vec3 throat = player.getEyePosition().add(horizontalLook(player).scale(0.4)).add(0.0, -0.9, 0.0);
+					Vec3 throat = player.getEyePosition().add(look.scale(0.4)).add(0.0, -0.9, 0.0);
 					pos = pos.lerp(throat, t).add(0.0, Math.sin(t * Math.PI) * 1.2, 0.0);
 				}
+				if (tick >= DOWN) {
+					// The player is down: the leader stands over them, the pack closes in all around and looks down.
+					float t = Math.min(1.0F, (tick - DOWN) / 10.0F);
+					Vec3 gather = isLeader ? player.position().add(look.scale(0.6))
+						: player.position().add(Mth.cos(angle + i) * 1.5, 0.0, Mth.sin(angle + i) * 1.5);
+					pos = pos.lerp(gather, t * t * (3.0F - 2.0F * t));
+					// The last snap of the leader, down at the face.
+					if (isLeader && tick >= DEATH - 6) {
+						double snap = Math.sin(Math.PI * (tick - (DEATH - 6)) / 6.0);
+						pos = pos.lerp(ground, snap * 0.35);
+					}
+				}
 			}
-			if (!(isLeader && tick >= LEADER_LEAP)) {
+			if (!(isLeader && tick >= LEADER_LEAP && tick < DOWN)) {
 				pos = new Vec3(pos.x, floor(level, pos.x, pos.z, player.getY()), pos.z);
 			}
 			walk(wolf, pos);
-			face(wolf, player.getEyePosition());
+			face(wolf, tick >= DOWN ? ground : player.getEyePosition());
+			if (tick > RUN - 20 && (tick + i * 3) % 9 == 0) {
+				// Breath steaming in the cold, out of the snout.
+				float yaw = wolf.getYHeadRot() * Mth.DEG_TO_RAD;
+				double scale = isLeader ? 1.6 : 1.0;
+				Vec3 snout = wolf.position().add(-Math.sin(yaw) * 0.55 * scale, 0.5 * scale, Math.cos(yaw) * 0.55 * scale);
+				particles(level, ParticleTypes.WHITE_SMOKE, snout, 2, 0.04, 0.01);
+			}
 		}
 		placeEyes(tick);
 
-		if (tick < RUN + 10) {
+		int biter = biterAround(tick);
+		if (tick >= DOWN) {
+			// Knocked onto the back, looking up at the leader.
+			float t = Math.min(1.0F, (tick - DOWN) / 6.0F);
+			moveCamera(ground.subtract(player.getEyePosition()).scale(t * t));
+			turnTowards(player, leader.getEyePosition().add(0.0, 0.3, 0.0), 0.3F);
+		} else if (tick < RUN + 10) {
 			turnTowards(player, wolves.get(PACK / 2).getEyePosition(), 0.06F);
-		} else if (tick < LEADER_LEAP - 12) {
+		} else if (tick >= LEADER_LEAP - 12) {
+			turnTowards(player, leader.getEyePosition(), 0.35F);
+		} else if (biter >= 0) {
+			// Whipping round to whoever snaps.
+			turnTowards(player, wolves.get(biter).getEyePosition(), 0.3F);
+		} else {
 			// Turning with the pack, trying to keep an eye on all of them.
 			turnTowards(player, wolves.get((tick / 25) % PACK).getEyePosition(), 0.08F);
-		} else {
-			turnTowards(player, leader.getEyePosition(), 0.35F);
+		}
+
+		if (tick >= CIRCLE && tick >= nextBeat && tick < DEATH) {
+			// The heart beats faster and faster.
+			sound(level, player.getEyePosition(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 1.2F, 1.0F);
+			nextBeat = tick + Math.max(7, 22 - (tick - CIRCLE) / 6);
 		}
 
 		for (int i = 0; i < BITES.length; i++) {
@@ -153,12 +219,32 @@ public class WolfScene extends Scene {
 			// The leader growls, deep and long: here it comes.
 			sound(level, leader.position(), GROWL, SoundSource.HOSTILE, 2.5F, 0.6F);
 		}
-		if (tick == LEADER_LEAP + LEADER_LUNGE) {
+		if (tick == DOWN) {
 			sound(level, player.position(), SNARL, SoundSource.HOSTILE, 2.0F, 0.7F);
+			sound(level, player.position(), SoundEvents.PLAYER_BIG_FALL, SoundSource.PLAYERS, 1.0F, 0.9F);
 			particles(level, ParticleTypes.CRIT, player.getEyePosition().add(0, -0.4, 0), 25, 0.4, 0.4);
-			cameraShake(0.3F);
+			hurt(level, player, SoundEvents.PLAYER_HURT, 0.2F);
+		}
+		if (tick == DOWN + 12) {
+			sound(level, leader.position(), GROWL, SoundSource.HOSTILE, 2.5F, 0.55F);
+		}
+		if (tick == DEATH - 3) {
+			sound(level, leader.position(), SNARL, SoundSource.HOSTILE, 2.5F, 0.6F);
+		}
+		if (tick == DEATH) {
+			particles(level, ParticleTypes.CRIT, ground, 25, 0.4, 0.4);
 			kill(level, player, SoundEvents.PLAYER_HURT);
 		}
+	}
+
+	/** The wolf that is about to snap or snapping right now, so the view can whip round to it, or -1. */
+	private int biterAround(int tick) {
+		for (int i = 0; i < BITES.length; i++) {
+			if (tick >= BITES[i] - 10 && tick < BITES[i] + LUNGE) {
+				return BITERS[i];
+			}
+		}
+		return -1;
 	}
 
 	private void setUp(ClientLevel level, LocalPlayer player) {
