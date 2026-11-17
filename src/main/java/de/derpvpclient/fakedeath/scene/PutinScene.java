@@ -37,6 +37,12 @@ public class PutinScene extends CastScene {
 	private static final int BEAR_WALK = 22;
 	private static final int SIT_DOWN = BEAR_GO + BEAR_WALK;
 	private static final int DEATH = SIT_DOWN + 14;
+	/** The refrain of the Russian anthem (Alexandrov's melody, as in the anthem scene): its first line while he rides in like at a
+	 * parade, its second line when the bear comes. Big and brassy, three ticks to a sixteenth. */
+	private static final int REFRAIN = 24;
+	private static final int PARADE = 2;
+	private static final int MISHA = SIT + 6;
+	private static final int FAST = 3;
 	private static final ChatFormatting RU = ChatFormatting.AQUA;
 
 	private RemotePlayer putin;
@@ -55,15 +61,46 @@ public class PutinScene extends CastScene {
 		return DEATH + 1;
 	}
 
-	@Override
-	public int photoTick() {
-		return RIDE - 12;
+	private static float pitchOf(int midi, int base) {
+		return (float) Math.pow(2.0, (midi - base) / 12.0);
+	}
+
+	/**
+	 * One line of the anthem's refrain from a tick on: the tune on trumpet and flute, a chord, the bass and the big drum
+	 * on every half bar, the snare in between, like a brass band at a parade.
+	 */
+	private void anthemLine(ClientLevel level, Vec3 at, int tick, int start, int line) {
+		int since = tick - start;
+		if (since < 0 || since > 32 * FAST) {
+			return;
+		}
+		int units = 0;
+		for (int i = REFRAIN + line * 8; i < REFRAIN + line * 8 + 8; i++) {
+			if (since == units * FAST) {
+				int midi = StalinScene.MELODY[i][0];
+				sound(level, at, SoundEvents.NOTE_BLOCK_TRUMPET.value(), SoundSource.RECORDS, 1.3F, pitchOf(midi, 66));
+				sound(level, at, SoundEvents.NOTE_BLOCK_FLUTE.value(), SoundSource.RECORDS, 0.6F, pitchOf(midi, 66));
+			}
+			units += StalinScene.MELODY[i][1];
+		}
+		if (since % (4 * FAST) == 0 && since < 32 * FAST) {
+			int quarter = since / (4 * FAST);
+			int half = 8 + line * 4 + quarter / 2;
+			if (quarter % 2 == 0) {
+				for (int midi : StalinScene.CHORDS[half]) {
+					sound(level, at, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, 0.5F, pitchOf(midi, 66));
+				}
+				sound(level, at, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.RECORDS, 1.0F, pitchOf(StalinScene.BASS[half], 42));
+				sound(level, at, SoundEvents.NOTE_BLOCK_BASEDRUM.value(), SoundSource.RECORDS, 0.7F, 1.0F);
+			} else {
+				sound(level, at, SoundEvents.NOTE_BLOCK_SNARE.value(), SoundSource.RECORDS, 0.6F, 1.0F);
+			}
+		}
 	}
 
 	@Override
-	public boolean firstPersonOnly() {
-		// The throw and the bear sitting down are filmed from the eyes.
-		return now >= GRAB;
+	public int photoTick() {
+		return RIDE - 12;
 	}
 
 	@Override
@@ -103,6 +140,8 @@ public class PutinScene extends CastScene {
 		}
 		bubbles();
 		Vec3 eyes = player.getEyePosition();
+		anthemLine(level, eyes, tick, PARADE, 0);
+		anthemLine(level, eyes, tick, MISHA, 1);
 
 		if (tick <= RIDE) {
 			// Riding in at a stately pace, waving, slowing down at the end.

@@ -12,6 +12,7 @@
 		"EntityAccessor",
 		"FallingBlockEntityAccessor",
 		"FirstPersonHandsAndItemsMixin",
+		"FogRendererMixin",
 		"FrogAccessor",
 		"HudMixin",
 		"ItemDisplayAccessor",
@@ -20,8 +21,10 @@
 		"LivingEntityRendererMixin",
 		"LocalPlayerMixin",
 		"MultiPlayerGameModeMixin",
+		"OptionsMixin",
 		"OptionsScreenMixin",
 		"PlayerModelMixin",
+		"SkyRendererMixin",
 		"SpellcasterIllagerAccessor",
 		"TextDisplayAccessor"
 	],
