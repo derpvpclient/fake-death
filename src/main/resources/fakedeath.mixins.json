@@ -21,6 +21,7 @@
 		"LivingEntityRendererMixin",
 		"LocalPlayerMixin",
 		"MultiPlayerGameModeMixin",
+		"OptionsMixin",
 		"OptionsScreenMixin",
 		"PlayerModelMixin",
 		"SpellcasterIllagerAccessor",
